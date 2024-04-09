@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/eodh_qgis" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
