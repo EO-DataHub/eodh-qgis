@@ -155,7 +155,7 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def check_status(self, status_url):
         # NOTE: this should probably be a background thread
-        timeout = 5
+        timeout = 1
         self.responseBrowser.appendPlainText(f"Checking job status (every {timeout}s)")
         old_status = ""
         old_message = ""
@@ -183,8 +183,7 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
                 self.responseBrowser.appendPlainText(f"Message: {message}")
                 old_message = message
 
-            if status != "Running":
-                self.responseBrowser.appendPlainText(f"Result: {status}")
+            if status != "running":
                 break
-
+            QtWidgets.QApplication.processEvents()  # To avoid threads for now
             time.sleep(timeout)
