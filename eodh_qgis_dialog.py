@@ -22,14 +22,19 @@
  ***************************************************************************/
 """
 
+import json
 import os
+import time
+
+import requests
 
 from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'eodh_qgis_dialog_base.ui'))
+FORM_CLASS, _ = uic.loadUiType(
+    os.path.join(os.path.dirname(__file__), "eodh_qgis_dialog_base.ui")
+)
 
 
 class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -42,3 +47,129 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+
+        self.usernameInput: QtWidgets.QLineEdit
+        self.passwordInput: QtWidgets.QLineEdit
+        self.processComboBox: QtWidgets.QComboBox
+        self.inputsEdit: QtWidgets.QPlainTextEdit
+        self.executeButton: QtWidgets.QPushButton
+        self.responseBrowser: QtWidgets.QPlainTextEdit
+
+        self.setup_process_box()
+        self.executeButton.clicked.connect(self.handle_execute)
+
+    def setup_process_box(self):
+        self.processComboBox.addItem(
+            "Convert url",
+            userData={
+                "id": "convert-url",
+                "cwl_location": "https://raw.githubusercontent.com/EOEPCA/deployment-guide/main/deploy/samples/requests/processing/convert-url-app.cwl",
+                "inputs": {
+                    "fn": "resize",
+                    "url": "https://eoepca.org/media_portal/images/logo6_med.original.png",
+                    "size": "50%",
+                },
+            },
+        )
+        self.processComboBox.addItem(
+            "Water bodies",
+            userData={
+                "id": "water-bodies",
+                "cwl_location": "https://raw.githubusercontent.com/EOEPCA/deployment-guide/main/deploy/samples/requests/processing/water-bodies-app.cwl",
+                "inputs": {
+                    "stac_items": [
+                        "https://test.eodatahub.org.uk/catalogue-data/element84-data/collections/sentinel-2-c1-l2a/items/S2B_T42MVU_20240319T054135_L2A.json"
+                    ],
+                    "aoi": "68.09, -6.42, 69.09, -5.43",
+                    "epsg": "EPSG:4326",
+                    "bands": ["green", "nir"],
+                },
+            },
+        )
+        self.processComboBox.currentIndexChanged.connect(self.handle_process_selection)
+        self.selected_process = None
+
+    def handle_process_selection(self, index):
+        self.selected_process = self.processComboBox.itemData(index)
+        self.inputsEdit.setPlainText(
+            json.dumps(self.selected_process["inputs"], indent=2)
+        )
+        self.inputsEdit.setEnabled(True)
+
+    def handle_execute(self):
+        self.executeButton.setEnabled(False)
+        username = self.usernameInput.text()
+        password = self.passwordInput.text()
+
+        warnings = []
+        if not len(username):
+            warnings.append("Enter a username.")
+        if not len(password):
+            warnings.append("Enter a password.")
+
+        if self.selected_process is None:
+            warnings.append("Select a process.")
+
+        try:
+            inputs = json.loads(self.inputsEdit.toPlainText())
+        except json.JSONDecodeError as e:
+            warnings.append(f"Invalid JSON: Inputs\n{e}")
+        if warnings:
+            QtWidgets.QMessageBox.warning(self, "Invalid form!", "\n\n".join(warnings))
+            self.executeButton.setEnabled(True)
+            return
+
+        url = f"https://test.eodatahub.org.uk/ades/test_cluster_3/ogc-api/processes/{self.selected_process['id']}/execution"
+        headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Prefer": "respond-async",
+        }
+        response = requests.post(
+            url, headers=headers, auth=(username, password), data=json.dumps(inputs)
+        )
+        if not response.ok:
+            self.responseBrowser.appendPlainText(
+                f"Execute request failed with code {response.status_code}\n"
+                f"{response.text}"
+            )
+            self.executeButton.setEnabled(True)
+            return
+
+        status_url = response.headers.get("Location")
+        self.responseBrowser.appendPlainText(f"Status URL: {status_url}")
+        self.responseBrowser.appendPlainText(f"Execute response:\n {response.json()}\n")
+        self.check_status(status_url)
+        self.executeButton.setEnabled(True)
+
+    def check_status(self, status_url):
+        # NOTE: this should probably be a background thread
+        timeout = 5
+        self.responseBrowser.appendPlainText(f"Checking job status (every {timeout}s)")
+        old_status = ""
+        old_message = ""
+        while True:
+            response = requests.get(status_url, headers={"Accept": "application/json"})
+            if not response.ok:
+                self.responseBrowser.appendPlainText(
+                    f"Execute request failed with code {response.status_code}\n"
+                    f"{response.text}"
+                )
+                self.executeButton.setEnabled(True)
+                return
+            data = response.json()
+            status = data["status"]
+            message = data["message"]
+
+            if status != old_status:
+                self.responseBrowser.appendPlainText(f"\nStatus: {status}")
+                old_status = status
+            if message != old_message:
+                self.responseBrowser.appendPlainText(f"Message: {message}")
+                old_message = message
+
+            if status != "Running":
+                self.responseBrowser.appendPlainText(f"Result: {status}")
+                break
+
+            time.sleep(timeout)

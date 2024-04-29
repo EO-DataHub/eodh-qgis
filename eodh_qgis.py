@@ -27,6 +27,7 @@ from qgis.PyQt.QtWidgets import QAction
 
 # Initialize Qt resources from file resources.py
 from .resources import *
+
 # Import the code for the dialog
 from .eodh_qgis_dialog import EodhQgisDialog
 import os.path
@@ -48,11 +49,10 @@ class EodhQgis:
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
         # initialize locale
-        locale = QSettings().value('locale/userLocale')[0:2]
+        locale = QSettings().value("locale/userLocale")[0:2]
         locale_path = os.path.join(
-            self.plugin_dir,
-            'i18n',
-            'EodhQgis_{}.qm'.format(locale))
+            self.plugin_dir, "i18n", "EodhQgis_{}.qm".format(locale)
+        )
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -61,7 +61,7 @@ class EodhQgis:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&EODH Workflows')
+        self.menu = self.tr("&EODH Workflows")
 
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
@@ -80,8 +80,7 @@ class EodhQgis:
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate('EodhQgis', message)
-
+        return QCoreApplication.translate("EodhQgis", message)
 
     def add_action(
         self,
@@ -93,7 +92,8 @@ class EodhQgis:
         add_to_toolbar=True,
         status_tip=None,
         whats_this=None,
-        parent=None):
+        parent=None,
+    ):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -149,9 +149,7 @@ class EodhQgis:
             self.iface.addToolBarIcon(action)
 
         if add_to_menu:
-            self.iface.addPluginToWebMenu(
-                self.menu,
-                action)
+            self.iface.addPluginToWebMenu(self.menu, action)
 
         self.actions.append(action)
 
@@ -160,25 +158,22 @@ class EodhQgis:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/eodh_qgis/icon.png'
+        icon_path = ":/plugins/eodh_qgis/icon.png"
         self.add_action(
             icon_path,
-            text=self.tr(u'Access workflows on the EODH'),
+            text=self.tr("Access workflows on the EODH"),
             callback=self.run,
-            parent=self.iface.mainWindow())
+            parent=self.iface.mainWindow(),
+        )
 
         # will be set False in run()
         self.first_start = True
 
-
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
-            self.iface.removePluginWebMenu(
-                self.tr(u'&EODH Workflows'),
-                action)
+            self.iface.removePluginWebMenu(self.tr("&EODH Workflows"), action)
             self.iface.removeToolBarIcon(action)
-
 
     def run(self):
         """Run method that performs all the real work"""
