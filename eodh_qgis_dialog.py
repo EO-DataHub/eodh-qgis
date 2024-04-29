@@ -24,18 +24,91 @@
 
 import json
 import os
+import sys
 import time
+import traceback
 
 import requests
 
 from qgis.PyQt import uic
-from qgis.PyQt import QtWidgets
+from qgis.PyQt import QtWidgets, QtCore
+
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer
 FORM_CLASS, _ = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "eodh_qgis_dialog_base.ui")
 )
+
+
+class WorkerSignals(QtCore.QObject):
+    """
+    Defines the signals available from a running worker thread.
+
+    Supported signals are:
+
+    finished
+        No data
+
+    error
+        tuple (exctype, value, traceback.format_exc() )
+
+    result
+        object data returned from processing, anything
+
+    progress
+        int indicating % progress
+
+    """
+
+    finished = QtCore.pyqtSignal()
+    error = QtCore.pyqtSignal(tuple)
+    result = QtCore.pyqtSignal(object)
+    progress = QtCore.pyqtSignal(object)
+
+
+class Worker(QtCore.QRunnable):
+    """
+    Worker thread
+
+    Inherits from QRunnable to handler worker thread setup, signals and wrap-up.
+
+    :param callback: The function callback to run on this worker thread. Supplied args
+                     and kwargs will be passed through to the runner.
+    :type callback: function
+    :param args: Arguments to pass to the callback function
+    :param kwargs: Keywords to pass to the callback function
+
+    """
+
+    def __init__(self, fn, *args, **kwargs):
+        super(Worker, self).__init__()
+
+        # Store constructor arguments (re-used for processing)
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        self.signals = WorkerSignals()
+
+        # Add the callback to our kwargs
+        self.kwargs["progress_callback"] = self.signals.progress
+
+    @QtCore.pyqtSlot()
+    def run(self):
+        """
+        Initialise the runner function with passed args, kwargs.
+        """
+
+        try:
+            result = self.fn(*self.args, **self.kwargs)
+        except Exception:
+            traceback.print_exc()
+            exctype, value = sys.exc_info()[:2]
+            self.signals.error.emit((exctype, value, traceback.format_exc()))
+        else:
+            self.signals.result.emit(result)
+        finally:
+            self.signals.finished.emit()
 
 
 class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -48,6 +121,8 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+
+        self.threadpool = QtCore.QThreadPool()
 
         self.usernameInput: QtWidgets.QLineEdit
         self.passwordInput: QtWidgets.QLineEdit
@@ -103,6 +178,8 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def handle_execute(self):
         self.executeButton.setEnabled(False)
+        self.usernameInput.setEnabled(False)
+        self.passwordInput.setEnabled(False)
         self.username = self.usernameInput.text()
         self.password = self.passwordInput.text()
 
@@ -150,40 +227,47 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
         status_url = response.headers.get("Location")
         self.responseBrowser.appendPlainText(f"Status URL: {status_url}")
         self.responseBrowser.appendPlainText(f"Execute response:\n {response.json()}\n")
-        self.check_status(status_url)
-        self.executeButton.setEnabled(True)
 
-    def check_status(self, status_url):
-        # NOTE: this should probably be a background thread
-        timeout = 1
-        self.responseBrowser.appendPlainText(f"Checking job status (every {timeout}s)")
+        worker = Worker(self.check_status, status_url)
+        worker.signals.progress.connect(self.log_msg)
+        worker.signals.finished.connect(lambda: self.executeButton.setEnabled(True))
+        self.threadpool.start(worker)
+
+    def log_msg(self, msg):
+        self.responseBrowser.appendPlainText(msg)
+
+    def check_status(self, status_url, progress_callback):
+        timeout = 2
+        progress_callback.emit(f"Checking job status (every {timeout}s)")
         old_status = ""
         old_message = ""
+
         while True:
             response = requests.get(
                 status_url,
                 headers={"Accept": "application/json"},
                 auth=(self.username, self.password),
             )
+
             if not response.ok:
-                self.responseBrowser.appendPlainText(
+                progress_callback.emit(
                     f"Execute request failed with code {response.status_code}\n"
                     f"{response.text}"
                 )
-                self.executeButton.setEnabled(True)
                 return
+
             data = response.json()
             status = data["status"]
             message = data["message"]
 
             if status != old_status:
-                self.responseBrowser.appendPlainText(f"\nStatus: {status}")
+                progress_callback.emit(f"\nStatus: {status}")
                 old_status = status
+
             if message != old_message:
-                self.responseBrowser.appendPlainText(f"Message: {message}")
+                progress_callback.emit(f"Message: {message}")
                 old_message = message
 
             if status != "running":
                 break
-            QtWidgets.QApplication.processEvents()  # To avoid threads for now
             time.sleep(timeout)
