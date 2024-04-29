@@ -31,7 +31,8 @@ import requests
 from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
 
-# This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
+# This loads your .ui file so that PyQt can populate your plugin with the elements from
+# Qt Designer
 FORM_CLASS, _ = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "eodh_qgis_dialog_base.ui")
 )
@@ -63,10 +64,11 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
             "Convert url",
             userData={
                 "id": "convert-url",
-                "cwl_location": "https://raw.githubusercontent.com/EOEPCA/deployment-guide/main/deploy/samples/requests/processing/convert-url-app.cwl",
                 "inputs": {
                     "fn": "resize",
-                    "url": "https://eoepca.org/media_portal/images/logo6_med.original.png",
+                    "url": (
+                        "https://eoepca.org/media_portal/images/logo6_med.original.png"
+                    ),
                     "size": "50%",
                 },
             },
@@ -75,10 +77,13 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
             "Water bodies",
             userData={
                 "id": "water-bodies",
-                "cwl_location": "https://raw.githubusercontent.com/EOEPCA/deployment-guide/main/deploy/samples/requests/processing/water-bodies-app.cwl",
                 "inputs": {
                     "stac_items": [
-                        "https://test.eodatahub.org.uk/catalogue-data/element84-data/collections/sentinel-2-c1-l2a/items/S2B_T42MVU_20240319T054135_L2A.json"
+                        (
+                            "https://test.eodatahub.org.uk/catalogue-data/"
+                            "element84-data/collections/sentinel-2-c1-l2a/items/"
+                            "S2B_T42MVU_20240319T054135_L2A.json"
+                        )
                     ],
                     "aoi": "68.09, -6.42, 69.09, -5.43",
                     "epsg": "EPSG:4326",
@@ -98,20 +103,20 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def handle_execute(self):
         self.executeButton.setEnabled(False)
-        username = self.usernameInput.text()
-        password = self.passwordInput.text()
+        self.username = self.usernameInput.text()
+        self.password = self.passwordInput.text()
 
         warnings = []
-        if not len(username):
+        if not len(self.username):
             warnings.append("Enter a username.")
-        if not len(password):
+        if not len(self.password):
             warnings.append("Enter a password.")
 
         if self.selected_process is None:
             warnings.append("Select a process.")
 
         try:
-            inputs = json.loads(self.inputsEdit.toPlainText())
+            inputs = {"inputs": json.loads(self.inputsEdit.toPlainText())}
         except json.JSONDecodeError as e:
             warnings.append(f"Invalid JSON: Inputs\n{e}")
         if warnings:
@@ -119,14 +124,20 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
             self.executeButton.setEnabled(True)
             return
 
-        url = f"https://test.eodatahub.org.uk/ades/test_cluster_3/ogc-api/processes/{self.selected_process['id']}/execution"
+        url = (
+            "https://test.eodatahub.org.uk/ades/test_cluster_3/ogc-api/processes/"
+            f"{self.selected_process['id']}/execution"
+        )
         headers = {
             "Accept": "application/json",
             "Content-Type": "application/json",
             "Prefer": "respond-async",
         }
         response = requests.post(
-            url, headers=headers, auth=(username, password), data=json.dumps(inputs)
+            url,
+            headers=headers,
+            auth=(self.username, self.password),
+            data=json.dumps(inputs),
         )
         if not response.ok:
             self.responseBrowser.appendPlainText(
@@ -149,7 +160,11 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
         old_status = ""
         old_message = ""
         while True:
-            response = requests.get(status_url, headers={"Accept": "application/json"})
+            response = requests.get(
+                status_url,
+                headers={"Accept": "application/json"},
+                auth=(self.username, self.password),
+            )
             if not response.ok:
                 self.responseBrowser.appendPlainText(
                     f"Execute request failed with code {response.status_code}\n"
