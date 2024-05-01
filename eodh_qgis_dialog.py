@@ -177,9 +177,7 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
         self.inputsEdit.setEnabled(True)
 
     def handle_execute(self):
-        self.executeButton.setEnabled(False)
-        self.usernameInput.setEnabled(False)
-        self.passwordInput.setEnabled(False)
+        self.lock_form(True)
         self.username = self.usernameInput.text()
         self.password = self.passwordInput.text()
 
@@ -198,7 +196,7 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
             warnings.append(f"Invalid JSON: Inputs\n{e}")
         if warnings:
             QtWidgets.QMessageBox.warning(self, "Invalid form!", "\n\n".join(warnings))
-            self.executeButton.setEnabled(True)
+            self.lock_form(False)
             return
 
         url = (
@@ -210,6 +208,7 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
             "Content-Type": "application/json",
             "Prefer": "respond-async",
         }
+        self.responseBrowser.appendPlainText(f"Sending request to: {url}")
         response = requests.post(
             url,
             headers=headers,
@@ -221,7 +220,7 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
                 f"Execute request failed with code {response.status_code}\n"
                 f"{response.text}"
             )
-            self.executeButton.setEnabled(True)
+            self.lock_form(False)
             return
 
         status_url = response.headers.get("Location")
@@ -230,7 +229,7 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
 
         worker = Worker(self.check_status, status_url)
         worker.signals.progress.connect(self.log_msg)
-        worker.signals.finished.connect(lambda: self.executeButton.setEnabled(True))
+        worker.signals.finished.connect(lambda: self.lock_form(False))
         self.threadpool.start(worker)
 
     def log_msg(self, msg):
@@ -271,3 +270,10 @@ class EodhQgisDialog(QtWidgets.QDialog, FORM_CLASS):
             if status != "running":
                 break
             time.sleep(timeout)
+
+    def lock_form(self, lock: bool):
+        self.executeButton.setEnabled(not lock)
+        self.usernameInput.setEnabled(not lock)
+        self.passwordInput.setEnabled(not lock)
+        self.processComboBox.setEnabled(not lock)
+        self.inputsEdit.setEnabled(not lock)
