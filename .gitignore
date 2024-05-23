@@ -160,3 +160,7 @@ cython_debug/
 #.idea/
 
 .vscode/
+
+libs/linux
+libs/darwin
+libs/windows

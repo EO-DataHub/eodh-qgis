@@ -35,7 +35,7 @@ def include_deps():
         return
 
     deps_path = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), f"libs_{system.lower()}")
+        os.path.join(os.path.dirname(__file__), f"libs/{system.lower()}")
     )
     site.addsitedir(deps_path)
 
