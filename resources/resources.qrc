@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/plugins/eodh_qgis" >
         <file>icon.png</file>
+        <file>fonts/FiraSans-Bold.ttf</file>
+        <file>fonts/FiraSans-Medium.ttf</file>
+        <file>fonts/FiraSans-Regular.ttf</file>
+        <file>fonts/FiraSans-SemiBold.ttf</file>
     </qresource>
 </RCC>
