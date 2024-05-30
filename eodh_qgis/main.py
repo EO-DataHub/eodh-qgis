@@ -3,7 +3,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
 # Initialize Qt resources from file resources.py
-from .resources import *  # type: ignore
+from .resources import *  # type: ignore # noqa: F401,F403
 
 # Import the code for the dialog
 from .main_dialog import MainDialog
@@ -158,7 +158,7 @@ class EodhQgis:
         # Create the dialog with elements (after translation) and keep reference
         # Only create GUI ONCE in callback, so that it will only load when the plugin
         # is started
-        if self.first_start == True:
+        if self.first_start is True:
             self.first_start = False
             self.dlg = MainDialog()
 

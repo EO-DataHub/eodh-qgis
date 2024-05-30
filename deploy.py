@@ -18,7 +18,7 @@ def main(install_path: pathlib.Path):
     if not install_path:
         print("Provide qgis plugin path")
         sys.exit(1)
-
+    verify_install_path(install_path)
     uninstall(install_path)
     build()
     compile_resources()
@@ -37,6 +37,15 @@ def build(
     shutil.copy2("metadata.txt", build_dir)
     print(f"Copied metadata.txt to {build_dir}")
     shutil.copytree(libs_dir, build_dir / "libs")
+
+
+def verify_install_path(install_path: pathlib.Path):
+    if "/QGIS/QGIS3/profiles/" not in install_path.as_posix():
+        print("Provided plugin path argument doesn't look like a qgis path!")
+        sys.exit(1)
+    if install_path.name == "plugins":
+        print("Specify plugin name in the install path.")
+        sys.exit(1)
 
 
 def install(install_path: pathlib.Path, build_dir: pathlib.Path = BUILD_DIR):
@@ -78,4 +87,4 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("install_path", help="Path to qgis plugin directory")
     args = parser.parse_args()
-    main(pathlib.Path(args.install_path))
+    main(pathlib.Path(args.install_path).resolve())
