@@ -8,17 +8,18 @@
 
 """
 
-__author__ = 'daniel@oxidian.com'
-__date__ = '2024-04-09'
-__copyright__ = 'Copyright 2024, Oxidian'
+__author__ = "daniel@oxidian.com"
+__date__ = "2024-04-09"
+__copyright__ = "Copyright 2024, Oxidian"
 
 import unittest
 
 from qgis.PyQt.QtGui import QDialogButtonBox, QDialog
 
-from eodh_qgis_dialog import EodhQgisDialog
+from eodh_qgis.main import MainDialog
 
 from utilities import get_qgis_app
+
 QGIS_APP = get_qgis_app()
 
 
@@ -27,7 +28,7 @@ class EodhQgisDialogTest(unittest.TestCase):
 
     def setUp(self):
         """Runs before each test."""
-        self.dialog = EodhQgisDialog(None)
+        self.dialog = MainDialog(None)
 
     def tearDown(self):
         """Runs after each test."""
@@ -48,8 +49,8 @@ class EodhQgisDialogTest(unittest.TestCase):
         result = self.dialog.result()
         self.assertEqual(result, QDialog.Rejected)
 
+
 if __name__ == "__main__":
     suite = unittest.makeSuite(EodhQgisDialogTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
-
