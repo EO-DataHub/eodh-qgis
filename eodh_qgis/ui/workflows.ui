@@ -33,21 +33,21 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="workflows_new_button">
+      <widget class="QPushButton" name="new_button">
        <property name="text">
         <string>New</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="workflows_edit_button">
+      <widget class="QPushButton" name="edit_button">
        <property name="text">
         <string>Edit</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="workflows_execute_button">
+      <widget class="QPushButton" name="execute_button">
        <property name="text">
         <string>Execute</string>
        </property>

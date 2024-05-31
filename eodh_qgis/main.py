@@ -6,7 +6,7 @@ from qgis.PyQt.QtWidgets import QAction
 from .resources import *  # type: ignore # noqa: F401,F403
 
 # Import the code for the dialog
-from .main_dialog import MainDialog
+from .gui.main_dialog import MainDialog
 import os.path
 
 
