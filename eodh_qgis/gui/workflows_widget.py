@@ -18,6 +18,7 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.new_button: QtWidgets.QPushButton
         self.workflow_editor = WorkflowEditorWidget()
         self.new_button.clicked.connect(self.handle_new)
+        self.edit_button.cliecked.connect(self.handle_new)
 
     def handle_new(self):
         self.parent().addWidget(self.workflow_editor)
