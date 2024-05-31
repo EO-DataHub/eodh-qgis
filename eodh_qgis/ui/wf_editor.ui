@@ -27,7 +27,7 @@
 QPushButton { 
 	background: #BCCEEB;
 	color: #2A3559;
-	font-weight: bold;
+	font: 11 bold &quot;Fira Sans&quot;;
 }
 
 QLineEdit {
@@ -41,6 +41,12 @@ QLineEdit {
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <family>Fira Sans</family>
+       <pointsize>11</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>Workflow Editor</string>
      </property>
@@ -66,6 +72,12 @@ QLineEdit {
      </item>
      <item>
       <widget class="QRadioButton" name="cwl_url_button">
+       <property name="font">
+        <font>
+         <family>Sans Serif</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>URL</string>
        </property>
@@ -76,6 +88,12 @@ QLineEdit {
      </item>
      <item>
       <widget class="QRadioButton" name="cwl_yaml_button">
+       <property name="font">
+        <font>
+         <family>Sans Serif</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>CWL Yaml</string>
        </property>
@@ -107,13 +125,26 @@ QLineEdit {
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QLabel" name="label_2">
+           <property name="font">
+            <font>
+             <family>Sans Serif</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>CWL file URL:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="cwl_url_input"/>
+          <widget class="QLineEdit" name="cwl_url_input">
+           <property name="font">
+            <font>
+             <family>Sans Serif</family>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -135,7 +166,14 @@ QLineEdit {
      <widget class="QWidget" name="page_2">
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QTextEdit" name="textEdit"/>
+        <widget class="QTextEdit" name="textEdit">
+         <property name="font">
+          <font>
+           <family>Fira Sans</family>
+           <pointsize>11</pointsize>
+          </font>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -143,6 +181,9 @@ QLineEdit {
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <property name="spacing">
+      <number>10</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
@@ -157,12 +198,37 @@ QLineEdit {
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="cancel_button">
+       <property name="font">
+        <font>
+         <family>Fira Sans</family>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <italic>false</italic>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="deploy_button">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <family>Fira Sans</family>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <italic>false</italic>
+         <bold>true</bold>
+        </font>
        </property>
        <property name="text">
         <string>Deploy</string>

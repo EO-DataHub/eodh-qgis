@@ -2,7 +2,7 @@ import os
 
 from eodh_qgis.gui.jobs_widget import JobsWidget
 from eodh_qgis.gui.settings_widget import SettingsWidget
-from qgis.PyQt import QtWidgets, uic
+from qgis.PyQt import QtWidgets, uic, QtGui, QtCore
 
 from eodh_qgis.gui.workflows_widget import WorkflowsWidget
 
@@ -33,6 +33,7 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         self.workflows_button: QtWidgets.QPushButton
         self.jobs_button: QtWidgets.QPushButton
         self.settings_button: QtWidgets.QPushButton
+        self.logo: QtWidgets.QLabel
 
         self.workflows_button.clicked.connect(
             lambda: self.content_widget.setCurrentWidget(self.workflows_widget)
@@ -45,3 +46,9 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         self.settings_button.clicked.connect(
             lambda: self.content_widget.setCurrentWidget(self.settings_widget)
         )
+
+        self.logo.mousePressEvent = self.open_url
+        self.logo.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+
+    def open_url(self, event):
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl("https://eodatahub.org.uk/"))
