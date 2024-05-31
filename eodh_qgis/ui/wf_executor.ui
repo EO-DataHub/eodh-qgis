@@ -10,8 +10,23 @@
     <height>300</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <family>Fira Sans</family>
+    <pointsize>11</pointsize>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QFrame#frame { background: #EFEFEF }
+
+QPushButton { 
+	background: #BCCEEB;
+	color: #2A3559;
+	font-weight: bold;
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
