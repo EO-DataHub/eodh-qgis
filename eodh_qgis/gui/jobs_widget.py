@@ -1,5 +1,6 @@
 import os
 
+from eodh_qgis.gui.job_details_widget import JobDetailsWidget
 from qgis.PyQt import QtWidgets, uic
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
@@ -16,6 +17,7 @@ class JobsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.details_button: QtWidgets.QPushButton
         self.populate_table_dummy()
         self.table.cellClicked.connect(self.handle_table_click)
+        self.details_button.clicked.connect(self.open_details)
 
     def populate_table_dummy(self):
         data = [
@@ -37,3 +39,8 @@ class JobsWidget(QtWidgets.QWidget, FORM_CLASS):
     def handle_table_click(self, row, col):
         print(row, col)
         self.details_button.setEnabled(True)
+
+    def open_details(self):
+        details = JobDetailsWidget(parent=self.parent())
+        self.parent().addWidget(details)
+        self.parent().setCurrentWidget(details)
