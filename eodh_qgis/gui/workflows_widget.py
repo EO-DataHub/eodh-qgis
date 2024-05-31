@@ -26,11 +26,11 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.execute_button.clicked.connect(self.handle_execute)
 
     def handle_new(self):
-        editor = WorkflowEditorWidget()
+        editor = WorkflowEditorWidget(parent=self.parent())
         self.parent().addWidget(editor)
         self.parent().setCurrentWidget(editor)
 
     def handle_execute(self):
-        executor = WorkflowExecutorWidget()
+        executor = WorkflowExecutorWidget(parent=self.parent())
         self.parent().addWidget(executor)
         self.parent().setCurrentWidget(executor)

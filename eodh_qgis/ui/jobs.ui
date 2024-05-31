@@ -59,6 +59,14 @@ QPushButton {
      </item>
      <item>
       <widget class="QPushButton" name="jobs_refresh_button">
+       <property name="font">
+        <font>
+         <family>Sans Serif</family>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
        <property name="text">
         <string>Refresh</string>
        </property>

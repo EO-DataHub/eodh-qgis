@@ -112,6 +112,14 @@ QPushButton {
      </item>
      <item>
       <widget class="QPushButton" name="execute_button">
+       <property name="font">
+        <font>
+         <family>Fira Sans</family>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
        <property name="text">
         <string>Execute</string>
        </property>

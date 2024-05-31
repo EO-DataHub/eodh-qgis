@@ -14,3 +14,8 @@ class WorkflowExecutorWidget(QtWidgets.QWidget, FORM_CLASS):
         """Constructor."""
         super(WorkflowExecutorWidget, self).__init__(parent)
         self.setupUi(self)
+        self.cancel_button.clicked.connect(self.handle_cancel)
+
+    def handle_cancel(self):
+        self.parent().removeWidget(self)
+        self.parent().setCurrentIndex(0)
