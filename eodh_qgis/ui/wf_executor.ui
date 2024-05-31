@@ -31,8 +31,27 @@ QPushButton {
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <family>Fira Sans</family>
+       <pointsize>16</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background: #4C72BA;
+color: white;
+padding: 5px;
+font-size: 16;
+font-weight: bold;
+font-family: Fira Sans;</string>
+     </property>
      <property name="text">
       <string>Workflow executor</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>

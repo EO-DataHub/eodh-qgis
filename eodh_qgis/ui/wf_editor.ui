@@ -27,7 +27,9 @@
 QPushButton { 
 	background: #BCCEEB;
 	color: #2A3559;
-	font: 11 bold &quot;Fira Sans&quot;;
+	font-size: 11;
+	font-weight: bold;
+	font-family: Fira Sans;
 }
 
 QLineEdit {
@@ -36,6 +38,7 @@ QLineEdit {
     border-radius: 4px;
 	border-color: #EFEFEF;
 }
+
 </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -44,11 +47,21 @@ QLineEdit {
      <property name="font">
       <font>
        <family>Fira Sans</family>
-       <pointsize>11</pointsize>
+       <pointsize>16</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
       </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background: #4C72BA;
+color: white;
+padding: 5px;</string>
      </property>
      <property name="text">
       <string>Workflow Editor</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>
@@ -74,9 +87,20 @@ QLineEdit {
       <widget class="QRadioButton" name="cwl_url_button">
        <property name="font">
         <font>
-         <family>Sans Serif</family>
+         <family>Fira Sans Medium</family>
          <pointsize>11</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">
+
+QRadioButton::indicator::checked {
+	border-radius: 7px;
+	border: 1px solid #444;
+	background: qradialgradient(cx:0, cy:0, radius: 1, fx:1, fy:1, stop:0.25 #4C72BA, stop:0.3 transparent)
+};</string>
        </property>
        <property name="text">
         <string>URL</string>
@@ -90,9 +114,18 @@ QLineEdit {
       <widget class="QRadioButton" name="cwl_yaml_button">
        <property name="font">
         <font>
-         <family>Sans Serif</family>
+         <family>Fira Sans Medium</family>
          <pointsize>11</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QRadioButton::indicator::checked {
+	border-radius: 7px;
+	border: 1px solid #444;
+	background: qradialgradient(cx:0, cy:0, radius: 1, fx:1, fy:1, stop:0.25 #4C72BA, stop:0.3 transparent)
+};</string>
        </property>
        <property name="text">
         <string>CWL Yaml</string>

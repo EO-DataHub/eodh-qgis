@@ -55,10 +55,8 @@ QPushButton {
 
 QPushButton:hover {
 	background: #BCCEEB;
-	border-radius: 10px;
-	
-}
-</string>
+	border-radius: 10px;	
+}</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>

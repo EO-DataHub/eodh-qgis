@@ -132,6 +132,14 @@ QPushButton {
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="font">
+          <font>
+           <family>Fira Sans</family>
+           <pointsize>11</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="acceptDrops">
           <bool>false</bool>
          </property>

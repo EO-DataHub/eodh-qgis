@@ -26,11 +26,33 @@ QPushButton {
 	background: #BCCEEB;
 	color: #2A3559;
 	font-weight: bold;
+}
+QPushButton:disabled {
+	background: #f6f6f6;
+	color: #aaa;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QTableView" name="tableView"/>
+    <widget class="QTableWidget" name="table">
+     <property name="font">
+      <font>
+       <family>Fira Sans</family>
+      </font>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::AdjustToContents</enum>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -61,7 +83,7 @@ QPushButton {
       <widget class="QPushButton" name="jobs_refresh_button">
        <property name="font">
         <font>
-         <family>Sans Serif</family>
+         <family>Fira Sans</family>
          <pointsize>11</pointsize>
          <weight>75</weight>
          <bold>true</bold>
@@ -69,6 +91,27 @@ QPushButton {
        </property>
        <property name="text">
         <string>Refresh</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="details_button">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="font">
+        <font>
+         <family>Fira Sans</family>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string>Details</string>
        </property>
       </widget>
      </item>
