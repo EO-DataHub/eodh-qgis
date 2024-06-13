@@ -22,6 +22,7 @@ def main(install_path: pathlib.Path):
     uninstall(install_path)
     build()
     compile_resources()
+    patch_resources()
     install(install_path)
 
 
@@ -81,6 +82,20 @@ def compile_resources(
     except subprocess.CalledProcessError as e:
         print(f"Error compiling resource files: {e}")
         sys.exit(1)
+
+
+def patch_resources(build_dir: pathlib.Path = BUILD_DIR):
+    p = build_dir / "ui/main.ui"
+    # Read in the file
+    with open(p, "r") as file:
+        filedata = file.read()
+
+    # Replace the target string
+    filedata = filedata.replace("../../resources/resources.qrc", "resources.py")
+
+    # Write the file out again
+    with open(p, "w") as file:
+        file.write(filedata)
 
 
 if __name__ == "__main__":

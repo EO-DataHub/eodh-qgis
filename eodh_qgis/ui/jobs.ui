@@ -46,6 +46,9 @@ QPushButton:disabled {
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
      </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
      </property>
@@ -73,14 +76,17 @@ QPushButton:disabled {
       </spacer>
      </item>
      <item>
-      <widget class="QCheckBox" name="jobs_auto_refresh">
+      <widget class="QCheckBox" name="auto_refresh">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="text">
         <string>Auto update</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="jobs_refresh_button">
+      <widget class="QPushButton" name="refresh_button">
        <property name="font">
         <font>
          <family>Fira Sans</family>

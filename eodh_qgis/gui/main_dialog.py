@@ -1,6 +1,7 @@
 import os
 
 from eodh_qgis.gui.jobs_widget import JobsWidget
+from eodh_qgis.gui.login_dialog import LoginDialog
 from eodh_qgis.gui.settings_widget import SettingsWidget
 from qgis.PyQt import QtWidgets, uic, QtGui, QtCore
 
@@ -21,9 +22,13 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+        self.get_ades()
+        if not self.ades_svc:
+            self.close()
+            return
         self.content_widget: QtWidgets.QStackedWidget
-        self.workflows_widget = WorkflowsWidget(parent=self)
-        self.jobs_widget = JobsWidget()
+        self.workflows_widget = WorkflowsWidget(ades_svc=self.ades_svc, parent=self)
+        self.jobs_widget = JobsWidget(ades_svc=self.ades_svc)
         self.settings_widget = SettingsWidget()
         self.content_widget.addWidget(self.workflows_widget)
         self.content_widget.addWidget(self.jobs_widget)
@@ -52,3 +57,8 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def open_url(self, event):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl("https://eodatahub.org.uk/"))
+
+    def get_ades(self):
+        login_dialog = LoginDialog(parent=self)
+        login_dialog.exec()
+        self.ades_svc = login_dialog.ades_svc

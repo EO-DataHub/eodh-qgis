@@ -26,6 +26,11 @@ QPushButton {
 	background: #BCCEEB;
 	color: #2A3559;
 	font-weight: bold;
+}
+
+QPushButton:disabled {
+	background: #f6f6f6;
+	color: #aaa;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -34,8 +39,14 @@ QPushButton {
      <property name="sizeAdjustPolicy">
       <enum>QAbstractScrollArea::AdjustToContents</enum>
      </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
      <property name="alternatingRowColors">
       <bool>true</bool>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
      </property>
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectRows</enum>
@@ -80,6 +91,9 @@ QPushButton {
      </item>
      <item>
       <widget class="QPushButton" name="edit_button">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="font">
         <font>
          <family>Fira Sans</family>
@@ -95,6 +109,9 @@ QPushButton {
      </item>
      <item>
       <widget class="QPushButton" name="execute_button">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="font">
         <font>
          <family>Fira Sans</family>

@@ -26,7 +26,13 @@ QPushButton {
 	background: #BCCEEB;
 	color: #2A3559;
 	font-weight: bold;
-}</string>
+}
+QPushButton:disabled {
+	background: #f6f6f6;
+	color: #aaa;
+}
+
+</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -53,7 +59,7 @@ padding: 5px;</string>
     </widget>
    </item>
    <item>
-    <widget class="QTableWidget" name="tableWidget">
+    <widget class="QTableWidget" name="table">
      <property name="font">
       <font>
        <family>Fira Sans</family>
@@ -154,6 +160,9 @@ padding: 5px;</string>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="spacing">
+      <number>10</number>
+     </property>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -166,6 +175,23 @@ padding: 5px;</string>
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="stop_button">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Stop</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="close_button">
