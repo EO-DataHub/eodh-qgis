@@ -39,6 +39,10 @@ QLineEdit {
 	border-color: #EFEFEF;
 }
 
+QPushButton:disabled {
+	background: #f6f6f6;
+	color: #aaa;
+}
 </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -150,7 +154,7 @@ QRadioButton::indicator::checked {
    <item>
     <widget class="QStackedWidget" name="content_widget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="page">
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -197,18 +201,7 @@ QRadioButton::indicator::checked {
       </layout>
      </widget>
      <widget class="QWidget" name="page_2">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QTextEdit" name="textEdit">
-         <property name="font">
-          <font>
-           <family>Fira Sans</family>
-           <pointsize>11</pointsize>
-          </font>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <layout class="QVBoxLayout" name="verticalLayout_3"/>
      </widget>
     </widget>
    </item>
@@ -248,6 +241,9 @@ QRadioButton::indicator::checked {
      </item>
      <item>
       <widget class="QPushButton" name="deploy_button">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="sizePolicy">
         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
          <horstretch>0</horstretch>

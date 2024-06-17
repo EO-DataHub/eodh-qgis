@@ -36,7 +36,7 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.load_workflows()
 
     def handle_new(self):
-        editor = WorkflowEditorWidget(parent=self.parent())
+        editor = WorkflowEditorWidget(ades_svc=self.ades_svc, parent=self.parent())
         self.parent().addWidget(editor)
         self.parent().setCurrentWidget(editor)
 
