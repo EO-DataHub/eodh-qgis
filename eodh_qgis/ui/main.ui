@@ -28,7 +28,8 @@ QPushButton {
 	background: #BCCEEB;
 	color: #2A3559;
 	font-weight: bold;
-}</string>
+}
+</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
@@ -53,7 +54,7 @@ QPushButton {
 	padding: 5px;
 }
 
-QPushButton:hover {
+QPushButton:hover, QPushButton[selected=true]   {
 	background: #BCCEEB;
 	border-radius: 10px;	
 }</string>
@@ -89,6 +90,15 @@ QPushButton:hover {
             <width>30</width>
             <height>30</height>
            </size>
+          </property>
+          <property name="checkable">
+           <bool>false</bool>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+          <property name="selected" stdset="0">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -131,6 +141,9 @@ QPushButton:hover {
             <width>30</width>
             <height>30</height>
            </size>
+          </property>
+          <property name="selected" stdset="0">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -195,6 +208,9 @@ QPushButton:hover {
             <width>30</width>
             <height>30</height>
            </size>
+          </property>
+          <property name="selected" stdset="0">
+           <bool>false</bool>
           </property>
          </widget>
         </item>

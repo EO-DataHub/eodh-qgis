@@ -40,16 +40,27 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         self.settings_button: QtWidgets.QPushButton
         self.logo: QtWidgets.QLabel
 
+        self.selected_button: QtWidgets.QPushButton = self.workflows_button
+
         self.workflows_button.clicked.connect(
-            lambda: self.content_widget.setCurrentWidget(self.workflows_widget)
+            lambda: self.handle_menu_button_clicked(
+                self.workflows_button,
+                self.workflows_widget,
+            )
         )
 
         self.jobs_button.clicked.connect(
-            lambda: self.content_widget.setCurrentWidget(self.jobs_widget)
+            lambda: self.handle_menu_button_clicked(
+                self.jobs_button,
+                self.jobs_widget,
+            )
         )
 
         self.settings_button.clicked.connect(
-            lambda: self.content_widget.setCurrentWidget(self.settings_widget)
+            lambda: self.handle_menu_button_clicked(
+                self.settings_button,
+                self.settings_widget,
+            )
         )
 
         self.logo.mousePressEvent = self.open_url
@@ -62,3 +73,17 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         login_dialog = LoginDialog(parent=self)
         login_dialog.exec()
         self.ades_svc = login_dialog.ades_svc
+
+    def handle_menu_button_clicked(self, button: QtWidgets.QPushButton, widget):
+        if button is self.selected_button:
+            return
+
+        self.content_widget.setCurrentWidget(widget)
+        self.selected_button.setProperty("selected", False)
+        self.selected_button.style().unpolish(self.selected_button)
+        self.selected_button.style().polish(self.selected_button)
+
+        self.selected_button = button
+        self.selected_button.setProperty("selected", True)
+        self.selected_button.style().unpolish(self.selected_button)
+        self.selected_button.style().polish(self.selected_button)
