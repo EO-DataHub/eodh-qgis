@@ -75,6 +75,20 @@ QPushButton:disabled {
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="refresh_button">
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Refresh</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="new_button">
        <property name="font">
         <font>

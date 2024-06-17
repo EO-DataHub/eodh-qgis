@@ -26,12 +26,14 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.new_button: QtWidgets.QPushButton
         self.edit_button: QtWidgets.QPushButton
         self.execute_button: QtWidgets.QPushButton
+        self.refresh_button: QtWidgets.QPushButton
         self.table: QtWidgets.QTableWidget
 
         self.table.cellClicked.connect(self.handle_table_click)
         self.new_button.clicked.connect(self.handle_new)
         self.edit_button.clicked.connect(self.handle_new)
         self.execute_button.clicked.connect(self.handle_execute)
+        self.refresh_button.clicked.connect(self.load_workflows)
 
         self.load_workflows()
 
