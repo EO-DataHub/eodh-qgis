@@ -64,3 +64,4 @@ class WorkflowExecutorWidget(QtWidgets.QWidget, FORM_CLASS):
         job_details = JobDetailsWidget(job=job, parent=self.parent())
         self.parent().addWidget(job_details)
         self.parent().setCurrentWidget(job_details)
+        self.parent().parent().parent().jobs_widget.load_jobs()

@@ -1,4 +1,5 @@
 import os
+from typing import Callable
 
 from eodh_qgis.gui.jobs_widget import JobsWidget
 from eodh_qgis.gui.login_dialog import LoginDialog
@@ -46,13 +47,13 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
             lambda: self.handle_menu_button_clicked(
                 self.workflows_button,
                 self.workflows_widget,
+                self.workflows_widget.load_workflows,
             )
         )
 
         self.jobs_button.clicked.connect(
             lambda: self.handle_menu_button_clicked(
-                self.jobs_button,
-                self.jobs_widget,
+                self.jobs_button, self.jobs_widget, self.jobs_widget.load_jobs
             )
         )
 
@@ -74,7 +75,12 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         login_dialog.exec()
         self.ades_svc = login_dialog.ades_svc
 
-    def handle_menu_button_clicked(self, button: QtWidgets.QPushButton, widget):
+    def handle_menu_button_clicked(
+        self,
+        button: QtWidgets.QPushButton,
+        widget,
+        invoke_fn: Callable | None = None,
+    ):
         if button is self.selected_button:
             return
 
@@ -87,3 +93,6 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         self.selected_button.setProperty("selected", True)
         self.selected_button.style().unpolish(self.selected_button)
         self.selected_button.style().polish(self.selected_button)
+
+        if invoke_fn is not None:
+            invoke_fn()
