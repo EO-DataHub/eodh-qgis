@@ -108,12 +108,14 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.handle_close()
 
     def read_logs(self):
-        fname = "/tmp/qgis-files/job-jobs.json"
+        fname = "/tmp/qgis-files/job-logs.json"
         if os.path.exists(fname):
             with open(fname, "r") as f:
                 self.logs = json.load(f)
 
     def save_logs(self):
+        if not os.path.exists("/tmp/qgis-files"):
+            os.makedirs("/tmp/qgis-files")
         self.logs[self.job.id] = self.message_log.toPlainText()
-        with open("/tmp/qgis-files/job-logs.json", "w") as f:
+        with open("/tmp/qgis-files/job-logs.json", "w+") as f:
             json.dump(self.logs, f)
