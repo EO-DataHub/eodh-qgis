@@ -24,17 +24,27 @@ class YAMLEditor(Qsci.QsciScintilla):
 
 
 class WorkflowEditorWidget(QtWidgets.QWidget, FORM_CLASS):
-    def __init__(self, ades_svc: pyeodh.ades.Ades, parent=None):
+    def __init__(
+        self,
+        ades_svc: pyeodh.ades.Ades,
+        update_mode=False,
+        process: pyeodh.ades.Process | None = None,
+        parent=None,
+    ):
         """Constructor."""
         super(WorkflowEditorWidget, self).__init__(parent)
         self.setupUi(self)
         self.ades_svc = ades_svc
+        self.update_mode = update_mode
+        self.process = process
+
         self.content_widget: QtWidgets.QStackedWidget
         self.cwl_url_button: QtWidgets.QRadioButton
         self.cwl_yaml_button: QtWidgets.QRadioButton
         self.cancel_button: QtWidgets.QPushButton
         self.deploy_button: QtWidgets.QPushButton
         self.cwl_url_input: QtWidgets.QLineEdit
+        self.proc_label: QtWidgets.QLabel
         self.cwl_url_button.page_index = 0
         self.cwl_yaml_button.page_index = 1
 
@@ -48,6 +58,11 @@ class WorkflowEditorWidget(QtWidgets.QWidget, FORM_CLASS):
         self.yaml_editor.textChanged.connect(self.handle_yaml_input)
         self.content_widget.insertWidget(1, self.yaml_editor)
         self.content_widget.setCurrentIndex(0)
+
+        if self.update_mode and self.process is not None:
+            self.proc_label.setText(f"**Process ID**:    `{self.process.id}`")
+        else:
+            self.proc_label.hide()
 
     def handle_radio(self):
         btn: QtWidgets.QRadioButton = self.sender()
@@ -111,7 +126,11 @@ class WorkflowEditorWidget(QtWidgets.QWidget, FORM_CLASS):
                 return
             kwargs["cwl_yaml"] = text
         try:
-            proc = self.ades_svc.deploy_process(**kwargs)
+            if self.update_mode and self.process is not None:
+                self.process.update(**kwargs)
+                proc = self.process
+            else:
+                proc = self.ades_svc.deploy_process(**kwargs)
         except requests.HTTPError as e:
             QtWidgets.QMessageBox.critical(
                 self, "Error", f"Error deploying process!\n{e}"

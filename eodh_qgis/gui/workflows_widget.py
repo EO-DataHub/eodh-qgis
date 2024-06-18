@@ -33,7 +33,7 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
 
         self.table.cellClicked.connect(self.handle_table_click)
         self.new_button.clicked.connect(self.handle_new)
-        self.edit_button.clicked.connect(self.handle_new)
+        self.edit_button.clicked.connect(self.handle_update)
         self.execute_button.clicked.connect(self.handle_execute)
         self.refresh_button.clicked.connect(self.load_workflows)
         self.remove_button.clicked.connect(self.handle_remove)
@@ -45,9 +45,18 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.parent().addWidget(editor)
         self.parent().setCurrentWidget(editor)
 
+    def handle_update(self):
+        editor = WorkflowEditorWidget(
+            ades_svc=self.ades_svc,
+            update_mode=True,
+            process=self.get_selected_process(),
+            parent=self.parent(),
+        )
+        self.parent().addWidget(editor)
+        self.parent().setCurrentWidget(editor)
+
     def handle_execute(self):
-        selected_rows = self.table.selectionModel().selectedRows()
-        process = self.processes[selected_rows[0].row()]
+        process = self.get_selected_process()
         executor = WorkflowExecutorWidget(
             process_id=process.id,
             ades_svc=self.ades_svc,
@@ -55,6 +64,11 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         )
         self.parent().addWidget(executor)
         self.parent().setCurrentWidget(executor)
+
+    def get_selected_process(self):
+        selected_rows = self.table.selectionModel().selectedRows()
+        process = self.processes[selected_rows[0].row()]
+        return process
 
     def handle_table_click(self, row, col):
         self.row_selected = True
@@ -105,8 +119,7 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
 
     def handle_remove(self):
         self.lock_form(True)
-        selected_rows = self.table.selectionModel().selectedRows()
-        process = self.processes[selected_rows[0].row()]
+        process = self.get_selected_process()
 
         resp = QtWidgets.QMessageBox.question(self, "Confirm", f"Delete {process.id}?")
         if resp != QtWidgets.QMessageBox.Yes:

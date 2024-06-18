@@ -46,6 +46,9 @@ QPushButton:disabled {
 </string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>16</number>
+   </property>
    <item>
     <widget class="QLabel" name="label">
      <property name="font">
@@ -63,6 +66,30 @@ padding: 5px;</string>
      </property>
      <property name="text">
       <string>Workflow Editor</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="proc_label">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="font">
+      <font>
+       <family>Fira Sans</family>
+       <pointsize>11</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>**Process ID:** `process.id`</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::MarkdownText</enum>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

@@ -37,7 +37,7 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
             pyeodh.ades.AdesJobStatus.RUNNING,
             pyeodh.ades.AdesJobStatus.ACCEPTED,
         ]:
-            # self.stop_button.setEnabled(True) # ! ADES doesn't support job cancelling yet
+            # self.stop_button.setEnabled(True) # ! ADES doesn't support job cancel yet
             self.trigger_polling()
 
     def handle_close(self):
