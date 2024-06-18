@@ -117,6 +117,7 @@ class WorkflowEditorWidget(QtWidgets.QWidget, FORM_CLASS):
                 self, "Error", f"Error deploying process!\n{e}"
             )
         else:
+            self.parent().parent().parent().workflows_widget.load_workflows()
             QtWidgets.QMessageBox.information(
                 self, "Success", f"Successfully deployed {proc.id}."
             )
