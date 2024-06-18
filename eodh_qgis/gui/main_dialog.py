@@ -85,6 +85,12 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
             return
 
         self.content_widget.setCurrentWidget(widget)
+        self.style_menu_button(button)
+
+        if invoke_fn is not None:
+            invoke_fn()
+
+    def style_menu_button(self, button: QtWidgets.QPushButton):
         self.selected_button.setProperty("selected", False)
         self.selected_button.style().unpolish(self.selected_button)
         self.selected_button.style().polish(self.selected_button)
@@ -93,6 +99,3 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         self.selected_button.setProperty("selected", True)
         self.selected_button.style().unpolish(self.selected_button)
         self.selected_button.style().polish(self.selected_button)
-
-        if invoke_fn is not None:
-            invoke_fn()
