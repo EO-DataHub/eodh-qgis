@@ -37,7 +37,7 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
             pyeodh.ades.AdesJobStatus.RUNNING,
             pyeodh.ades.AdesJobStatus.ACCEPTED,
         ]:
-            self.stop_button.setEnabled(True)
+            # self.stop_button.setEnabled(True) # ! ADES doesn't support job cancelling yet
             self.trigger_polling()
 
     def handle_close(self):
@@ -100,12 +100,21 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
                 break
 
             time.sleep(timeout)
-        self.stop_button.setEnabled(False)
+        # self.stop_button.setEnabled(False) # ! ADES doesn't support job cancelling yet
 
     def handle_stop(self):
+        # ! ADES does not support job cancel yet
         return
-        self.job.delete()
-        self.handle_close()
+
+        def delete_job():
+            self.job.delete()
+
+        def deleted():
+            self.log_msg("Job cancelled")
+
+        worker = Worker(delete_job)
+        worker.signals.finished.connect(deleted)
+        self.threadpool.start(worker)
 
     def read_logs(self):
         fname = "/tmp/qgis-files/job-logs.json"
