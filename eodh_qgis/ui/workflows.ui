@@ -78,6 +78,7 @@ QPushButton:disabled {
       <widget class="QPushButton" name="refresh_button">
        <property name="font">
         <font>
+         <family>Fira Sans</family>
          <pointsize>11</pointsize>
          <weight>75</weight>
          <bold>true</bold>
@@ -100,6 +101,24 @@ QPushButton:disabled {
        </property>
        <property name="text">
         <string>New</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="remove_button">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="font">
+        <font>
+         <family>Fira Sans</family>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Remove</string>
        </property>
       </widget>
      </item>

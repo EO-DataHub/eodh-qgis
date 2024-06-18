@@ -6,6 +6,7 @@ from qgis.PyQt import QtCore, QtWidgets, uic
 from eodh_qgis.gui.wf_editor_widget import WorkflowEditorWidget
 from eodh_qgis.gui.wf_executor_widget import WorkflowExecutorWidget
 from eodh_qgis.worker import Worker
+import requests
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer
@@ -27,6 +28,7 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.edit_button: QtWidgets.QPushButton
         self.execute_button: QtWidgets.QPushButton
         self.refresh_button: QtWidgets.QPushButton
+        self.remove_button: QtWidgets.QPushButton
         self.table: QtWidgets.QTableWidget
 
         self.table.cellClicked.connect(self.handle_table_click)
@@ -34,6 +36,7 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.edit_button.clicked.connect(self.handle_new)
         self.execute_button.clicked.connect(self.handle_execute)
         self.refresh_button.clicked.connect(self.load_workflows)
+        self.remove_button.clicked.connect(self.handle_remove)
 
         self.load_workflows()
 
@@ -57,6 +60,7 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.row_selected = True
         self.execute_button.setEnabled(True)
         self.edit_button.setEnabled(True)
+        self.remove_button.setEnabled(True)
 
     def populate_table(self, processes: list[pyeodh.ades.Process]):
         self.processes = processes
@@ -96,4 +100,22 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.new_button.setEnabled(not locked)
         self.edit_button.setEnabled(not locked and self.row_selected)
         self.execute_button.setEnabled(not locked and self.row_selected)
+        self.remove_button.setEnabled(not locked and self.row_selected)
         self.table.setEnabled(not locked)
+
+    def handle_remove(self):
+        self.lock_form(True)
+        selected_rows = self.table.selectionModel().selectedRows()
+        process = self.processes[selected_rows[0].row()]
+        try:
+            process.delete()
+        except requests.HTTPError as e:
+            QtWidgets.QMessageBox.critical(
+                self, "Error", f"Error un-deploying process {process.id}!\n{e}"
+            )
+        else:
+            QtWidgets.QMessageBox.information(
+                self, "Success", f"Successfully un-deployed {process.id}."
+            )
+        finally:
+            self.load_workflows()

@@ -183,6 +183,7 @@ padding: 5px;</string>
        </property>
        <property name="font">
         <font>
+         <family>Fira Sans</family>
          <pointsize>11</pointsize>
          <weight>75</weight>
          <bold>true</bold>
