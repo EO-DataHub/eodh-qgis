@@ -107,6 +107,12 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.lock_form(True)
         selected_rows = self.table.selectionModel().selectedRows()
         process = self.processes[selected_rows[0].row()]
+
+        resp = QtWidgets.QMessageBox.question(self, "Confirm", f"Delete {process.id}?")
+        if resp != QtWidgets.QMessageBox.Yes:
+            self.lock_form(False)
+            return
+
         try:
             process.delete()
         except requests.HTTPError as e:
