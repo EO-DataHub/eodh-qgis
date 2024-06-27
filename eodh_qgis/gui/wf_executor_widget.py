@@ -35,13 +35,13 @@ class WorkflowExecutorWidget(QtWidgets.QWidget, FORM_CLASS):
     def create_inputs(self):
         for k, v in self.process.inputs_schema.items():
             input_name = k
-            input_default = v["schema"]["default"]
-            input_type = v["schema"]["type"]
-            input_desc = v["description"]
+            input_default = v["schema"].get("default", "")
+            input_type = v["schema"].get("type", "")
+            input_desc = v.get("description", "")
 
             horizontal_layout = QtWidgets.QHBoxLayout()
 
-            label = QtWidgets.QLabel(f"{input_name} [{input_type}]")
+            label = QtWidgets.QLabel(f"{input_name} ({input_type})")
             line_edit = QtWidgets.QLineEdit()
             line_edit.setText(input_default)
             line_edit.setToolTip(input_desc)
