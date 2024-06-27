@@ -98,8 +98,39 @@ def patch_resources(build_dir: pathlib.Path = BUILD_DIR):
         file.write(filedata)
 
 
+def load_dotenv():
+    if not os.path.isfile(".env"):
+        return {}
+    with open(".env") as file:
+        lines = file.read().splitlines()
+
+    dotenv_vars = {}
+    for line in lines:
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+
+        key, value = line.split("=", maxsplit=1)
+        dotenv_vars[key] = value.strip('"')
+
+    return dotenv_vars
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("install_path", help="Path to qgis plugin directory")
+    parser.add_argument(
+        "install_path",
+        nargs="?",
+        help=(
+            "Path to qgis plugin directory, if not provided, looks for EODH_QGIS_PATH "
+            "in .env file."
+        ),
+    )
     args = parser.parse_args()
-    main(pathlib.Path(args.install_path).resolve())
+    install_path = args.install_path or load_dotenv().get("EODH_QGIS_PATH")
+    if not install_path:
+        raise ValueError(
+            "Provide path to qgis plugin, either via argument or .env variable."
+        )
+
+    main(pathlib.Path(install_path).resolve())

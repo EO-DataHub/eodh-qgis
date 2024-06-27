@@ -7,9 +7,9 @@ This plugin demonstrates the EO Application Package and workflow capabilities of
 
 ### Requirements
 
-Install Plugin Builder Tool
+Install pyeodh library to `libs/<os>` (os: `linux`, `darwin` or `windows`).
 
-`pip install --user pb_tool`
+To e.g. install/update to latest version from pypi: `pip install --target libs/linux --upgrade pyeodh`
 
 ### Flatpak and VSCode
 
@@ -30,6 +30,8 @@ To setup language server support in VSCode if you've installed QGIS from Flatpak
 1. Make changes
 2. Deploy changes to plugin directory
 
-   `pbt deploy -y -p <path/to/plugins>`
+   1. Locate the QGIS plugin directory, **make sure the directory named after the plugin is included in the path** e.g. `~/.var/app/org.qgis.qgis/data/QGIS/QGIS3/profiles/default/python/plugins/eodh_qgis`
+   2. (Optional) Set this path as an env variable in `.env` named `EODH_QGIS_PATH`
+   3. Run `python deploy.py <path to plugin directory>` (Path can be ommited if already set as an env variable in prev. step)
 
 3. Reload plugin
