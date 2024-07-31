@@ -32,11 +32,16 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.table: QtWidgets.QTableWidget
 
         self.table.cellClicked.connect(self.handle_table_click)
-        self.new_button.clicked.connect(self.handle_new)
-        self.edit_button.clicked.connect(self.handle_update)
         self.execute_button.clicked.connect(self.handle_execute)
         self.refresh_button.clicked.connect(self.load_workflows)
-        self.remove_button.clicked.connect(self.handle_remove)
+        # self.new_button.clicked.connect(self.handle_new)
+        # self.edit_button.clicked.connect(self.handle_update)
+        # self.remove_button.clicked.connect(self.handle_remove)
+
+        # Hide New, Remove, Edit buttons
+        self.new_button.hide()
+        self.remove_button.hide()
+        self.edit_button.hide()
 
         self.load_workflows()
 
