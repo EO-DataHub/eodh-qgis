@@ -1,11 +1,12 @@
 import os
 from typing import Callable
 
-from eodh_qgis.gui.jobs_widget import JobsWidget
-from eodh_qgis.gui.login_dialog import LoginDialog
-from eodh_qgis.gui.settings_widget import SettingsWidget
-from qgis.PyQt import QtWidgets, uic, QtGui, QtCore
+import pyeodh
+import requests
+from qgis.PyQt import QtCore, QtGui, QtWidgets, uic
 
+from eodh_qgis.gui.jobs_widget import JobsWidget
+from eodh_qgis.gui.settings_widget import SettingsWidget
 from eodh_qgis.gui.workflows_widget import WorkflowsWidget
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
@@ -23,9 +24,10 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+        self.ades_svc = None
         self.get_ades()
-        if not self.ades_svc:
-            self.close()
+        if self.ades_svc is None:
+            self.reject()
             return
         self.content_widget: QtWidgets.QStackedWidget
         self.workflows_widget = WorkflowsWidget(ades_svc=self.ades_svc, parent=self)
@@ -71,9 +73,27 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl("https://eodatahub.org.uk/"))
 
     def get_ades(self):
-        login_dialog = LoginDialog(parent=self)
-        login_dialog.exec()
-        self.ades_svc = login_dialog.ades_svc
+        username = os.getenv("ADES_USERNAME")
+        token = os.getenv("ADES_TOKEN")
+        s3_token = os.getenv("ADES_S3_TOKEN")
+
+        if not username or not token or not s3_token:
+            QtWidgets.QMessageBox.critical(
+                self,
+                "Missing credentials",
+                "Configure environment variables ADES_USERNAME, ADES_TOKEN and "
+                "ADES_S3_TOKEN.",
+            )
+            return
+
+        try:
+            self.ades_svc = pyeodh.Client(
+                username=username, token=token, s3_token=s3_token
+            ).get_ades()
+        except requests.HTTPError:
+            QtWidgets.QMessageBox.critical(
+                self, "Error", "Error logging in, validate your credentials."
+            )
 
     def handle_menu_button_clicked(
         self,
