@@ -1,11 +1,15 @@
 import json
 import os
+import shutil
 import time
 
-from eodh_qgis.worker import Worker
-import pyeodh.resource_catalog
-from qgis.PyQt import QtWidgets, uic, QtCore
 import pyeodh.ades
+import pyeodh.resource_catalog
+import requests
+from qgis.core import QgsProject, QgsRasterLayer
+from qgis.PyQt import QtCore, QtWidgets, uic
+
+from eodh_qgis.worker import Worker
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer
@@ -19,6 +23,7 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
         """Constructor."""
         super(JobDetailsWidget, self).__init__(parent)
         self.job = job
+        self.outputs: list[pyeodh.resource_catalog.Item] = []
         self.setupUi(self)
         self.threadpool = QtCore.QThreadPool()
         self.logs = {}
@@ -136,11 +141,12 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
             json.dump(self.logs, f)
 
     def populate_outputs_table(self, items: list[pyeodh.resource_catalog.Item]):
+        self.outputs = items
         headers = ["Item ID", "Asset Name", "Asset URL"]
         self.outputs_table.setRowCount(len(items))
         self.outputs_table.setColumnCount(len(headers))
         self.outputs_table.setHorizontalHeaderLabels(headers)
-
+        self.outputs_table.itemDoubleClicked.connect(self.handle_add_layer)
         for row_index, item in enumerate(items):
             self.outputs_table.setItem(
                 row_index, 0, QtWidgets.QTableWidgetItem(str(item.id))
@@ -152,6 +158,14 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
             self.outputs_table.setItem(
                 row_index, 2, QtWidgets.QTableWidgetItem(str(asset.href))
             )
+            header = self.outputs_table.horizontalHeader()
+            header.setSectionResizeMode(
+                0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents
+            )
+            header.setSectionResizeMode(
+                1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents
+            )
+            header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
 
         self.outputs_table.show()
 
@@ -161,4 +175,25 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
 
         worker = Worker(load_data)
         worker.signals.result.connect(self.populate_outputs_table)
+        self.threadpool.start(worker)
+
+    def handle_add_layer(self, table_item: QtWidgets.QTableWidgetItem):
+        item = self.outputs[table_item.row()]
+        if not os.path.exists("/tmp/qgis-files"):
+            os.makedirs("/tmp/qgis-files")
+
+        def load_data(url: str, *args, **kwargs):
+            local_filename = url.split("/")[-1]
+            path = f"/tmp/qgis-files/{local_filename}"
+            with requests.get(
+                url,
+                stream=True,
+                headers={"Authorization": f"Bearer {self.job._client.s3_token}"},
+            ) as r:
+                with open(path, "wb") as f:
+                    shutil.copyfileobj(r.raw, f)
+            rlayer = QgsRasterLayer(path, local_filename)
+            QgsProject.instance().addMapLayer(rlayer, True)
+
+        worker = Worker(load_data, next(iter(item.assets.values())).href)
         self.threadpool.start(worker)
