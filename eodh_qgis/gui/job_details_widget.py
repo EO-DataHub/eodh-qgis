@@ -34,10 +34,12 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.message_log: QtWidgets.QTextBrowser
         self.close_button: QtWidgets.QPushButton
         self.stop_button: QtWidgets.QPushButton
+        self.add_all_button: QtWidgets.QPushButton
 
         self.message_log.setText(self.logs.get(self.job.id))
         self.close_button.clicked.connect(self.handle_close)
         self.stop_button.clicked.connect(self.handle_stop)
+        self.add_all_button.clicked.connect(self.handle_add_all)
         self.populate_table()
 
         if self.job.status in [
@@ -168,6 +170,7 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
             header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
 
         self.outputs_table.show()
+        self.add_all_button.setEnabled(True)
 
     def fetch_outputs(self):
         def load_data(*args, **kwargs):
@@ -177,8 +180,7 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
         worker.signals.result.connect(self.populate_outputs_table)
         self.threadpool.start(worker)
 
-    def handle_add_layer(self, table_item: QtWidgets.QTableWidgetItem):
-        item = self.outputs[table_item.row()]
+    def add_layer(self, item: pyeodh.resource_catalog.Item):
         if not os.path.exists("/tmp/qgis-files"):
             os.makedirs("/tmp/qgis-files")
 
@@ -197,3 +199,12 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
 
         worker = Worker(load_data, next(iter(item.assets.values())).href)
         self.threadpool.start(worker)
+
+    def handle_add_layer(self, table_item: QtWidgets.QTableWidgetItem):
+        item = self.outputs[table_item.row()]
+        self.add_layer(item)
+
+    def handle_add_all(self):
+        self.add_all_button.setDisabled(True)
+        for item in self.outputs:
+            self.add_layer(item)
