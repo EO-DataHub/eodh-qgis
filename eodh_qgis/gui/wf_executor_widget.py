@@ -59,7 +59,7 @@ class WorkflowExecutorWidget(QtWidgets.QWidget, FORM_CLASS):
         for k in self.process.inputs_schema.keys():
             inputs[k] = self.input_map[k].text().strip()
 
-        job = self.process.execute({"inputs": inputs})
+        job = self.process.execute(inputs)
         self.parent().removeWidget(self)
         job_details = JobDetailsWidget(job=job, parent=self.parent())
         self.parent().addWidget(job_details)
