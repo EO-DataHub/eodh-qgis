@@ -1,9 +1,12 @@
 import os
-from typing import Callable
+from typing import Callable, Literal
 
+from eodh_qgis.settings import Settings
 import pyeodh
 import requests
 from qgis.PyQt import QtCore, QtGui, QtWidgets, uic
+from qgis.core import QgsApplication, QgsAuthMethodConfig
+
 
 from eodh_qgis.gui.jobs_widget import JobsWidget
 from eodh_qgis.gui.settings_widget import SettingsWidget
@@ -24,71 +27,92 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
-        self.ades_svc = None
-        self.get_ades()
-        if self.ades_svc is None:
-            self.reject()
-            return
         self.content_widget: QtWidgets.QStackedWidget
-        self.workflows_widget = WorkflowsWidget(ades_svc=self.ades_svc, parent=self)
-        self.jobs_widget = JobsWidget(ades_svc=self.ades_svc)
-        self.settings_widget = SettingsWidget()
-        self.content_widget.addWidget(self.workflows_widget)
-        self.content_widget.addWidget(self.jobs_widget)
-        self.content_widget.addWidget(self.settings_widget)
-        self.content_widget.setCurrentWidget(self.workflows_widget)
-
         self.workflows_button: QtWidgets.QPushButton
         self.jobs_button: QtWidgets.QPushButton
         self.settings_button: QtWidgets.QPushButton
         self.logo: QtWidgets.QLabel
+        self.selected_button: QtWidgets.QPushButton | None = None
+        self.ades_svc = None
 
-        self.selected_button: QtWidgets.QPushButton = self.workflows_button
-
-        self.workflows_button.clicked.connect(
-            lambda: self.handle_menu_button_clicked(
-                self.workflows_button,
-                self.workflows_widget,
-                self.workflows_widget.load_workflows,
-            )
-        )
-
-        self.jobs_button.clicked.connect(
-            lambda: self.handle_menu_button_clicked(
-                self.jobs_button, self.jobs_widget, self.jobs_widget.load_jobs
-            )
-        )
+        self.button_widget_map = {
+            "settings": {
+                "button": self.settings_button,
+                "widget": SettingsWidget(parent=self),
+            },
+            "workflows": {
+                "button": self.workflows_button,
+                "widget": None,
+            },
+            "jobs": {
+                "button": self.jobs_button,
+                "widget": None,
+            },
+        }
+        self.content_widget.addWidget(self.button_widget_map["settings"]["widget"])
 
         self.settings_button.clicked.connect(
+            lambda: self.handle_menu_button_clicked("settings")
+        )
+        self.workflows_button.clicked.connect(
             lambda: self.handle_menu_button_clicked(
-                self.settings_button,
-                self.settings_widget,
+                "workflows",
+                self.button_widget_map["workflows"]["widget"].load_workflows,
+            )
+        )
+        self.jobs_button.clicked.connect(
+            lambda: self.handle_menu_button_clicked(
+                "jobs", self.button_widget_map["jobs"]["widget"].load_jobs
             )
         )
 
         self.logo.mousePressEvent = self.open_url
         self.logo.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        self.setup_ui_after_token()
+
+    def missing_creds(self):
+        self.content_widget.setCurrentWidget(
+            self.button_widget_map["settings"]["widget"]
+        )
+        self.selected_button = self.settings_button
+        self.style_menu_button(self.selected_button)
+        QtWidgets.QMessageBox.warning(
+            self,
+            "Missing credentials",
+            "Configure authentication settings",
+        )
+
+    def setup_ui_after_token(self):
+        self.creds = self.get_creds()
+        if not self.creds:
+            self.missing_creds()
+            return
+
+        self.get_ades()
+        if self.ades_svc is None:
+            self.missing_creds()
+            return
+
+        self.button_widget_map["workflows"]["widget"] = WorkflowsWidget(
+            ades_svc=self.ades_svc, parent=self
+        )
+        self.content_widget.addWidget(self.button_widget_map["workflows"]["widget"])
+        self.button_widget_map["jobs"]["widget"] = JobsWidget(ades_svc=self.ades_svc)
+        self.content_widget.addWidget(self.button_widget_map["jobs"]["widget"])
+
+        if self.selected_button is None:
+            self.handle_menu_button_clicked("workflows")
 
     def open_url(self, event):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl("https://eodatahub.org.uk/"))
 
     def get_ades(self):
-        username = os.getenv("ADES_USERNAME")
-        token = os.getenv("ADES_TOKEN")
-        s3_token = os.getenv("ADES_S3_TOKEN")
-
-        if not username or not token or not s3_token:
-            QtWidgets.QMessageBox.critical(
-                self,
-                "Missing credentials",
-                "Configure environment variables ADES_USERNAME, ADES_TOKEN and "
-                "ADES_S3_TOKEN.",
-            )
-            return
+        username = self.creds["username"]
+        token = self.creds["token"]
 
         try:
             self.ades_svc = pyeodh.Client(
-                username=username, token=token, s3_token=s3_token
+                username=username, token=token, s3_token=token
             ).get_ades()
         except requests.HTTPError:
             QtWidgets.QMessageBox.critical(
@@ -97,12 +121,17 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
 
     def handle_menu_button_clicked(
         self,
-        button: QtWidgets.QPushButton,
-        widget,
+        action: Literal["settings", "workflows", "jobs"],
         invoke_fn: Callable | None = None,
     ):
+        button = self.button_widget_map[action]["button"]
+        widget = self.button_widget_map[action]["widget"]
         if button is self.selected_button:
             return
+
+        if not widget:
+            self.setup_ui_after_token()
+            widget = self.button_widget_map[action]["widget"]
 
         self.content_widget.setCurrentWidget(widget)
         self.style_menu_button(button)
@@ -111,11 +140,28 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
             invoke_fn()
 
     def style_menu_button(self, button: QtWidgets.QPushButton):
-        self.selected_button.setProperty("selected", False)
-        self.selected_button.style().unpolish(self.selected_button)
-        self.selected_button.style().polish(self.selected_button)
+        if self.selected_button:
+            self.selected_button.setProperty("selected", False)
+            self.selected_button.style().unpolish(self.selected_button)
+            self.selected_button.style().polish(self.selected_button)
 
         self.selected_button = button
         self.selected_button.setProperty("selected", True)
         self.selected_button.style().unpolish(self.selected_button)
         self.selected_button.style().polish(self.selected_button)
+
+    def get_creds(self) -> dict[str, str]:
+        settings = Settings()
+        auth_config_id = settings.data["auth_config"]
+        if not auth_config_id:
+            return
+        auth_mgr = QgsApplication.authManager()
+        cfg = QgsAuthMethodConfig()
+        auth_mgr.loadAuthenticationConfig(auth_config_id, cfg, True)
+        creds = {
+            "token": cfg.configMap().get("token"),
+            "username": cfg.configMap().get("username"),
+        }
+        if not creds.get("token") or not creds.get("username"):
+            return
+        return creds
