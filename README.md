@@ -3,6 +3,23 @@
 A QGIS plugin to integrate with the Earth Observation Data Hub (EODH)
 This plugin demonstrates the EO Application Package and workflow capabilities of the EODH.
 
+## Installation
+
+### From QGIS repository
+
+**_Note: This is not avaiable yet_**
+
+1. Go to menu Plugins -> All
+2. Search for `EODH Workflows`
+3. Click Install Plugin
+
+### Manual
+
+1. Download archive for your platform from releases
+2. Extract it to QGIS plugin directory.
+   To find it go to QGIS menu Settings -> User profiles -> Open active profile folder -> python -> plugins
+3. Make sure plugin is enabled in menu Plugins -> Manage and Install Plugin... -> Installed. There must be a tick next to EODH Workflows.
+
 ## Usage
 
 When opening the plugin for the first time, you need to configure authentication credentials to access EODH APIs.
