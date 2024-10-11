@@ -14,11 +14,12 @@ RESOURCE_PATH = ROOT_DIR / "resources/resources.qrc"
 LIBS_DIR = ROOT_DIR / "libs"
 
 
-def main(install_path: pathlib.Path):
+def main(install_path: pathlib.Path, is_dist=False):
     if not install_path:
         print("Provide qgis plugin path")
         sys.exit(1)
-    verify_install_path(install_path)
+    if not is_dist:
+        verify_install_path(install_path)
     uninstall(install_path)
     build()
     compile_resources()
@@ -55,9 +56,6 @@ def install(install_path: pathlib.Path, build_dir: pathlib.Path = BUILD_DIR):
 
 
 def uninstall(install_path: pathlib.Path):
-    if "/QGIS/QGIS3/profiles/" not in install_path.as_posix():
-        print("Provided plugin path argument doesn't look like a qgis path!")
-        sys.exit(1)
     if os.path.exists(install_path):
         shutil.rmtree(install_path)
         print(f"Removed {install_path}")
@@ -126,6 +124,9 @@ if __name__ == "__main__":
             "in .env file."
         ),
     )
+    parser.add_argument(
+        "--dist", action="store_true", help="Use this when building a release package."
+    )
     args = parser.parse_args()
     install_path = args.install_path or load_dotenv().get("EODH_QGIS_PATH")
     if not install_path:
@@ -133,4 +134,4 @@ if __name__ == "__main__":
             "Provide path to qgis plugin, either via argument or .env variable."
         )
 
-    main(pathlib.Path(install_path).resolve())
+    main(pathlib.Path(install_path).resolve(), args.dist)

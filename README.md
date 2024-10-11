@@ -3,6 +3,14 @@
 A QGIS plugin to integrate with the Earth Observation Data Hub (EODH)
 This plugin demonstrates the EO Application Package and workflow capabilities of the EODH.
 
+## Usage
+
+When opening the plugin for the first time, you need to configure authentication credentials to access EODH APIs.
+
+1. Click on settings button
+2. Enter your EODH username and API token (can be generated in your account settings on EODH website).
+3. Click back to Workflows or Jobs and your list will load normally.
+
 ## Development
 
 ### Requirements
