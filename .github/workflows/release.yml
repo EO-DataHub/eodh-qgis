@@ -26,8 +26,16 @@ jobs:
           pip install pyqt5
           pip install --target libs/${{ matrix.os.family }} --upgrade pyeodh
           python deploy.py --dist dist/eodh_qgis
+
+      - if: ${{ matrix.os.name != 'windows' }}
+        run: |
           cd dist
           zip -r eodh_qgis_${{ github.ref_name }}_${{ matrix.os.family }}.zip eodh_qgis
+
+      - if: ${{ matrix.os.name == 'windows' }}
+        run: |
+          cd dist
+          Compress-Archive -Path 'eodh_qgis' -DestinationPath 'eodh_qgis_${{ github.ref_name }}_${{ matrix.os.family }}.zip'
 
       - uses: actions/upload-artifact@v4
         with:
