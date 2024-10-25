@@ -23,7 +23,7 @@ def _run_tests(test_suite, package_name):
     print("########")
     cov = coverage.Coverage(
         source=["./"],
-        omit=["*/test/*"],
+        omit=["*/test/*", "*/__init__.py", "test_suite.py", "main.py", "dist/*"],
     )
     cov.start()
 
