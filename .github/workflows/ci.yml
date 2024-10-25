@@ -31,7 +31,7 @@ jobs:
 
       - name: Retrieve coverage report
         run: |
-          cp qgis:/tests_directory/coverage.xml ./
+          docker cp qgis:/tests_directory/coverage.xml ./
 
       - name: Codecov Upload
         uses: codecov/codecov-action@v4
