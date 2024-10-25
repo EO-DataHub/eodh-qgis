@@ -31,7 +31,9 @@ class SettingsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.username_input.editingFinished.connect(lambda: self.save_creds("username"))
         self.token_input.editingFinished.connect(lambda: self.save_creds("token"))
 
-        self.check_updates_on_start.setChecked(self.settings.data["check_update"])
+        self.check_updates_on_start.setChecked(
+            self.settings.data["check_update"] is True
+        )
         self.check_updates_on_start.stateChanged.connect(
             lambda state: self.settings.save(
                 "check_update", state == QtCore.Qt.CheckState.Checked
