@@ -28,3 +28,12 @@ jobs:
       - name: Run Tests
         run: |
           .docker/exec.sh
+
+      - name: Retrieve coverage report
+        run: |
+          cp qgis:/tests_directory/coverage.xml ./
+
+      - name: Codecov Upload
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

@@ -4,7 +4,7 @@
 
 set -e
 
-pip3 install pyeodh
+pip3 install pyeodh coverage
 
 qgis_setup.sh
 

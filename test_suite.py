@@ -2,23 +2,14 @@ import sys
 from qgis.testing import unittest
 import qgis  # NOQA  For SIP API to V2 if run outside of QGIS
 
-try:
-    from pip import main as pipmain
-except ImportError:
-    from pip._internal import main as pipmain
+import coverage
 
-try:
-    import coverage
-except ImportError:
-    pipmain(["install", "coverage"])
-    import coverage
-import tempfile
 from qgis.PyQt import Qt
 
 from qgis.core import Qgis
 
 
-def _run_tests(test_suite, package_name, with_coverage=False):
+def _run_tests(test_suite, package_name):
     """Core function to test a test suite."""
     count = test_suite.countTestCases()
 
@@ -30,25 +21,17 @@ def _run_tests(test_suite, package_name, with_coverage=False):
     print("QGIS : %s" % version)
     print("QT : %s" % Qt.QT_VERSION_STR)
     print("########")
-    if with_coverage:
-        cov = coverage.Coverage(
-            source=["./"],
-            omit=["*/test/*", "./definitions/*"],
-        )
-        cov.start()
+    cov = coverage.Coverage(
+        source=["./"],
+        omit=["*/test/*"],
+    )
+    cov.start()
 
     unittest.TextTestRunner(verbosity=3, stream=sys.stdout).run(test_suite)
 
-    if with_coverage:
-        cov.stop()
-        cov.save()
-        report = tempfile.NamedTemporaryFile(delete=False)
-        cov.report(file=report)
-        # Produce HTML reports in the `htmlcov` folder and open index.html
-        # cov.html_report()
-        report.close()
-        with open(report.name, "r") as fin:
-            print(fin.read())
+    cov.stop()
+    cov.save()
+    cov.xml_report()
 
 
 def test_package(package="test"):
