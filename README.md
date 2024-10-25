@@ -1,5 +1,7 @@
 # eodh-qgis Plugin
 
+[![codecov](https://codecov.io/github/EO-DataHub/eodh-qgis/graph/badge.svg?token=N2VQBHVZN8)](https://codecov.io/github/EO-DataHub/eodh-qgis)
+
 A QGIS plugin to integrate with the Earth Observation Data Hub (EODH)
 This plugin demonstrates the EO Application Package and workflow capabilities of the EODH.
 
