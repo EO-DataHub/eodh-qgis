@@ -80,7 +80,18 @@ class SettingsWidget(QtWidgets.QWidget, FORM_CLASS):
                 self.settings.save("auth_config", cfg.id())
                 self.reload_ui()
 
+    def get_main_dialog(self):
+        # Navigate up the parent hierarchy to find the main dialog
+        parent = self.parent()
+        while parent:
+            if hasattr(parent, "setup_ui_after_token"):
+                return parent
+            parent = parent.parent()
+        return None
+
     def reload_ui(self):
         if not self.creds.get("username") or not self.creds.get("token"):
             return
-        self.parent().parent().parent().setup_ui_after_token()
+        main_dialog = self.get_main_dialog()
+        if main_dialog:
+            main_dialog.setup_ui_after_token()
