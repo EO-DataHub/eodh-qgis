@@ -1,10 +1,10 @@
-from qgis.testing import unittest
-from unittest.mock import patch, MagicMock
-from eodh_qgis.gui.main_dialog import MainDialog
-from PyQt5.QtWidgets import QStackedWidget, QPushButton
-from PyQt5.QtCore import Qt
+from unittest.mock import patch
 
+from qgis.PyQt import QtCore, QtWidgets
+from qgis.testing import unittest
 from utilities import get_qgis_app
+
+from eodh_qgis.gui.main_dialog import MainDialog
 
 QGIS_APP = get_qgis_app()
 
@@ -30,10 +30,10 @@ class EodhQgisDialogTest(unittest.TestCase):
 
     def test_ui_elements_exist(self):
         """Test that essential UI elements are present"""
-        self.assertIsInstance(self.dialog.content_widget, QStackedWidget)
-        self.assertIsInstance(self.dialog.workflows_button, QPushButton)
-        self.assertIsInstance(self.dialog.jobs_button, QPushButton)
-        self.assertIsInstance(self.dialog.settings_button, QPushButton)
+        self.assertIsInstance(self.dialog.content_widget, QtWidgets.QStackedWidget)
+        self.assertIsInstance(self.dialog.workflows_button, QtWidgets.QPushButton)
+        self.assertIsInstance(self.dialog.jobs_button, QtWidgets.QPushButton)
+        self.assertIsInstance(self.dialog.settings_button, QtWidgets.QPushButton)
 
     def test_initial_state(self):
         """Test the initial state of the dialog"""
@@ -52,7 +52,7 @@ class EodhQgisDialogTest(unittest.TestCase):
     def test_logo_cursor(self):
         """Test that the logo has the correct cursor"""
         self.assertEqual(
-            self.dialog.logo.cursor().shape(), Qt.CursorShape.PointingHandCursor
+            self.dialog.logo.cursor().shape(), QtCore.Qt.CursorShape.PointingHandCursor
         )
 
     @patch("eodh_qgis.gui.main_dialog.QtWidgets.QMessageBox.warning")

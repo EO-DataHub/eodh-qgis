@@ -23,6 +23,7 @@ jobs:
       - name: Start container
         run: |
           .docker/start.sh
+          sleep 10
 
       - name: Run Tests
         run: |
