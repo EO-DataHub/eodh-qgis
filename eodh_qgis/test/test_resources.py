@@ -8,14 +8,13 @@
 
 """
 
-__author__ = 'daniel@oxidian.com'
-__date__ = '2024-04-09'
-__copyright__ = 'Copyright 2024, Oxidian'
+__author__ = "daniel@oxidian.com"
+__date__ = "2024-04-09"
+__copyright__ = "Copyright 2024, Oxidian"
 
 import unittest
 
 from qgis.PyQt.QtGui import QIcon
-
 
 
 class EodhQgisDialogTest(unittest.TestCase):
@@ -31,14 +30,6 @@ class EodhQgisDialogTest(unittest.TestCase):
 
     def test_icon_png(self):
         """Test we can click OK."""
-        path = ':/plugins/EodhQgis/icon.png'
+        path = ":/plugins/EodhQgis/icon.png"
         icon = QIcon(path)
         self.assertFalse(icon.isNull())
-
-if __name__ == "__main__":
-    suite = unittest.makeSuite(EodhQgisResourcesTest)
-    runner = unittest.TextTestRunner(verbosity=2)
-    runner.run(suite)
-
-
-

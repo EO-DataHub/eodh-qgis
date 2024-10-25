@@ -20,16 +20,10 @@ jobs:
         run: |
           pip install pyqt5
 
-      - name: Build Plugin
+      - name: Start container
         run: |
-          python deploy.py --dist dist/eodh_qgis
-
-      - name: Setup qgis container
-        run: |
-          docker compose up -d
-          sleep 10
-          docker compose exec -T qgis-testing-environment sh -c "pip3 install pyeodh"
+          .docker/start.sh
 
       - name: Run Tests
         run: |
-          docker compose exec -T qgis-testing-environment qgis_testrunner.sh test_suite.test_package
+          .docker/exec.sh

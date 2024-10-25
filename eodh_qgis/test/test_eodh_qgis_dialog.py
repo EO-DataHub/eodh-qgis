@@ -1,22 +1,8 @@
-# coding=utf-8
-"""Dialog test.
-
-.. note:: This program is free software; you can redistribute it and/or modify
-     it under the terms of the GNU General Public License as published by
-     the Free Software Foundation; either version 2 of the License, or
-     (at your option) any later version.
-
-"""
-
-__author__ = "daniel@oxidian.com"
-__date__ = "2024-04-09"
-__copyright__ = "Copyright 2024, Oxidian"
-
-import unittest
-
-from qgis.PyQt.QtCore import QDialogButtonBox, QDialog
-
-from eodh_qgis.main import MainDialog
+from qgis.testing import unittest
+from unittest.mock import patch, MagicMock
+from eodh_qgis.gui.main_dialog import MainDialog
+from PyQt5.QtWidgets import QStackedWidget, QPushButton
+from PyQt5.QtCore import Qt
 
 from utilities import get_qgis_app
 
@@ -26,31 +12,52 @@ QGIS_APP = get_qgis_app()
 class EodhQgisDialogTest(unittest.TestCase):
     """Test dialog works."""
 
-    def setUp(self):
+    @patch("eodh_qgis.gui.main_dialog.MainDialog.setup_ui_after_token")
+    @patch("eodh_qgis.gui.main_dialog.MainDialog.get_creds")
+    def setUp(self, mock_get_creds, mock_setup_ui):
         """Runs before each test."""
-        self.dialog = MainDialog(None)
+        mock_get_creds.return_value = {"username": "test", "token": "test_token"}
+        self.dialog = MainDialog()
 
     def tearDown(self):
         """Runs after each test."""
         self.dialog = None
 
-    def test_dialog_ok(self):
-        """Test we can click OK."""
+    def test_dialog_creation(self):
+        """Test that the dialog is created successfully"""
+        self.assertIsNotNone(self.dialog)
+        self.assertIsInstance(self.dialog, MainDialog)
 
-        button = self.dialog.button_box.button(QDialogButtonBox.Ok)
-        button.click()
-        result = self.dialog.result()
-        self.assertEqual(result, QDialog.Accepted)
+    def test_ui_elements_exist(self):
+        """Test that essential UI elements are present"""
+        self.assertIsInstance(self.dialog.content_widget, QStackedWidget)
+        self.assertIsInstance(self.dialog.workflows_button, QPushButton)
+        self.assertIsInstance(self.dialog.jobs_button, QPushButton)
+        self.assertIsInstance(self.dialog.settings_button, QPushButton)
 
-    def test_dialog_cancel(self):
-        """Test we can click cancel."""
-        button = self.dialog.button_box.button(QDialogButtonBox.Cancel)
-        button.click()
-        result = self.dialog.result()
-        self.assertEqual(result, QDialog.Rejected)
+    def test_initial_state(self):
+        """Test the initial state of the dialog"""
+        self.assertIsNone(self.dialog.selected_button)
+        self.assertIsNone(self.dialog.ades_svc)
 
+    def test_button_widget_map(self):
+        """Test that the button_widget_map is correctly set up"""
+        expected_keys = ["settings", "workflows", "jobs"]
+        self.assertEqual(set(self.dialog.button_widget_map.keys()), set(expected_keys))
 
-if __name__ == "__main__":
-    suite = unittest.makeSuite(EodhQgisDialogTest)
-    runner = unittest.TextTestRunner(verbosity=2)
-    runner.run(suite)
+        for key in expected_keys:
+            self.assertIn("button", self.dialog.button_widget_map[key])
+            self.assertIn("widget", self.dialog.button_widget_map[key])
+
+    def test_logo_cursor(self):
+        """Test that the logo has the correct cursor"""
+        self.assertEqual(
+            self.dialog.logo.cursor().shape(), Qt.CursorShape.PointingHandCursor
+        )
+
+    @patch("eodh_qgis.gui.main_dialog.QtWidgets.QMessageBox.warning")
+    def test_missing_creds(self, mock_warning):
+        """Test missing_creds method"""
+        self.dialog.missing_creds()
+        mock_warning.assert_called_once()
+        self.assertEqual(self.dialog.selected_button, self.dialog.settings_button)

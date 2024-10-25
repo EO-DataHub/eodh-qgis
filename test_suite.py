@@ -1,6 +1,5 @@
 import sys
-import os
-import unittest
+from qgis.testing import unittest
 import qgis  # NOQA  For SIP API to V2 if run outside of QGIS
 
 try:
