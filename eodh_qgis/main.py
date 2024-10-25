@@ -3,7 +3,7 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
 # Initialize Qt resources from file resources.py
-from .resources import *  # type: ignore # noqa: F401,F403
+from resources import *  # type: ignore # noqa: F401,F403
 
 # Import the code for the dialog
 from .gui.main_dialog import MainDialog

@@ -14,7 +14,7 @@ __copyright__ = "Copyright 2024, Oxidian"
 
 import unittest
 
-from qgis.PyQt.QtGui import QDialogButtonBox, QDialog
+from qgis.PyQt.QtCore import QDialogButtonBox, QDialog
 
 from eodh_qgis.main import MainDialog
 

@@ -1,0 +1,35 @@
+name: QGIS Plugin Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup environment
+        run: |
+          pip install pyqt5
+
+      - name: Build Plugin
+        run: |
+          python deploy.py --dist dist/eodh_qgis
+
+      - name: Setup qgis container
+        run: |
+          docker compose up -d
+          sleep 10
+          docker compose exec -T qgis-testing-environment sh -c "pip3 install pyeodh"
+
+      - name: Run Tests
+        run: |
+          docker compose exec -T qgis-testing-environment qgis_testrunner.sh test_suite.test_package
