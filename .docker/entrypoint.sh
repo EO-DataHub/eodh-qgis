@@ -1,6 +1,4 @@
-#!/usr/bin/env bash
-
-# Docker entrypoint file intended for docker-compose recipe for running unittests
+#!/bin/bash
 
 set -e
 
@@ -8,7 +6,7 @@ pip3 install pyeodh pytest pytest-cov pytest-qgis
 
 qgis_setup.sh
 
-# FIX default installation because the sources must be in "stream_feature_extractor" parent folder
+# Fix the symlink created by qgis_setup.sh
 rm -rf  /root/.local/share/QGIS/QGIS3/profiles/default/python/plugins/eodh_qgis
 ln -sf /tests_directory /root/.local/share/QGIS/QGIS3/profiles/default/python/plugins/eodh_qgis
 ln -sf /tests_directory /usr/share/qgis/python/plugins/eodh_qgis

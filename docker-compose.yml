@@ -8,6 +8,6 @@ services:
       CI: "true"
       DISPLAY: ":99"
     working_dir: /tests_directory
-    entrypoint: /tests_directory/.docker/qgis-testing-entrypoint.sh
+    entrypoint: /tests_directory/.docker/entrypoint.sh
     command: tail -f /dev/null
     tty: true
