@@ -40,6 +40,7 @@ def build(
     print(f"Copied metadata.txt to {build_dir}")
     shutil.copytree(libs_dir, build_dir / "libs")
     shutil.copytree(ROOT_DIR / ".docker", build_dir / ".docker")
+    shutil.copy2(ROOT_DIR / ".coveragerc", build_dir / ".coveragerc")
 
 
 def verify_install_path(install_path: pathlib.Path):
