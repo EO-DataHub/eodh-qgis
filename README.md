@@ -62,3 +62,9 @@ To setup language server support in VSCode if you've installed QGIS from Flatpak
    3. Run `python deploy.py <path to plugin directory>` (Path can be ommited if already set as an env variable in prev. step)
 
 3. Reload plugin
+
+### Testing
+
+1. `make check` will run code formatting and linting checks.
+
+2. `make test` will run tests against a running QGIS instance in a docker container.
