@@ -1,12 +1,12 @@
 import os
 
 import pyeodh.ades
+import requests
 from qgis.PyQt import QtCore, QtWidgets, uic
 
 from eodh_qgis.gui.wf_editor_widget import WorkflowEditorWidget
 from eodh_qgis.gui.wf_executor_widget import WorkflowExecutorWidget
 from eodh_qgis.worker import Worker
-import requests
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer

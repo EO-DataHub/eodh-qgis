@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from qgis.PyQt import QtWidgets
 import pyeodh.ades
+from qgis.PyQt import QtWidgets
 
 from eodh_qgis.gui.wf_executor_widget import WorkflowExecutorWidget
 from eodh_qgis.test.utilities import get_qgis_app

@@ -2,9 +2,10 @@ from unittest.mock import patch
 
 from qgis.PyQt import QtCore, QtWidgets
 from qgis.testing import unittest
-from .utilities import get_qgis_app
 
 from eodh_qgis.gui.main_dialog import MainDialog
+
+from .utilities import get_qgis_app
 
 
 class EodhQgisDialogTest(unittest.TestCase):

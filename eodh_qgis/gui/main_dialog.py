@@ -1,16 +1,15 @@
 import os
 from typing import Callable, Literal
 
-from eodh_qgis.settings import Settings
 import pyeodh
 import requests
-from qgis.PyQt import QtCore, QtGui, QtWidgets, uic
 from qgis.core import QgsApplication, QgsAuthMethodConfig
-
+from qgis.PyQt import QtCore, QtGui, QtWidgets, uic
 
 from eodh_qgis.gui.jobs_widget import JobsWidget
 from eodh_qgis.gui.settings_widget import SettingsWidget
 from eodh_qgis.gui.workflows_widget import WorkflowsWidget
+from eodh_qgis.settings import Settings
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer

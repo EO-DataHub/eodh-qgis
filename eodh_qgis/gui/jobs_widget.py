@@ -1,9 +1,10 @@
 import os
 
+import pyeodh.ades
+from qgis.PyQt import QtCore, QtWidgets, uic
+
 from eodh_qgis.gui.job_details_widget import JobDetailsWidget
 from eodh_qgis.worker import Worker
-import pyeodh.ades
-from qgis.PyQt import QtWidgets, uic, QtCore
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer

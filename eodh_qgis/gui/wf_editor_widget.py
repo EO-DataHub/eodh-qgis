@@ -1,9 +1,8 @@
 import os
 
 import pyeodh.ades
-from qgis.PyQt import QtWidgets, uic, Qsci, QtGui
 import requests
-
+from qgis.PyQt import Qsci, QtGui, QtWidgets, uic
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer

@@ -1,8 +1,10 @@
 import unittest
 from unittest.mock import MagicMock, patch
-from eodh_qgis.test.utilities import get_qgis_app
+
 from qgis.PyQt import QtWidgets
+
 from eodh_qgis.gui.settings_widget import SettingsWidget
+from eodh_qgis.test.utilities import get_qgis_app
 
 
 class TestSettingsWidget(unittest.TestCase):

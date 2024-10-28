@@ -1,9 +1,10 @@
 import os
 from typing import Literal
 
-from eodh_qgis.settings import Settings
-from qgis.PyQt import QtWidgets, uic, QtCore
 from qgis.core import QgsApplication, QgsAuthMethodConfig
+from qgis.PyQt import QtCore, QtWidgets, uic
+
+from eodh_qgis.settings import Settings
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer
