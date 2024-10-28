@@ -13,8 +13,6 @@ SRC_DIR = ROOT_DIR / "eodh_qgis"
 RESOURCE_PATH = ROOT_DIR / "resources/resources.qrc"
 LIBS_DIR = ROOT_DIR / "libs"
 
-TEST_FILES = ["test_suite.py", "docker-compose.yml"]
-
 
 def main(install_path: pathlib.Path, is_dist=False):
     if not install_path:
@@ -41,8 +39,6 @@ def build(
     shutil.copy2("metadata.txt", build_dir)
     print(f"Copied metadata.txt to {build_dir}")
     shutil.copytree(libs_dir, build_dir / "libs")
-    for file in TEST_FILES:
-        shutil.copy2(ROOT_DIR / file, build_dir)
     shutil.copytree(ROOT_DIR / ".docker", build_dir / ".docker")
 
 
