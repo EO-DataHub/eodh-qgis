@@ -1,15 +1,19 @@
 import unittest
 from unittest.mock import MagicMock, patch
-from qgis.PyQt.QtWidgets import QApplication, QWidget
-from qgis.PyQt.QtCore import Qt
+from eodh_qgis.test.utilities import get_qgis_app
+from qgis.PyQt import QtWidgets
 from eodh_qgis.gui.settings_widget import SettingsWidget
-from eodh_qgis.settings import Settings
 
 
 class TestSettingsWidget(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        cls.QGIS_APP = get_qgis_app()
+        assert cls.QGIS_APP is not None
+
     def setUp(self):
-        self.parent = QWidget()
+        self.parent = QtWidgets.QWidget()
         self.parent.get_creds = MagicMock(
             return_value={
                 "username": "test_user",
@@ -19,8 +23,8 @@ class TestSettingsWidget(unittest.TestCase):
         self.widget = SettingsWidget(self.parent)
 
     def tearDown(self):
-        self.widget.deleteLater()
-        self.parent.deleteLater()
+        self.widget = None
+        self.parent = None
 
     def test_init(self):
         self.assertIsInstance(self.widget, SettingsWidget)

@@ -1,11 +1,17 @@
 import unittest
+
 from qgis.PyQt import QtCore
 from qgis.PyQt.QtTest import QSignalSpy
 
+from eodh_qgis.test.utilities import get_qgis_app
 from eodh_qgis.worker import Worker
 
 
 class TestWorker(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.QGIS_APP = get_qgis_app()
+        assert cls.QGIS_APP is not None
 
     def setUp(self):
         self.threadpool = QtCore.QThreadPool()

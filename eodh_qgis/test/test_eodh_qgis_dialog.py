@@ -6,16 +6,20 @@ from utilities import get_qgis_app
 
 from eodh_qgis.gui.main_dialog import MainDialog
 
-QGIS_APP = get_qgis_app()
-
 
 class EodhQgisDialogTest(unittest.TestCase):
     """Test dialog works."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.QGIS_APP = get_qgis_app()
+        assert cls.QGIS_APP is not None
 
     @patch("eodh_qgis.gui.main_dialog.MainDialog.setup_ui_after_token")
     @patch("eodh_qgis.gui.main_dialog.MainDialog.get_creds")
     def setUp(self, mock_get_creds, mock_setup_ui):
         """Runs before each test."""
+
         mock_get_creds.return_value = {"username": "test", "token": "test_token"}
         self.dialog = MainDialog()
 

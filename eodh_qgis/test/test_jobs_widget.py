@@ -1,19 +1,28 @@
 import unittest
-from unittest.mock import MagicMock, patch
-from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5.QtTest import QTest
-from PyQt5.QtCore import Qt
+from unittest.mock import MagicMock
+
+import pyeodh.ades
+from qgis.PyQt import QtWidgets
 
 from eodh_qgis.gui.jobs_widget import JobsWidget
-import pyeodh.ades
+from eodh_qgis.test.utilities import get_qgis_app
 
 
 class TestJobsWidget(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        cls.QGIS_APP = get_qgis_app()
+        assert cls.QGIS_APP is not None
+
     def setUp(self):
         self.ades_svc = MagicMock(spec=pyeodh.ades.Ades)
-        self.parent = QWidget()
+        self.parent = QtWidgets.QWidget()
         self.jobs_widget = JobsWidget(self.ades_svc, parent=self.parent)
+
+    def tearDown(self):
+        """Runs after each test."""
+        self.jobs_widget = None
 
     def test_init(self):
         self.assertIsInstance(self.jobs_widget, JobsWidget)

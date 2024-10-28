@@ -1,9 +1,16 @@
 import unittest
 from unittest.mock import patch
+
 from eodh_qgis.settings import Settings
+from eodh_qgis.test.utilities import get_qgis_app
 
 
 class TestSettings(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.QGIS_APP = get_qgis_app()
+        assert cls.QGIS_APP is not None
 
     def setUp(self):
         self.settings = Settings()
