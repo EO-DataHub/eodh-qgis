@@ -68,6 +68,31 @@ class TestWorker(unittest.TestCase):
         self.assertEqual(error_args[0], ValueError)
         self.assertEqual(str(error_args[1]), "Test error")
 
+    def test_worker_run(self):
+        def test_function(progress_callback, test_arg=None):
+            progress_callback.emit(25)
+            return f"Result with {test_arg}"
+
+        # Create worker with args and kwargs
+        worker = Worker(test_function, test_arg="test_value")
+
+        # Set up signal spies
+        finished_spy = QSignalSpy(worker.signals.finished)
+        result_spy = QSignalSpy(worker.signals.result)
+        progress_spy = QSignalSpy(worker.signals.progress)
+
+        # Directly call run method
+        worker.run()
+
+        # Check if signals were emitted
+        self.assertEqual(len(finished_spy), 1)
+        self.assertEqual(len(result_spy), 1)
+        self.assertEqual(len(progress_spy), 1)
+
+        # Check the emitted values
+        self.assertEqual(result_spy[0][0], "Result with test_value")
+        self.assertEqual(progress_spy[0][0], 25)
+
 
 if __name__ == "__main__":
     unittest.main()
