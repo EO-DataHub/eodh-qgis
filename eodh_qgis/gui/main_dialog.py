@@ -110,9 +110,7 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         token = self.creds["token"]
 
         try:
-            self.ades_svc = pyeodh.Client(
-                username=username, token=token, s3_token=token
-            ).get_ades()
+            self.ades_svc = pyeodh.Client(username=username, token=token).get_ades()
         except requests.HTTPError:
             QtWidgets.QMessageBox.critical(
                 self, "Error", "Error logging in, validate your credentials."
