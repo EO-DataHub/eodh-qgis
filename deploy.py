@@ -32,8 +32,14 @@ def build(
     src_dir: pathlib.Path = SRC_DIR,
     libs_dir: pathlib.Path = LIBS_DIR,
 ):
-    build_dir.mkdir()
-    print(f"Created {build_dir}")
+    try:
+        build_dir.mkdir()
+        print(f"Created {build_dir}")
+    except FileExistsError:
+        print(f"{build_dir} already exists - deleting")
+        shutil.rmtree(build_dir)
+        build_dir.mkdir()
+        print(f"Re-created empty {build_dir}")
     shutil.copytree(src_dir, build_dir, dirs_exist_ok=True)
     print(f"Copied {src_dir} to {build_dir}")
     shutil.copy2("metadata.txt", build_dir)
@@ -117,6 +123,7 @@ def load_dotenv():
 
 
 if __name__ == "__main__":
+    print(sys.version)
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "install_path",
