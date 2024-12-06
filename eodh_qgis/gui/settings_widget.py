@@ -1,10 +1,16 @@
 import os
+from pathlib import Path
+import platform
+import subprocess
+import sys
 from typing import Literal
 
+import pyeodh
 from qgis.core import QgsApplication, QgsAuthMethodConfig
 from qgis.PyQt import QtCore, QtWidgets, uic
 
 from eodh_qgis.settings import Settings
+import requests
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer
@@ -22,6 +28,7 @@ class SettingsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.username_input: QtWidgets.QLineEdit
         self.token_input: QtWidgets.QLineEdit
         self.check_updates_on_start: QtWidgets.QCheckBox
+        self.check_updates_button: QtWidgets.QPushButton
         self.settings = Settings()
 
         self.creds = parent.get_creds() or {}
@@ -40,6 +47,7 @@ class SettingsWidget(QtWidgets.QWidget, FORM_CLASS):
                 "check_update", state == QtCore.Qt.CheckState.Checked
             )
         )
+        self.check_updates_button.clicked.connect(self.check_updates)
 
     def save_creds(self, key: Literal["username", "token"]):
         username = self.username_input.text()
@@ -96,3 +104,51 @@ class SettingsWidget(QtWidgets.QWidget, FORM_CLASS):
         main_dialog = self.get_main_dialog()
         if main_dialog:
             main_dialog.setup_ui_after_token()
+
+    def check_updates(self):
+        lib_path = (
+            Path(os.path.dirname(__file__)).parent / "libs" / platform.system().lower()
+        )
+
+        installed_version = pyeodh.__version__
+        latest_version = requests.get("https://pypi.org/pypi/pyeodh/json").json()[
+            "info"
+        ]["version"]
+
+        if installed_version == latest_version:
+            QtWidgets.QMessageBox.information(
+                self,
+                "No updates available",
+                "The plugin dependencies are already up to date.",
+            )
+            return
+
+        res = QtWidgets.QMessageBox.question(
+            self,
+            "Update dependencies",
+            "The plugin dependencies are outdated. Do you want to update them?",
+        )
+        if res == QtWidgets.QMessageBox.StandardButton.No:
+            return
+
+        subprocess.check_call(
+            [
+                sys.executable,
+                "-m",
+                "pip",
+                "install",
+                "--target",
+                lib_path,
+                "--upgrade",
+                "pyeodh",
+            ]
+        )
+        QtWidgets.QMessageBox.information(
+            self,
+            "Dependencies updated",
+            (
+                "The plugin dependencies have been updated, please restart QGIS for the"
+                " changes to take effect."
+            ),
+        )
+        self.check_updates_button.setEnabled(False)
