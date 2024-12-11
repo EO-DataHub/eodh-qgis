@@ -18,24 +18,30 @@ jobs:
           - name: macos
             family: darwin
     steps:
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - uses: actions/checkout@v4
-      - run: |
-          pip install pyqt5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install libs
+        run: |
           pip install --target libs/${{ matrix.os.family }} --upgrade pyeodh
 
-      - if: ${{ matrix.os.name != 'windows' }}
+      - name: Zip libs for Linux/macOS
+        if: ${{ matrix.os.name != 'windows' }}
         run: |
           zip -r libs_${{ matrix.os.family }}.zip libs
 
-      - if: ${{ matrix.os.name == 'windows' }}
+      - name: Zip libs for Windows
+        if: ${{ matrix.os.name == 'windows' }}
         run: |
           Compress-Archive -Path 'libs' -DestinationPath 'libs_${{ matrix.os.family }}.zip'
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
           name: libs_${{ matrix.os.family }}
           path: libs_${{ matrix.os.family }}.zip
@@ -46,8 +52,17 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          pip install pyqt5
 
       - name: Download libs artifacts
         uses: actions/download-artifact@v4
