@@ -1,5 +1,5 @@
 import os
-from typing import Callable, Literal
+from typing import Callable, Literal, Optional
 
 import pyeodh
 import requests
@@ -31,7 +31,7 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         self.jobs_button: QtWidgets.QPushButton
         self.settings_button: QtWidgets.QPushButton
         self.logo: QtWidgets.QLabel
-        self.selected_button: QtWidgets.QPushButton | None = None
+        self.selected_button: Optional[QtWidgets.QPushButton] = None
         self.ades_svc = None
 
         self.button_widget_map = {
@@ -119,7 +119,7 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
     def handle_menu_button_clicked(
         self,
         action: Literal["settings", "workflows", "jobs"],
-        invoke_fn: Callable | None = None,
+        invoke_fn: Optional[Callable] = None,
     ):
         button = self.button_widget_map[action]["button"]
         widget = self.button_widget_map[action]["widget"]

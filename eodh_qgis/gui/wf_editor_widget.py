@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 import pyeodh.ades
 import requests
@@ -27,7 +28,7 @@ class WorkflowEditorWidget(QtWidgets.QWidget, FORM_CLASS):
         self,
         ades_svc: pyeodh.ades.Ades,
         update_mode=False,
-        process: pyeodh.ades.Process | None = None,
+        process: Optional[pyeodh.ades.Process] = None,
         parent=None,
     ):
         """Constructor."""
