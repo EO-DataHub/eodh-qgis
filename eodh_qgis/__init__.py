@@ -1,16 +1,9 @@
 import os
-import platform
 import site
 
 
 def include_deps():
-    system = platform.system()
-    if system not in ["Linux", "Darwin", "Windows"]:
-        return
-
-    deps_path = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), f"libs/{system.lower()}")
-    )
+    deps_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "libs"))
     site.addsitedir(deps_path)
 
 

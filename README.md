@@ -34,9 +34,9 @@ When opening the plugin for the first time, you need to configure authentication
 
 ### Requirements
 
-Install pyeodh library to `libs/<os>` (os: `linux`, `darwin` or `windows`).
+Install pyeodh library to `libs` directory.
 
-To e.g. install/update to latest version from pypi: `pip install --target libs/linux --upgrade pyeodh`
+To e.g. install/update to latest version from pypi: `pip install --target libs --upgrade pyeodh`
 
 ### Flatpak and VSCode
 

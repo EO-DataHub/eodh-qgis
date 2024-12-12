@@ -161,6 +161,4 @@ cython_debug/
 
 .vscode/
 
-libs/linux
-libs/darwin
-libs/windows
+libs/*

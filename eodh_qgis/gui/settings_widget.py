@@ -1,16 +1,15 @@
 import os
-from pathlib import Path
-import platform
 import subprocess
 import sys
+from pathlib import Path
 from typing import Literal
 
 import pyeodh
+import requests
 from qgis.core import QgsApplication, QgsAuthMethodConfig
 from qgis.PyQt import QtCore, QtWidgets, uic
 
 from eodh_qgis.settings import Settings
-import requests
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer
@@ -106,9 +105,7 @@ class SettingsWidget(QtWidgets.QWidget, FORM_CLASS):
             main_dialog.setup_ui_after_token()
 
     def check_updates(self):
-        lib_path = (
-            Path(os.path.dirname(__file__)).parent / "libs" / platform.system().lower()
-        )
+        lib_path = Path(os.path.dirname(__file__)).parent / "libs"
 
         installed_version = pyeodh.__version__
         latest_version = requests.get("https://pypi.org/pypi/pyeodh/json").json()[
