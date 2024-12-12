@@ -27,6 +27,7 @@ jobs:
         run: |
           python deploy.py --dist dist/eodh_qgis
           cd dist
+          find . -name "__pycache__" -type d | xargs rm -rf
           zip -r eodh_qgis_${{ github.ref_name }}.zip eodh_qgis
 
       - name: Create release
