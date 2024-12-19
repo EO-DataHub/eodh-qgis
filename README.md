@@ -9,11 +9,10 @@ This plugin demonstrates the EO Application Package and workflow capabilities of
 
 ### From QGIS repository
 
-**_Note: This is not avaiable yet_**
-
 1. Go to menu Plugins -> All
-2. Search for `EODH Workflows`
-3. Click Install Plugin
+2. Tick `Show experimental plugins` in the settings tab
+3. Search for `EODH Workflows`
+4. Click Install Plugin
 
 ### Manual
 
