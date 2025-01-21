@@ -128,7 +128,16 @@ class SettingsWidget(QtWidgets.QWidget, FORM_CLASS):
         if res == QtWidgets.QMessageBox.StandardButton.No:
             return
 
-        subprocess.check_call(
+        check_pip_ret = subprocess.call([sys.executable, "-m", "pip", "--version"])
+        if check_pip_ret != 0:
+            QtWidgets.QMessageBox.critical(
+                self,
+                "Error",
+                "Pip is not installed, please install it and try again.",
+            )
+            return
+
+        pip_install = subprocess.run(
             [
                 sys.executable,
                 "-m",
@@ -138,8 +147,18 @@ class SettingsWidget(QtWidgets.QWidget, FORM_CLASS):
                 lib_path,
                 "--upgrade",
                 "pyeodh",
-            ]
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
         )
+        if pip_install.returncode != 0:
+            QtWidgets.QMessageBox.critical(
+                self,
+                "Error",
+                "Failed to update the plugin dependencies:",
+                pip_install.stdout.decode(),
+            )
+            return
         QtWidgets.QMessageBox.information(
             self,
             "Dependencies updated",
