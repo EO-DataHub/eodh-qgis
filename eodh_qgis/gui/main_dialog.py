@@ -54,15 +54,10 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
             lambda: self.handle_menu_button_clicked("settings")
         )
         self.workflows_button.clicked.connect(
-            lambda: self.handle_menu_button_clicked(
-                "workflows",
-                self.button_widget_map["workflows"]["widget"].load_workflows,
-            )
+            lambda: self.handle_menu_button_clicked("workflows")
         )
         self.jobs_button.clicked.connect(
-            lambda: self.handle_menu_button_clicked(
-                "jobs", self.button_widget_map["jobs"]["widget"].load_jobs
-            )
+            lambda: self.handle_menu_button_clicked("jobs")
         )
 
         self.logo.mousePressEvent = self.open_url

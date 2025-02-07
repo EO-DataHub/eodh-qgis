@@ -54,7 +54,9 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
 
     def handle_close(self):
         self.parent().removeWidget(self)
-        self.parent().setCurrentIndex(1)
+        self.parent().setCurrentWidget(
+            self.parent().parent().parent().button_widget_map["jobs"]["widget"]
+        )
 
     def populate_table(self):
         headers = {

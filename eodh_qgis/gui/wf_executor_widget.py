@@ -64,7 +64,7 @@ class WorkflowExecutorWidget(QtWidgets.QWidget, FORM_CLASS):
         job_details = JobDetailsWidget(job=job, parent=self.parent())
         self.parent().addWidget(job_details)
         self.parent().setCurrentWidget(job_details)
-        self.parent().parent().parent().jobs_widget.load_jobs()
+        self.parent().parent().parent().button_widget_map["jobs"]["widget"].load_jobs()
         self.parent().parent().parent().style_menu_button(
             self.parent().parent().parent().jobs_button
         )
