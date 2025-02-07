@@ -37,6 +37,12 @@ class TestWorkflowExecutorWidget(unittest.TestCase):
         self.main_dialog.jobs_widget = MagicMock()
         self.main_dialog.jobs_button = MagicMock()
         self.main_dialog.style_menu_button = MagicMock()
+        self.main_dialog.button_widget_map = {
+            "jobs": {
+                "widget": self.main_dialog.jobs_widget,
+                "button": self.main_dialog.jobs_button,
+            }
+        }
 
         self.content_widget = QtWidgets.QStackedWidget(self.main_dialog)
         self.stacked_widget = QtWidgets.QStackedWidget(self.content_widget)

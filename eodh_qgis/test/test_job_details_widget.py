@@ -84,7 +84,9 @@ class TestJobDetailsWidget(unittest.TestCase):
 
         # Verify that removeWidget was called
         mock_parent.removeWidget.assert_called_once_with(self.widget)
-        mock_parent.setCurrentIndex.assert_called_once_with(1)
+        mock_parent.setCurrentWidget.assert_called_once_with(
+            self.widget.parent().parent().parent().button_widget_map["jobs"]["widget"]
+        )
 
 
 if __name__ == "__main__":
