@@ -74,7 +74,8 @@ class JobsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.lock_form(True)
 
         def load_data(*args, **kwargs):
-            return self.ades_svc.get_jobs()
+            jobs = [j for j in self.ades_svc.get_jobs(limit=100)]
+            return jobs
 
         worker = Worker(load_data)
         worker.signals.result.connect(self.populate_table)
