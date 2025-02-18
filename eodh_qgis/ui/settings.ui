@@ -96,7 +96,7 @@ QPushButton {
        <item>
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>EODH API Token</string>
+          <string>EODH API Key</string>
          </property>
         </widget>
        </item>
