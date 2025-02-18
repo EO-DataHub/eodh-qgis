@@ -17,9 +17,11 @@ This plugin demonstrates the EO Application Package and workflow capabilities of
 ### Manual
 
 1. Download archive for your platform from releases
-2. Extract it to QGIS plugin directory.
-   To find it go to QGIS menu Settings -> User profiles -> Open active profile folder -> python -> plugins
-3. Make sure plugin is enabled in menu Plugins -> Manage and Install Plugin... -> Installed. There must be a tick next to EODH Workflows.
+2. Open QGIS
+3. Go to menu Plugins -> Manage and Install Plugins...
+4. Select `Install from ZIP...`
+5. Select the downloaded archive
+6. Click `Install Plugin`
 
 ## Usage
 
