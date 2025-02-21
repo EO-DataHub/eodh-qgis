@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pyqt5 qgis-plugin-ci
+          pip install pyqt5
           pip install --target libs --upgrade pyeodh
 
       - name: Build release
@@ -34,10 +34,3 @@ jobs:
         run: gh release create ${{ github.ref_name }} dist/eodh_qgis_${{ github.ref_name }}.zip
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Deploy plugin
-        run: >-
-          python scripts/upload.py
-          --osgeo-username ${{ secrets.OSGEO_USER }}
-          --osgeo-password ${{ secrets.OSGEO_PASSWORD }}
-          --plugin-path dist/eodh_qgis_${{ github.ref_name }}.zip
