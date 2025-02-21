@@ -37,8 +37,7 @@ jobs:
 
       - name: Deploy plugin
         run: >-
-          qgis-plugin-ci
-          release ${{ github.ref_name }}
-          --github-token ${{ secrets.GITHUB_TOKEN }}
+          python scripts/upload.py
           --osgeo-username ${{ secrets.OSGEO_USER }}
           --osgeo-password ${{ secrets.OSGEO_PASSWORD }}
+          --plugin-path dist/eodh_qgis_${{ github.ref_name }}.zip

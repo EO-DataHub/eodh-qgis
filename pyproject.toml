@@ -10,6 +10,7 @@ package-mode = false
 [tool.poetry.dependencies]
 python = "^3.10"
 pyeodh = "^0.0.7"
+qgis-plugin-ci = "^2.8.10"
 
 
 [tool.poetry.group.dev.dependencies]
