@@ -46,7 +46,6 @@ class SettingsWidget(QtWidgets.QWidget, FORM_CLASS):
                 "check_update", state == QtCore.Qt.CheckState.Checked
             )
         )
-        self.check_updates_button.clicked.connect(self.check_updates)
 
     def save_creds(self, key: Literal["username", "token"]):
         username = self.username_input.text()
@@ -103,68 +102,3 @@ class SettingsWidget(QtWidgets.QWidget, FORM_CLASS):
         main_dialog = self.get_main_dialog()
         if main_dialog:
             main_dialog.setup_ui_after_token()
-
-    def check_updates(self):
-        lib_path = Path(os.path.dirname(__file__)).parent / "libs"
-
-        installed_version = pyeodh.__version__
-        latest_version = requests.get("https://pypi.org/pypi/pyeodh/json").json()[
-            "info"
-        ]["version"]
-
-        if installed_version == latest_version:
-            QtWidgets.QMessageBox.information(
-                self,
-                "No updates available",
-                "The plugin dependencies are already up to date.",
-            )
-            return
-
-        res = QtWidgets.QMessageBox.question(
-            self,
-            "Update dependencies",
-            "The plugin dependencies are outdated. Do you want to update them?",
-        )
-        if res == QtWidgets.QMessageBox.StandardButton.No:
-            return
-
-        check_pip_ret = subprocess.call([sys.executable, "-m", "pip", "--version"])
-        if check_pip_ret != 0:
-            QtWidgets.QMessageBox.critical(
-                self,
-                "Error",
-                "Pip is not installed, please install it and try again.",
-            )
-            return
-
-        pip_install = subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "pip",
-                "install",
-                "--target",
-                lib_path,
-                "--upgrade",
-                "pyeodh",
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-        )
-        if pip_install.returncode != 0:
-            QtWidgets.QMessageBox.critical(
-                self,
-                "Error",
-                "Failed to update the plugin dependencies:",
-                pip_install.stdout.decode(),
-            )
-            return
-        QtWidgets.QMessageBox.information(
-            self,
-            "Dependencies updated",
-            (
-                "The plugin dependencies have been updated, please restart QGIS for the"
-                " changes to take effect."
-            ),
-        )
-        self.check_updates_button.setEnabled(False)

@@ -21,7 +21,6 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pyqt5
-          pip install --target libs --upgrade pyeodh
 
       - name: Build release
         run: |

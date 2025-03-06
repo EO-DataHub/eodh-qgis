@@ -11,7 +11,6 @@ ROOT_DIR = pathlib.Path(__file__).parent.resolve()
 BUILD_DIR = ROOT_DIR / "build"
 SRC_DIR = ROOT_DIR / "eodh_qgis"
 RESOURCE_PATH = ROOT_DIR / "resources/resources.qrc"
-LIBS_DIR = ROOT_DIR / "libs"
 
 
 def main(install_path: pathlib.Path, is_dist=False):
@@ -30,7 +29,6 @@ def main(install_path: pathlib.Path, is_dist=False):
 def build(
     build_dir: pathlib.Path = BUILD_DIR,
     src_dir: pathlib.Path = SRC_DIR,
-    libs_dir: pathlib.Path = LIBS_DIR,
 ):
     try:
         build_dir.mkdir()
@@ -46,7 +44,8 @@ def build(
     print(f"Copied metadata.txt to {build_dir}")
     shutil.copy2("LICENSE", build_dir)
     print(f"Copied LICENSE to {build_dir}")
-    shutil.copytree(libs_dir, build_dir / "libs")
+    shutil.copy2("requirements.txt", build_dir)
+    print(f"Copied requirements.txt to {build_dir}")
     shutil.copytree(ROOT_DIR / ".docker", build_dir / ".docker")
     shutil.copy2(ROOT_DIR / ".coveragerc", build_dir / ".coveragerc")
 
@@ -74,7 +73,6 @@ def uninstall(install_path: pathlib.Path):
 def compile_resources(
     build_dir: pathlib.Path = BUILD_DIR, resource_path: pathlib.Path = RESOURCE_PATH
 ):
-
     output_path = build_dir / "resources.py"
     try:
         subprocess.run(

@@ -13,6 +13,7 @@ This plugin demonstrates the EO Application Package and workflow capabilities of
 2. Tick `Show experimental plugins` in the settings tab
 3. Search for `EODH Workflows`
 4. Click Install Plugin
+5. We're using [QPIP plugin](https://github.com/opengisch/qpip) to install python dependencies using pip. Click OK to install them.
 
 ### Manual
 
@@ -22,6 +23,7 @@ This plugin demonstrates the EO Application Package and workflow capabilities of
 4. Select `Install from ZIP...`
 5. Select the downloaded archive
 6. Click `Install Plugin`
+7. We're using [QPIP plugin](https://github.com/opengisch/qpip) to install python dependencies using pip. Click OK to install them.
 
 ## Usage
 
@@ -32,12 +34,6 @@ When opening the plugin for the first time, you need to configure authentication
 3. Click back to Workflows or Jobs and your list will load normally.
 
 ## Development
-
-### Requirements
-
-Install pyeodh library to `libs` directory.
-
-To e.g. install/update to latest version from pypi: `pip install --target libs --upgrade pyeodh`
 
 ### Flatpak and VSCode
 
