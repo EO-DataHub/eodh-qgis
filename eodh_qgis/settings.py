@@ -2,12 +2,11 @@ from qgis.PyQt import QtCore
 
 
 class Settings:
-
     def __init__(self):
         self.group = "/eodh"
         self.data = {
             "auth_config": "",
-            "check_update": False,
+            "env": "production",
         }
         self.load_all()
 

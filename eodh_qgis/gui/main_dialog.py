@@ -103,9 +103,20 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
     def get_ades(self):
         username = self.creds["username"]
         token = self.creds["token"]
+        env = self.settings.data["env"]
+
+        url = "https://eodatahub.org.uk"
+        if env == "production":
+            url = "https://eodatahub.org.uk"
+        elif env == "staging":
+            url = "https://staging.eodatahub.org.uk"
+        elif env == "test":
+            url = "https://test.eodatahub.org.uk"
 
         try:
-            self.ades_svc = pyeodh.Client(username=username, token=token).get_ades()
+            self.ades_svc = pyeodh.Client(
+                base_url=url, username=username, token=token
+            ).get_ades()
         except requests.HTTPError:
             QtWidgets.QMessageBox.critical(
                 self, "Error", "Error logging in, validate your credentials."

@@ -1,13 +1,8 @@
 import os
-import subprocess
-import sys
-from pathlib import Path
 from typing import Literal
 
-import pyeodh
-import requests
 from qgis.core import QgsApplication, QgsAuthMethodConfig
-from qgis.PyQt import QtCore, QtWidgets, uic
+from qgis.PyQt import QtWidgets, uic
 
 from eodh_qgis.settings import Settings
 
@@ -26,8 +21,7 @@ class SettingsWidget(QtWidgets.QWidget, FORM_CLASS):
 
         self.username_input: QtWidgets.QLineEdit
         self.token_input: QtWidgets.QLineEdit
-        self.check_updates_on_start: QtWidgets.QCheckBox
-        self.check_updates_button: QtWidgets.QPushButton
+        self.env_select: QtWidgets.QComboBox
         self.settings = Settings()
 
         self.creds = parent.get_creds() or {}
@@ -38,14 +32,12 @@ class SettingsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.username_input.editingFinished.connect(lambda: self.save_creds("username"))
         self.token_input.editingFinished.connect(lambda: self.save_creds("token"))
 
-        self.check_updates_on_start.setChecked(
-            self.settings.data["check_update"] is True
-        )
-        self.check_updates_on_start.stateChanged.connect(
-            lambda state: self.settings.save(
-                "check_update", state == QtCore.Qt.CheckState.Checked
-            )
-        )
+        self.env_select.currentTextChanged.connect(self.save_env)
+        self.env_select.setCurrentText(self.settings.data["env"])
+
+    def save_env(self):
+        self.settings.save("env", self.env_select.currentText())
+        self.reload_ui()
 
     def save_creds(self, key: Literal["username", "token"]):
         username = self.username_input.text()

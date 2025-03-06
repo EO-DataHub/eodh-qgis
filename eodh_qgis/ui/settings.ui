@@ -141,10 +141,61 @@ margin-left: 30px;</string>
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_4"/>
+      <widget class="QLabel" name="label_6">
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>General</string>
+       </property>
+      </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_5"/>
+      <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,2,1">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>EODH Environment</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QComboBox" name="env_select">
+         <item>
+          <property name="text">
+           <string>production</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>staging</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>test</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
       <spacer name="verticalSpacer">
