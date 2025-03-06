@@ -6,7 +6,6 @@ from eodh_qgis.test.utilities import get_qgis_app
 
 
 class TestSettings(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.QGIS_APP = get_qgis_app()
@@ -49,4 +48,4 @@ class TestSettings(unittest.TestCase):
     def test_initial_values(self):
         self.assertEqual(self.settings.group, "/eodh")
         self.assertIn("auth_config", self.settings.data)
-        self.assertIn("check_update", self.settings.data)
+        self.assertIn("env", self.settings.data)

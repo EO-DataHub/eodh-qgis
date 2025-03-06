@@ -8,7 +8,6 @@ from eodh_qgis.test.utilities import get_qgis_app
 
 
 class TestSettingsWidget(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.QGIS_APP = get_qgis_app()
@@ -32,17 +31,6 @@ class TestSettingsWidget(unittest.TestCase):
         self.assertIsInstance(self.widget, SettingsWidget)
         self.assertEqual(self.widget.username_input.text(), "test_user")
         self.assertEqual(self.widget.token_input.text(), "test_token")
-
-    @patch("eodh_qgis.gui.settings_widget.Settings")
-    def test_check_updates_on_start(self, mock_settings):
-        mock_settings_instance = mock_settings.return_value
-        mock_settings_instance.data = {"check_update": True}
-
-        widget = SettingsWidget(self.parent)
-        self.assertTrue(widget.check_updates_on_start.isChecked())
-
-        widget.check_updates_on_start.setChecked(False)
-        mock_settings_instance.save.assert_called_with("check_update", False)
 
     @patch("eodh_qgis.gui.settings_widget.QgsApplication")
     @patch("eodh_qgis.gui.settings_widget.QgsAuthMethodConfig")
