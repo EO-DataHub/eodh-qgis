@@ -1,7 +1,8 @@
 services:
   qgis:
-    image: qgis/qgis:release-3_36
-    container_name: qgis
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - ./dist/eodh_qgis:/tests_directory
     environment:

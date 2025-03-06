@@ -2,8 +2,6 @@
 
 set -e
 
-pip3 install pyeodh pytest pytest-cov pytest-qgis
-
 qgis_setup.sh
 
 # Fix the symlink created by qgis_setup.sh
