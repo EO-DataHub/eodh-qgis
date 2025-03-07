@@ -32,8 +32,8 @@ class SettingsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.username_input.editingFinished.connect(lambda: self.save_creds("username"))
         self.token_input.editingFinished.connect(lambda: self.save_creds("token"))
 
-        self.env_select.currentTextChanged.connect(self.save_env)
         self.env_select.setCurrentText(self.settings.data["env"])
+        self.env_select.currentTextChanged.connect(self.save_env)
 
     def save_env(self):
         self.settings.save("env", self.env_select.currentText())
