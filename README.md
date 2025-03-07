@@ -10,10 +10,9 @@ This plugin demonstrates the EO Application Package and workflow capabilities of
 ### From QGIS repository
 
 1. Go to menu Plugins -> All
-2. Tick `Show experimental plugins` in the settings tab
-3. Search for `EODH Workflows`
-4. Click Install Plugin
-5. We're using [QPIP plugin](https://github.com/opengisch/qpip) to install python dependencies using pip. Click OK to install them.
+2. Search for `EODH Workflows`
+3. Click Install Plugin
+4. We're using [QPIP plugin](https://github.com/opengisch/qpip) to install python dependencies using pip. Click OK to install them.
 
 ### Manual
 
