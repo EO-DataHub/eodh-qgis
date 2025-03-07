@@ -103,7 +103,7 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
     def get_ades(self):
         username = self.creds["username"]
         token = self.creds["token"]
-        env = self.settings.data["env"]
+        env = Settings().data["env"]
 
         url = "https://eodatahub.org.uk"
         if env == "production":
