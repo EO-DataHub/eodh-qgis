@@ -2,6 +2,8 @@ import json
 import os
 import shutil
 import time
+import tempfile
+from pathlib import Path
 
 import pyeodh.ades
 import pyeodh.resource_catalog
@@ -14,8 +16,15 @@ from eodh_qgis.worker import Worker
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer
 FORM_CLASS, _ = uic.loadUiType(
-    os.path.join(os.path.dirname(__file__), "../ui/job_detail.ui")
+    str(Path(__file__).parent.parent / "ui" / "job_detail.ui")
 )
+
+
+def get_temp_dir():
+    """Get a cross-platform temporary directory for QGIS plugin files."""
+    temp_dir = Path(tempfile.gettempdir()) / "qgis-files"
+    temp_dir.mkdir(parents=True, exist_ok=True)
+    return temp_dir
 
 
 class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
@@ -132,16 +141,15 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.threadpool.start(worker)
 
     def read_logs(self):
-        fname = "/tmp/qgis-files/job-logs.json"
-        if os.path.exists(fname):
-            with open(fname, "r") as f:
+        logs_file = get_temp_dir() / "job-logs.json"
+        if logs_file.exists():
+            with logs_file.open("r") as f:
                 self.logs = json.load(f)
 
     def save_logs(self):
-        if not os.path.exists("/tmp/qgis-files"):
-            os.makedirs("/tmp/qgis-files")
+        logs_file = get_temp_dir() / "job-logs.json"
         self.logs[self.job.id] = self.message_log.toPlainText()
-        with open("/tmp/qgis-files/job-logs.json", "w+") as f:
+        with logs_file.open("w+") as f:
             json.dump(self.logs, f)
 
     def populate_outputs_table(self, items: list[pyeodh.resource_catalog.Item]):
@@ -183,20 +191,21 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.threadpool.start(worker)
 
     def add_layer(self, item: pyeodh.resource_catalog.Item):
-        if not os.path.exists("/tmp/qgis-files"):
-            os.makedirs("/tmp/qgis-files")
+        temp_dir = get_temp_dir()
 
         def load_data(url: str, *args, **kwargs):
             local_filename = url.split("/")[-1]
-            path = f"/tmp/qgis-files/{local_filename}"
+            path = temp_dir / local_filename
+            print(f"Downloading {url} to {path}")
             with requests.get(
                 url,
                 stream=True,
-                headers={"Authorization": f"Bearer {self.job._client.s3_token}"},
+                headers={"Authorization": f"Bearer {self.job._client.token}"},
             ) as r:
-                with open(path, "wb") as f:
+                print(r.status_code)
+                with path.open("wb") as f:
                     shutil.copyfileobj(r.raw, f)
-            rlayer = QgsRasterLayer(path, local_filename)
+            rlayer = QgsRasterLayer(str(path), local_filename)
             QgsProject.instance().addMapLayer(rlayer, True)
 
         worker = Worker(load_data, next(iter(item.assets.values())).href)
