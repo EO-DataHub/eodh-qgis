@@ -3,7 +3,7 @@ name = "eodh-qgis"
 version = "0.0.2"
 description = "QGIS plugin for EODH"
 authors = ["Dusan Figala <dusan@oxidian.com>"]
-license = "BSD 2-Clause"
+license = "BSD-3-Clause"
 readme = "README.md"
 package-mode = false
 
