@@ -6,6 +6,7 @@ from qgis.PyQt.QtWidgets import QAction
 
 # Import the code for the dialog
 from .gui.main_dialog import MainDialog
+from .gui.v2.main_dialog import MainDialogV2
 
 # Initialize Qt resources from file resources.py
 from .resources import *  # type: ignore # noqa: F401,F403
@@ -148,8 +149,8 @@ class EodhQgis:
 
         self.add_action(
             icon_path,
-            text=self.tr("Search"),
-            callback=self.run_search,
+            text=self.tr("V2"),
+            callback=self.run_v2,
             parent=self.iface.mainWindow(),
         )
 
@@ -182,6 +183,7 @@ class EodhQgis:
             # substitute with your code.
             pass
 
-    def run_search(self):
-        """Run method for the Search action"""
-        pass
+    def run_v2(self):
+        """Run method for the v2 action"""
+        self.v2_dlg = MainDialogV2()
+        self.v2_dlg.show()
