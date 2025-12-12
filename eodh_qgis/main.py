@@ -146,6 +146,13 @@ class EodhQgis:
             parent=self.iface.mainWindow(),
         )
 
+        self.add_action(
+            icon_path,
+            text=self.tr("Search"),
+            callback=self.run_search,
+            parent=self.iface.mainWindow(),
+        )
+
         # will be set False in run()
         self.first_start = True
 
@@ -174,3 +181,7 @@ class EodhQgis:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
             pass
+
+    def run_search(self):
+        """Run method for the Search action"""
+        pass
