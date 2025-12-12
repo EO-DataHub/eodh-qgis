@@ -10,6 +10,8 @@ from .gui.main_dialog import MainDialog
 # Initialize Qt resources from file resources.py
 from .resources import *  # type: ignore # noqa: F401,F403
 
+MENU_NAME = "&EODH"
+
 
 class EodhQgis:
     """QGIS Plugin Implementation."""
@@ -39,7 +41,7 @@ class EodhQgis:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr("&EODH Workflows")
+        self.menu = self.tr(MENU_NAME)
 
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
