@@ -17,6 +17,7 @@ class MainDialogV2(QtWidgets.QDialog):
 
         # Tab widget for navigation
         self.tab_widget = QtWidgets.QTabWidget()
+        self.tab_widget.addTab(self._create_landing_tab(), "Welcome")
         self.tab_widget.addTab(self._create_overview_tab(), "Overview")
         self.tab_widget.addTab(self._create_search_tab(), "Search")
         self.tab_widget.addTab(self._create_placeholder_tab("Process"), "Process")
@@ -29,8 +30,8 @@ class MainDialogV2(QtWidgets.QDialog):
 
         self.setup_ui_after_token()
 
-    def _create_overview_tab(self):
-        """Create the Overview tab with intro content."""
+    def _create_landing_tab(self):
+        """Create the Welcome/Landing tab with intro content."""
         widget = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout()
 
@@ -60,6 +61,73 @@ class MainDialogV2(QtWidgets.QDialog):
         docs_layout.addWidget(docs_label)
         docs_group.setLayout(docs_layout)
         layout.addWidget(docs_group)
+
+        widget.setLayout(layout)
+        return widget
+
+    def _create_overview_tab(self):
+        """Create the Overview tab with catalogue selection and statistics."""
+        widget = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout()
+
+        # Catalogue dropdown section
+        dropdown_layout = QtWidgets.QHBoxLayout()
+        dropdown_layout.addStretch()
+        self.catalogue_dropdown = QtWidgets.QComboBox()
+        self.catalogue_dropdown.addItem("Drop down to choose data catalogue")
+        self.catalogue_dropdown.setMinimumWidth(300)
+        dropdown_layout.addWidget(self.catalogue_dropdown)
+        dropdown_layout.addStretch()
+        layout.addLayout(dropdown_layout)
+
+        layout.addSpacing(20)
+
+        # Statistics grid
+        stats_layout = QtWidgets.QGridLayout()
+
+        # Number of items
+        num_items_label = QtWidgets.QLabel("Number of items")
+        num_items_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.num_items_value = QtWidgets.QLabel("7700")
+        self.num_items_value.setAlignment(QtCore.Qt.AlignCenter)
+        self.num_items_value.setStyleSheet("font-size: 36px; font-weight: bold;")
+
+        # Date range
+        date_range_label = QtWidgets.QLabel("Date range")
+        date_range_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.date_range_value = QtWidgets.QLabel("01.01.1990  \u2192  30.09.2015")
+        self.date_range_value.setAlignment(QtCore.Qt.AlignCenter)
+        self.date_range_value.setStyleSheet("font-size: 18px;")
+
+        # Item average size
+        avg_size_label = QtWidgets.QLabel("Item average size (MB)")
+        avg_size_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.avg_size_value = QtWidgets.QLabel("650")
+        self.avg_size_value.setAlignment(QtCore.Qt.AlignCenter)
+        self.avg_size_value.setStyleSheet("font-size: 36px; font-weight: bold;")
+
+        # Total catalogue size
+        total_size_label = QtWidgets.QLabel("Total catalogue size (GB)")
+        total_size_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.total_size_value = QtWidgets.QLabel("5000")
+        self.total_size_value.setAlignment(QtCore.Qt.AlignCenter)
+        self.total_size_value.setStyleSheet("font-size: 36px; font-weight: bold;")
+
+        # Row 0: labels
+        stats_layout.addWidget(num_items_label, 0, 0)
+        stats_layout.addWidget(date_range_label, 0, 1)
+        # Row 1: values
+        stats_layout.addWidget(self.num_items_value, 1, 0)
+        stats_layout.addWidget(self.date_range_value, 1, 1)
+        # Row 2: labels
+        stats_layout.addWidget(avg_size_label, 2, 0)
+        stats_layout.addWidget(total_size_label, 2, 1)
+        # Row 3: values
+        stats_layout.addWidget(self.avg_size_value, 3, 0)
+        stats_layout.addWidget(self.total_size_value, 3, 1)
+
+        layout.addLayout(stats_layout)
+        layout.addStretch()
 
         widget.setLayout(layout)
         return widget
