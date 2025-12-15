@@ -185,5 +185,5 @@ class EodhQgis:
 
     def run_v2(self):
         """Run method for the v2 action"""
-        self.v2_dlg = MainDialogV2()
+        self.v2_dlg = MainDialogV2(iface=self.iface)
         self.v2_dlg.show()

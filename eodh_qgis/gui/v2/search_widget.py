@@ -1,12 +1,18 @@
+from qgis.core import Qgis, QgsMessageLog
 from qgis.PyQt import QtCore, QtWidgets
+
+from eodh_qgis.gui.v2.polygon_tool import PolygonCaptureTool
 
 
 class SearchWidget(QtWidgets.QWidget):
-    def __init__(self, creds: dict[str, str], parent=None):
+    def __init__(self, creds: dict[str, str], iface=None, parent=None):
         """Constructor."""
         super(SearchWidget, self).__init__(parent)
         self.creds = creds
+        self.iface = iface
         self.catalog = None
+        self.bbox = None
+        self.polygon_tool = None
 
         layout = QtWidgets.QVBoxLayout()
 
@@ -39,6 +45,20 @@ class SearchWidget(QtWidgets.QWidget):
         self.to_date.setDisplayFormat("dd.MM.yyyy")
         filter_layout.addWidget(self.to_date)
 
+        filter_layout.addSpacing(20)
+
+        # Spatial range buttons
+        filter_layout.addWidget(QtWidgets.QLabel("Spatial range"))
+        self.spatial_button = QtWidgets.QPushButton("Draw on map")
+        self.spatial_button.setCheckable(True)
+        self.spatial_button.clicked.connect(self.on_spatial_clicked)
+        filter_layout.addWidget(self.spatial_button)
+
+        self.clear_spatial_button = QtWidgets.QPushButton("Clear")
+        self.clear_spatial_button.clicked.connect(self.on_clear_spatial)
+        self.clear_spatial_button.setEnabled(False)
+        filter_layout.addWidget(self.clear_spatial_button)
+
         filter_layout.addStretch()
         layout.addLayout(filter_layout)
 
@@ -70,6 +90,45 @@ class SearchWidget(QtWidgets.QWidget):
         self.catalogue_dropdown.addItem(catalog_name)
         self.search_button.setEnabled(True)
 
+    def on_spatial_clicked(self):
+        """Activate polygon drawing tool on the map canvas."""
+        QgsMessageLog.logMessage("on_spatial_clicked called", "EODH", level=Qgis.Info)
+        QgsMessageLog.logMessage(f"iface is: {self.iface}", "EODH", level=Qgis.Info)
+
+        if not self.iface:
+            QgsMessageLog.logMessage("iface is None!", "EODH", level=Qgis.Warning)
+            QtWidgets.QMessageBox.warning(
+                self, "Error", "Map canvas not available"
+            )
+            self.spatial_button.setChecked(False)
+            return
+
+        QgsMessageLog.logMessage("Creating PolygonCaptureTool", "EODH", level=Qgis.Info)
+        self.polygon_tool = PolygonCaptureTool(self.iface.mapCanvas())
+        self.polygon_tool.polygon_captured.connect(self.on_polygon_captured)
+        self.iface.mapCanvas().setMapTool(self.polygon_tool)
+        QgsMessageLog.logMessage("Map tool set", "EODH", level=Qgis.Info)
+
+    def on_polygon_captured(self, geometry):
+        """Handle polygon capture completion."""
+        QgsMessageLog.logMessage("on_polygon_captured called", "EODH", level=Qgis.Info)
+        self.bbox = geometry.boundingBox()
+        QgsMessageLog.logMessage(f"bbox set to: {self.bbox.toString()}", "EODH", level=Qgis.Info)
+        self.spatial_button.setChecked(False)
+        self.clear_spatial_button.setEnabled(True)
+        self.spatial_button.setText("Area selected")
+        # Reset to default map tool
+        if self.iface:
+            self.iface.mapCanvas().unsetMapTool(self.polygon_tool)
+
+    def on_clear_spatial(self):
+        """Clear the spatial filter."""
+        self.bbox = None
+        self.clear_spatial_button.setEnabled(False)
+        self.spatial_button.setText("Draw on map")
+        if self.polygon_tool:
+            self.polygon_tool.reset()
+
     def on_search_clicked(self):
         """Handle search button click."""
         if not self.catalog:
@@ -83,9 +142,22 @@ class SearchWidget(QtWidgets.QWidget):
             start_date = self.from_date.date().toString("yyyy-MM-dd")
             end_date = self.to_date.date().toString("yyyy-MM-dd")
 
+            # Use drawn bbox or default world bbox
+            if self.bbox:
+                bbox = [
+                    self.bbox.xMinimum(),
+                    self.bbox.yMinimum(),
+                    self.bbox.xMaximum(),
+                    self.bbox.yMaximum(),
+                ]
+                QgsMessageLog.logMessage(f"Using drawn bbox: {bbox}", "EODH", level=Qgis.Info)
+            else:
+                bbox = [-180, -90, 180, 90]
+                QgsMessageLog.logMessage("Using default world bbox", "EODH", level=Qgis.Info)
+
             results = self.catalog.search(
                 limit=50,
-                bbox=[-180, -90, 180, 90],  # Hardcoded world bbox
+                bbox=bbox,
                 start_datetime=start_date,
                 end_datetime=end_date,
             )

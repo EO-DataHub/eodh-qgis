@@ -9,9 +9,10 @@ from eodh_qgis.settings import Settings
 
 
 class MainDialogV2(QtWidgets.QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, iface=None, parent=None):
         """Constructor."""
         super(MainDialogV2, self).__init__(parent)
+        self.iface = iface
         self.setWindowTitle("Earth Observation Data Hub")
         self.setMinimumSize(600, 500)
 
@@ -76,7 +77,7 @@ class MainDialogV2(QtWidgets.QDialog):
 
         # Replace placeholder tabs with actual widgets
         self.overview_widget = OverviewWidget(creds=self.creds, parent=self)
-        self.search_widget = SearchWidget(creds=self.creds, parent=self)
+        self.search_widget = SearchWidget(creds=self.creds, iface=self.iface, parent=self)
 
         # Connect overview catalogue selection to search widget
         self.overview_widget.catalogue_changed.connect(
