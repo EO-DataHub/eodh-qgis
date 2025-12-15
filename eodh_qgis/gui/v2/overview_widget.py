@@ -3,6 +3,9 @@ from qgis.PyQt import QtCore, QtWidgets
 
 
 class OverviewWidget(QtWidgets.QWidget):
+    # Signal emitted when catalogue selection changes, passes (catalog, catalog_name)
+    catalogue_changed = QtCore.pyqtSignal(object, str)
+
     def __init__(self, creds: dict[str, str], parent=None):
         """Constructor."""
         super(OverviewWidget, self).__init__(parent)
@@ -80,7 +83,8 @@ class OverviewWidget(QtWidgets.QWidget):
         """Populate the dropdown with available catalogues."""
         try:
             self.catalog_service = pyeodh.Client(
-                username=self.creds["username"], token=self.creds["token"]
+                username=self.creds["username"
+                ], token=self.creds["token"]
             ).get_catalog_service()
 
             catalogs = self.catalog_service.get_catalogs()
@@ -100,6 +104,11 @@ class OverviewWidget(QtWidgets.QWidget):
 
         try:
             catalog = self.catalogs[cat_idx]
+            cat_name = self.catalogue_dropdown.currentText()
+
+            # Emit signal for other widgets
+            self.catalogue_changed.emit(catalog, cat_name)
+
             collections = catalog.get_collections()
 
             total_items = 0

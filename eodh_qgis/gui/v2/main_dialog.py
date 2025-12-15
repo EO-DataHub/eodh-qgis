@@ -75,13 +75,18 @@ class MainDialogV2(QtWidgets.QDialog):
             return
 
         # Replace placeholder tabs with actual widgets
-        overview_widget = OverviewWidget(creds=self.creds, parent=self)
-        search_widget = SearchWidget(creds=self.creds, parent=self)
+        self.overview_widget = OverviewWidget(creds=self.creds, parent=self)
+        self.search_widget = SearchWidget(creds=self.creds, parent=self)
+
+        # Connect overview catalogue selection to search widget
+        self.overview_widget.catalogue_changed.connect(
+            self.search_widget.set_catalog
+        )
 
         # Remove placeholder and insert real widget at index 1 (Overview)
         self.tab_widget.removeTab(1)
-        self.tab_widget.insertTab(1, overview_widget, "Overview")
+        self.tab_widget.insertTab(1, self.overview_widget, "Overview")
 
         # Remove placeholder and insert real widget at index 2 (Search)
         self.tab_widget.removeTab(2)
-        self.tab_widget.insertTab(2, search_widget, "Search")
+        self.tab_widget.insertTab(2, self.search_widget, "Search")
