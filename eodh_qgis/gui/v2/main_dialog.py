@@ -1,5 +1,9 @@
 import pyeodh
+from qgis.core import QgsApplication, QgsAuthMethodConfig
 from qgis.PyQt import QtCore, QtWidgets
+
+from eodh_qgis.gui.settings_widget import SettingsWidget
+from eodh_qgis.settings import Settings
 
 
 class MainDialogV2(QtWidgets.QDialog):
@@ -17,26 +21,13 @@ class MainDialogV2(QtWidgets.QDialog):
         self.tab_widget.addTab(self._create_search_tab(), "Search")
         self.tab_widget.addTab(self._create_placeholder_tab("Process"), "Process")
         self.tab_widget.addTab(self._create_placeholder_tab("View"), "View")
+        self.settings_widget = SettingsWidget(parent=self)
+        self.tab_widget.addTab(self.settings_widget, "Settings")
         main_layout.addWidget(self.tab_widget)
 
-        # Optional login section
-        login_group = QtWidgets.QGroupBox("Optional login")
-        login_layout = QtWidgets.QHBoxLayout()
-        login_layout.addStretch()
-        self.username_input = QtWidgets.QLineEdit()
-        self.username_input.setPlaceholderText("Username")
-        self.username_input.setFixedWidth(150)
-        login_layout.addWidget(self.username_input)
-        self.api_key_input = QtWidgets.QLineEdit()
-        self.api_key_input.setPlaceholderText("API Key")
-        self.api_key_input.setEchoMode(QtWidgets.QLineEdit.Password)
-        self.api_key_input.setFixedWidth(150)
-        login_layout.addWidget(self.api_key_input)
-        login_layout.addStretch()
-        login_group.setLayout(login_layout)
-        main_layout.addWidget(login_group)
-
         self.setLayout(main_layout)
+
+        self.setup_ui_after_token()
 
     def _create_overview_tab(self):
         """Create the Overview tab with intro content."""
@@ -111,12 +102,10 @@ class MainDialogV2(QtWidgets.QDialog):
         self.results_text.clear()
         self.results_text.append(f"Searching for: {search_term}...")
 
-        # Use credentials if provided
-        username = self.username_input.text() or None
-        api_key = self.api_key_input.text() or None
-
         try:
-            client = pyeodh.Client(username=username, token=api_key)
+            client = pyeodh.Client(
+                username=self.creds["username"], token=self.creds["token"]
+            )
             catalog_service = client.get_catalog_service()
             results = catalog_service.collection_search(query=search_term, limit=10)
 
@@ -132,3 +121,34 @@ class MainDialogV2(QtWidgets.QDialog):
                 self.results_text.append("No results found.")
         except Exception as e:
             self.results_text.append(f"Error: {str(e)}")
+
+    def get_creds(self) -> dict[str, str]:
+        settings = Settings()
+        auth_config_id = settings.data["auth_config"]
+        if not auth_config_id:
+            return
+        auth_mgr = QgsApplication.authManager()
+        cfg = QgsAuthMethodConfig()
+        auth_mgr.loadAuthenticationConfig(auth_config_id, cfg, True)
+        creds = {
+            "token": cfg.configMap().get("token"),
+            "username": cfg.configMap().get("username"),
+        }
+        if not creds.get("token") or not creds.get("username"):
+            return
+        return creds
+
+    def missing_creds(self):
+        settings_index = self.tab_widget.indexOf(self.settings_widget)
+        self.tab_widget.setCurrentIndex(settings_index)
+        QtWidgets.QMessageBox.warning(
+            self,
+            "Missing credentials",
+            "Configure authentication settings",
+        )
+
+    def setup_ui_after_token(self):
+        self.creds = self.get_creds()
+        if not self.creds:
+            self.missing_creds()
+            return
