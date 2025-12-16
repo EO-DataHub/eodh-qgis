@@ -3,6 +3,7 @@ install:
 
 
 format:
+	poetry run isort eodh_qgis
 	poetry run black --preview eodh_qgis
 
 check:
