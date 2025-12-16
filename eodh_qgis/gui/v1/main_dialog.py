@@ -6,14 +6,14 @@ import requests
 from qgis.core import QgsApplication, QgsAuthMethodConfig
 from qgis.PyQt import QtCore, QtGui, QtWidgets, uic
 
-from eodh_qgis.gui.jobs_widget import JobsWidget
+from eodh_qgis.gui.v1.jobs_widget import JobsWidget
 from eodh_qgis.gui.settings_widget import SettingsWidget
-from eodh_qgis.gui.workflows_widget import WorkflowsWidget
+from eodh_qgis.gui.v1.workflows_widget import WorkflowsWidget
 from eodh_qgis.settings import Settings
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer
-FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../ui/main.ui"))
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../../ui/main.ui"))
 
 
 class MainDialog(QtWidgets.QDialog, FORM_CLASS):

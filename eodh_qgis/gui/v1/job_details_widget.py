@@ -15,7 +15,7 @@ from eodh_qgis.worker import Worker
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer
 FORM_CLASS, _ = uic.loadUiType(
-    str(Path(__file__).parent.parent / "ui" / "job_detail.ui")
+    str(Path(__file__).parent.parent.parent / "ui" / "job_detail.ui")
 )
 
 

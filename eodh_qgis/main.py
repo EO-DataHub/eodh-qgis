@@ -5,8 +5,8 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
 # Import the code for the dialog
-from .gui.main_dialog import MainDialog
-from .gui.v2.main_dialog import MainDialogV2
+from .gui.v1.main_dialog import MainDialog as MainDialogV1
+from .gui.v2.main_dialog import MainDialogV2 as MainDialog
 
 # Initialize Qt resources from file resources.py
 from .resources import *  # type: ignore # noqa: F401,F403
@@ -142,15 +142,15 @@ class EodhQgis:
         icon_path = ":/plugins/eodh_qgis/icon.png"
         self.add_action(
             icon_path,
-            text=self.tr("Access workflows on the EODH"),
+            text=self.tr("Earth Observation Data Hub"),
             callback=self.run,
             parent=self.iface.mainWindow(),
         )
 
         self.add_action(
             icon_path,
-            text=self.tr("V2"),
-            callback=self.run_v2,
+            text=self.tr("V1 (legacy)"),
+            callback=self.run_v1,
             parent=self.iface.mainWindow(),
         )
 
@@ -160,7 +160,7 @@ class EodhQgis:
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
-            self.iface.removePluginWebMenu(self.tr("&EODH Workflows"), action)
+            self.iface.removePluginWebMenu(self.menu, action)
             self.iface.removeToolBarIcon(action)
 
     def run(self):
@@ -171,7 +171,7 @@ class EodhQgis:
         # is started
         if self.first_start is True:
             self.first_start = False
-            self.dlg = MainDialog()
+            self.dlg = MainDialog(iface=self.iface)
 
         # show the dialog
         self.dlg.show()
@@ -183,7 +183,8 @@ class EodhQgis:
             # substitute with your code.
             pass
 
-    def run_v2(self):
-        """Run method for the v2 action"""
-        self.v2_dlg = MainDialogV2(iface=self.iface)
-        self.v2_dlg.show()
+    def run_v1(self):
+        """Run v1 dialog for comparison"""
+        self.dlg_v1 = MainDialogV1()
+        self.dlg_v1.show()
+        self.dlg_v1.exec_()
