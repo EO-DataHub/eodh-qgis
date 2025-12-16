@@ -70,6 +70,10 @@ class MainDialogV2(QtWidgets.QDialog):
         self.overview_widget.catalogue_changed.connect(
             self.search_widget.set_catalog
         )
+        # Connect overview collection selection to search widget
+        self.overview_widget.collection_changed.connect(
+            self.search_widget.set_collection
+        )
 
         self.tab_widget.insertTab(1, self.overview_widget, "Overview")
         self.tab_widget.insertTab(2, self.search_widget, "Search")

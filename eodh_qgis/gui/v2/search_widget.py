@@ -11,6 +11,7 @@ class SearchWidget(QtWidgets.QWidget):
         self.creds = creds
         self.iface = iface
         self.catalog = None
+        self.collection = None
         self.bbox = None
         self.polygon_tool = None
         self.search_results = []  # Store Item objects
@@ -88,9 +89,14 @@ class SearchWidget(QtWidgets.QWidget):
     def set_catalog(self, catalog, catalog_name: str):
         """Receive catalog selection from Overview widget."""
         self.catalog = catalog
+        self.collection = None  # Reset collection when catalog changes
         self.catalogue_dropdown.clear()
         self.catalogue_dropdown.addItem(catalog_name)
         self.search_button.setEnabled(True)
+
+    def set_collection(self, collection, collection_name: str):
+        """Receive collection selection from Overview widget."""
+        self.collection = collection
 
     def on_spatial_clicked(self):
         """Activate polygon drawing tool on the map canvas."""

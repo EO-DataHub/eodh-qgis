@@ -5,6 +5,8 @@ from qgis.PyQt import QtCore, QtWidgets
 class OverviewWidget(QtWidgets.QWidget):
     # Signal emitted when catalogue selection changes, passes (catalog, catalog_name)
     catalogue_changed = QtCore.pyqtSignal(object, str)
+    # Signal emitted when collection selection changes, passes (collection, collection_name)
+    collection_changed = QtCore.pyqtSignal(object, str)
 
     def __init__(self, creds: dict[str, str], parent=None):
         """Constructor."""
@@ -12,6 +14,8 @@ class OverviewWidget(QtWidgets.QWidget):
         self.creds = creds
         self.catalog_service = None
         self.catalogs = {}  # Store catalog objects by index
+        self.collections = {}  # Store collection objects by index
+        self.selected_collection = None
 
         layout = QtWidgets.QVBoxLayout()
 
@@ -25,6 +29,20 @@ class OverviewWidget(QtWidgets.QWidget):
         dropdown_layout.addWidget(self.catalogue_dropdown)
         dropdown_layout.addStretch()
         layout.addLayout(dropdown_layout)
+
+        layout.addSpacing(10)
+
+        # Collection dropdown section
+        collection_layout = QtWidgets.QHBoxLayout()
+        collection_layout.addStretch()
+        self.collection_dropdown = QtWidgets.QComboBox()
+        self.collection_dropdown.addItem("Select a catalogue first...", None)
+        self.collection_dropdown.setMinimumWidth(300)
+        self.collection_dropdown.setEnabled(False)
+        self.collection_dropdown.currentIndexChanged.connect(self.on_collection_changed)
+        collection_layout.addWidget(self.collection_dropdown)
+        collection_layout.addStretch()
+        layout.addLayout(collection_layout)
 
         layout.addSpacing(20)
 
@@ -109,25 +127,68 @@ class OverviewWidget(QtWidgets.QWidget):
             # Emit signal for other widgets
             self.catalogue_changed.emit(catalog, cat_name)
 
+            # Reset collection state
+            self.collections = {}
+            self.selected_collection = None
+            self.collection_dropdown.clear()
+            self.collection_dropdown.addItem("Select a collection...", None)
+
             collections = catalog.get_collections()
 
+            # Populate collection dropdown
+            for idx, collection in enumerate(collections):
+                # Add to dropdown (idx + 1 because index 0 is "Select...")
+                self.collections[idx + 1] = collection
+                self.collection_dropdown.addItem(
+                    collection.title or collection.id, idx + 1
+                )
+
+            # Reset statistics until a collection is selected
+            self.num_items_value.setText("-")
+            self.date_range_value.setText("-")
+
+            # Enable collection dropdown
+            self.collection_dropdown.setEnabled(True)
+
+        except Exception as e:
+            QtWidgets.QMessageBox.warning(
+                self, "Error", f"Failed to load catalogue statistics: {str(e)}"
+            )
+
+    def on_collection_changed(self, index):
+        """Handle collection selection change."""
+        col_idx = self.collection_dropdown.itemData(index)
+        if not col_idx or col_idx not in self.collections:
+            self.selected_collection = None
+            self.num_items_value.setText("-")
+            self.date_range_value.setText("-")
+            return
+
+        collection = self.collections[col_idx]
+        col_name = self.collection_dropdown.currentText()
+        self.selected_collection = collection
+
+        # Emit signal for other widgets
+        self.collection_changed.emit(collection, col_name)
+
+        # Update statistics for selected collection
+        try:
             total_items = 0
             min_date = None
             max_date = None
 
-            for collection in collections:
-                items = collection.get_items()
-                if items.total_count:
-                    total_items += items.total_count
+            items = collection.get_items()
+            if items.total_count:
+                total_items = items.total_count
 
-                if hasattr(collection, "extent") and collection.extent:
-                    temporal = getattr(collection.extent, "temporal", None)
-                    if temporal and temporal.intervals:
-                        for interval in temporal.intervals:
-                            if interval[0] and (min_date is None or interval[0] < min_date):
-                                min_date = interval[0]
-                            if interval[1] and (max_date is None or interval[1] > max_date):
-                                max_date = interval[1]
+            if hasattr(collection, "extent") and collection.extent:
+                temporal = getattr(collection.extent, "temporal", None)
+                if temporal and temporal.intervals:
+                    for interval in temporal.intervals:
+                        if interval[0] and (min_date is None or interval[0] < min_date):
+                            min_date = interval[0]
+                        if interval[1] and (max_date is None or interval[1] > max_date):
+                            max_date = interval[1]
 
             # Update statistics
             self.num_items_value.setText(str(total_items) if total_items else "-")
@@ -141,5 +202,5 @@ class OverviewWidget(QtWidgets.QWidget):
 
         except Exception as e:
             QtWidgets.QMessageBox.warning(
-                self, "Error", f"Failed to load catalogue statistics: {str(e)}"
+                self, "Error", f"Failed to load collection statistics: {str(e)}"
             )
