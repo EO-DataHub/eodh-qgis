@@ -101,6 +101,7 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl("https://eodatahub.org.uk/"))
 
     def get_ades(self):
+        assert self.creds is not None
         username = self.creds["username"]
         token = self.creds["token"]
         env = Settings().data["env"]
@@ -149,11 +150,12 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
             self.selected_button.style().polish(self.selected_button)
 
         self.selected_button = button
+        assert self.selected_button is not None
         self.selected_button.setProperty("selected", True)
         self.selected_button.style().unpolish(self.selected_button)
         self.selected_button.style().polish(self.selected_button)
 
-    def get_creds(self) -> dict[str, str]:
+    def get_creds(self) -> Optional[dict[str, str]]:
         settings = Settings()
         auth_config_id = settings.data["auth_config"]
         if not auth_config_id:

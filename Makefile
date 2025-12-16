@@ -10,6 +10,10 @@ check:
 	poetry run black --preview --check eodh_qgis
 	poetry run flake8 eodh_qgis
 	poetry run isort --check --diff eodh_qgis
+	poetry run pyright eodh_qgis
+
+typecheck:
+	poetry run pyright eodh_qgis
 
 test:
 	.docker/stop.sh

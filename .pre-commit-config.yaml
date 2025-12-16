@@ -21,3 +21,11 @@ repos:
         language: system
         types: [python]
         files: ^eodh_qgis/
+
+      - id: pyright
+        name: pyright
+        entry: poetry run pyright
+        language: system
+        types: [python]
+        files: ^eodh_qgis/
+        exclude: ^eodh_qgis/test/

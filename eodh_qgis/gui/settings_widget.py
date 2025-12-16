@@ -24,6 +24,7 @@ class SettingsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.env_select: QtWidgets.QComboBox
         self.settings = Settings()
 
+        assert parent is not None
         self.creds = parent.get_creds() or {}
         if self.creds:
             self.username_input.setText(self.creds.get("username", ""))
