@@ -74,7 +74,12 @@ class JobsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.lock_form(True)
 
         def load_data(*args, **kwargs):
-            jobs = [j for j in self.ades_svc.get_jobs(limit=100)]
+            jobs = [
+                j
+                for j in self.ades_svc.get_jobs(
+                    limit=100  # pyright: ignore[reportCallIssue]
+                )
+            ]
             return jobs
 
         worker = Worker(load_data)

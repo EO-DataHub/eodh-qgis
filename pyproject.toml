@@ -35,4 +35,5 @@ include = ["eodh_qgis"]
 exclude = ["eodh_qgis/test"]
 pythonVersion = "3.10"
 typeCheckingMode = "basic"
+reportMissingImports = "warning"
 
