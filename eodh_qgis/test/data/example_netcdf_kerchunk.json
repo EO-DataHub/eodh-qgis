@@ -1,0 +1,68 @@
+{
+    "version": 1,
+    "refs": {
+        ".zgroup": "{\"zarr_format\":2}",
+        ".zattrs": "{\"Conventions\":\"CF-1.10\",\"conventions\":\"CF-1.10\",\"creator_name\":\"Andy Ridout, Alan Muir (CPOM, University College London)\",\"creator_url\":\"http:\\/\\/www.cpom.org.uk\",\"date_created\":\"20250114T095946Z\",\"end_day\":\"30\",\"end_month\":\"11\",\"end_year\":\"2024\",\"geospatial_lat_max\":\"88.2284\",\"geospatial_lat_min\":\"67.1128\",\"geospatial_lon_max\":\"359.9999\",\"geospatial_lon_min\":\"0.0002\",\"geospatial_vertical_max\":\"0.0\",\"geospatial_vertical_min\":\"0.0\",\"institution\":\"Centre for Polar Observation and Modelling (CPOM), U.K\",\"keywords\":\"Sea Ice, Thickness, Radar Altimeters\",\"license\":\"Creative Commons Attribution 4.0 International (CC BY 4.0)\",\"ndays\":\"30\",\"platform\":\"CryoSat-2\",\"processing_level\":\"Level-3C\",\"project\":\"EOCIS\",\"sensor\":\"SIRAL\",\"spatial_resolution\":\"5 km\",\"standard_name_vocabulary\":\"CF\",\"start_day\":\"1\",\"start_month\":\"11\",\"start_year\":\"2024\",\"time_coverage_duration\":\"P1M\",\"time_coverage_end\":\"20241130T235959Z\",\"time_coverage_resolution\":\"P1M\",\"time_coverage_start\":\"20241101T000000Z\",\"title\":\"Arctic Monthly Gridded Sea Ice Thickness Product from CryoSat-2\"}",
+        "lat/.zarray": "{\"chunks\":[2240,1520],\"compressor\":null,\"dtype\":\"<f4\",\"fill_value\":null,\"filters\":[{\"elementsize\":4,\"id\":\"shuffle\"},{\"id\":\"zlib\",\"level\":9}],\"order\":\"C\",\"shape\":[2240,1520],\"zarr_format\":2}",
+        "lat/.zattrs": "{\"_ARRAY_DIMENSIONS\":[\"yc\",\"xc\"],\"long_name\":\"latitude of grid cell center\",\"standard_name\":\"latitude\",\"units\":\"degrees_north\"}",
+        "lat/0.0": [
+            "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/arctic_sea_ice/arctic_sea_ice_thickness_grids/L3C/monthly/v1.0/EOCIS-SEAICE-L3C-SITHICK-CS2-5KM-202411-fv1.0.nc",
+            2126221,
+            5583891
+        ],
+        "lon/.zarray": "{\"chunks\":[2240,1520],\"compressor\":null,\"dtype\":\"<f4\",\"fill_value\":null,\"filters\":[{\"elementsize\":4,\"id\":\"shuffle\"},{\"id\":\"zlib\",\"level\":9}],\"order\":\"C\",\"shape\":[2240,1520],\"zarr_format\":2}",
+        "lon/.zattrs": "{\"_ARRAY_DIMENSIONS\":[\"yc\",\"xc\"],\"long_name\":\"longitude of grid cell center\",\"standard_name\":\"longitude\",\"units\":\"degrees_east\"}",
+        "lon/0.0": [
+            "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/arctic_sea_ice/arctic_sea_ice_thickness_grids/L3C/monthly/v1.0/EOCIS-SEAICE-L3C-SITHICK-CS2-5KM-202411-fv1.0.nc",
+            7710112,
+            5398041
+        ],
+        "n_thickness_measurements/.zarray": "{\"chunks\":[1,2240,1520],\"compressor\":null,\"dtype\":\"<i4\",\"fill_value\":null,\"filters\":[{\"elementsize\":4,\"id\":\"shuffle\"},{\"id\":\"zlib\",\"level\":9}],\"order\":\"C\",\"shape\":[1,2240,1520],\"zarr_format\":2}",
+        "n_thickness_measurements/.zattrs": "{\"_ARRAY_DIMENSIONS\":[\"time\",\"yc\",\"xc\"],\"actual_range\":\"0 9628\",\"comment\":\"number of sea ice thickness measurements used to calculate the mean thickness in the grid cell\",\"coordinates\":\"time lon lat\",\"grid_mapping_name\":\"polar_stereographic\",\"long_name\":\"number of contributing thickness measurements\",\"standard_name\":\"number\"}",
+        "n_thickness_measurements/0.0.0": [
+            "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/arctic_sea_ice/arctic_sea_ice_thickness_grids/L3C/monthly/v1.0/EOCIS-SEAICE-L3C-SITHICK-CS2-5KM-202411-fv1.0.nc",
+            1821042,
+            305179
+        ],
+        "polar_stereographic/.zarray": "{\"chunks\":[],\"compressor\":null,\"dtype\":\"|i1\",\"fill_value\":-127,\"filters\":null,\"order\":\"C\",\"shape\":[],\"zarr_format\":2}",
+        "polar_stereographic/.zattrs": "{\"_ARRAY_DIMENSIONS\":[],\"epsg_code\":\"3413\",\"grid_mapping_name\":\"polar_stereographic\",\"latitude_of_projection_origin\":90.0,\"longitude_of_central_meridian\":-45.0,\"longitude_of_projection_origin\":-45.0,\"proj4_string\":\"+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs\",\"semi_major_axis\":6378137.0,\"standard_parallel\":70.0}",
+        "sea_ice_thickness/.zarray": "{\"chunks\":[1,2240,1520],\"compressor\":null,\"dtype\":\"<f4\",\"fill_value\":null,\"filters\":[{\"elementsize\":4,\"id\":\"shuffle\"},{\"id\":\"zlib\",\"level\":9}],\"order\":\"C\",\"shape\":[1,2240,1520],\"zarr_format\":2}",
+        "sea_ice_thickness/.zattrs": "{\"_ARRAY_DIMENSIONS\":[\"time\",\"yc\",\"xc\"],\"actual_range\":\"-2.32 7.50\",\"coordinates\":\"time lon lat\",\"grid_mapping_name\":\"polar_stereographic\",\"long_name\":\"sea ice thickness\",\"plot_range\":\"0.0 3.5\",\"standard_name\":\"sea_ice_thickness\",\"units\":\"m\"}",
+        "sea_ice_thickness/0.0.0": [
+            "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/arctic_sea_ice/arctic_sea_ice_thickness_grids/L3C/monthly/v1.0/EOCIS-SEAICE-L3C-SITHICK-CS2-5KM-202411-fv1.0.nc",
+            52361,
+            885200
+        ],
+        "sea_ice_thickness_stdev/.zarray": "{\"chunks\":[1,2240,1520],\"compressor\":null,\"dtype\":\"<f4\",\"fill_value\":null,\"filters\":[{\"elementsize\":4,\"id\":\"shuffle\"},{\"id\":\"zlib\",\"level\":4}],\"order\":\"C\",\"shape\":[1,2240,1520],\"zarr_format\":2}",
+        "sea_ice_thickness_stdev/.zattrs": "{\"_ARRAY_DIMENSIONS\":[\"time\",\"yc\",\"xc\"],\"actual_range\":\"0.00 6.86\",\"comment\":\"defined as the standard deviation of the thickness in the grid cell\",\"coordinates\":\"time lon lat\",\"grid_mapping_name\":\"polar_stereographic\",\"long_name\":\"standard deviation of sea ice thickness\",\"plot_range\":\"0.00 2.00\",\"units\":\"m\"}",
+        "sea_ice_thickness_stdev/0.0.0": [
+            "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/arctic_sea_ice/arctic_sea_ice_thickness_grids/L3C/monthly/v1.0/EOCIS-SEAICE-L3C-SITHICK-CS2-5KM-202411-fv1.0.nc",
+            937561,
+            883481
+        ],
+        "time/.zarray": "{\"chunks\":[512],\"compressor\":null,\"dtype\":\"<f8\",\"fill_value\":null,\"filters\":null,\"order\":\"C\",\"shape\":[1],\"zarr_format\":2}",
+        "time/.zattrs": "{\"_ARRAY_DIMENSIONS\":[\"time\"],\"axis\":\"T\",\"bounds\":\"time_bnds\",\"calendar\":\"standard\",\"long_name\":\"reference time of product\",\"standard_name\":\"time\",\"units\":\"seconds since 1970-01-01\"}",
+        "time/0": [
+            "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/arctic_sea_ice/arctic_sea_ice_thickness_grids/L3C/monthly/v1.0/EOCIS-SEAICE-L3C-SITHICK-CS2-5KM-202411-fv1.0.nc",
+            13108153,
+            4096
+        ],
+        "time_bnds/.zarray": "{\"chunks\":[1,2],\"compressor\":null,\"dtype\":\"<f8\",\"fill_value\":null,\"filters\":null,\"order\":\"C\",\"shape\":[1,2],\"zarr_format\":2}",
+        "time_bnds/.zattrs": "{\"_ARRAY_DIMENSIONS\":[\"time\",\"nv\"]}",
+        "time_bnds/0.0": "base64:AAAAgAbJ2UEAAABgldLZQQ==",
+        "xc/.zarray": "{\"chunks\":[1520],\"compressor\":null,\"dtype\":\"<f4\",\"fill_value\":null,\"filters\":[{\"elementsize\":4,\"id\":\"shuffle\"},{\"id\":\"zlib\",\"level\":9}],\"order\":\"C\",\"shape\":[1520],\"zarr_format\":2}",
+        "xc/.zattrs": "{\"_ARRAY_DIMENSIONS\":[\"xc\"],\"long_name\":\"x coordinate of projection (eastings)\",\"standard_name\":\"projection_x_coordinate\",\"units\":\"m\"}",
+        "xc/0": [
+            "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/arctic_sea_ice/arctic_sea_ice_thickness_grids/L3C/monthly/v1.0/EOCIS-SEAICE-L3C-SITHICK-CS2-5KM-202411-fv1.0.nc",
+            42759,
+            4103
+        ],
+        "yc/.zarray": "{\"chunks\":[2240],\"compressor\":null,\"dtype\":\"<f4\",\"fill_value\":null,\"filters\":[{\"elementsize\":4,\"id\":\"shuffle\"},{\"id\":\"zlib\",\"level\":9}],\"order\":\"C\",\"shape\":[2240],\"zarr_format\":2}",
+        "yc/.zattrs": "{\"_ARRAY_DIMENSIONS\":[\"yc\"],\"long_name\":\"y coordinate of projection (eastings)\",\"standard_name\":\"projection_y_coordinate\",\"units\":\"m\"}",
+        "yc/0": [
+            "https://dap.ceda.ac.uk/neodc/eocis/data/global_and_regional/arctic_sea_ice/arctic_sea_ice_thickness_grids/L3C/monthly/v1.0/EOCIS-SEAICE-L3C-SITHICK-CS2-5KM-202411-fv1.0.nc",
+            46862,
+            5499
+        ]
+    }
+}

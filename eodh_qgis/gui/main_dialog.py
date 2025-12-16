@@ -1,161 +1,50 @@
 import os
-from typing import Callable, Literal, Optional
+from typing import Optional
 
-import pyeodh
-import requests
 from qgis.core import QgsApplication, QgsAuthMethodConfig
-from qgis.PyQt import QtCore, QtGui, QtWidgets, uic
+from qgis.PyQt import QtWidgets, uic
 
-from eodh_qgis.gui.jobs_widget import JobsWidget
+from eodh_qgis.gui.landing_widget import LandingWidget
+from eodh_qgis.gui.overview_widget import OverviewWidget
+from eodh_qgis.gui.process_widget import ProcessWidget
+from eodh_qgis.gui.search_widget import SearchWidget
 from eodh_qgis.gui.settings_widget import SettingsWidget
-from eodh_qgis.gui.workflows_widget import WorkflowsWidget
 from eodh_qgis.settings import Settings
 
-# This loads your .ui file so that PyQt can populate your plugin with the elements from
-# Qt Designer
+# Load the UI file
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../ui/main.ui"))
 
 
 class MainDialog(QtWidgets.QDialog, FORM_CLASS):
-    def __init__(self, parent=None):
-        """Constructor."""
+    def __init__(self, iface=None, parent=None):
+        """Constructor.
+
+        Args:
+            iface: QGIS interface instance.
+            parent: Parent widget.
+        """
         super(MainDialog, self).__init__(parent)
-        # Set up the user interface from Designer through FORM_CLASS.
-        # After self.setupUi() you can access any designer object by doing
-        # self.<objectname>, and you can use autoconnect slots - see
-        # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
-        # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
-        self.content_widget: QtWidgets.QStackedWidget
-        self.workflows_button: QtWidgets.QPushButton
-        self.jobs_button: QtWidgets.QPushButton
-        self.settings_button: QtWidgets.QPushButton
-        self.logo: QtWidgets.QLabel
-        self.selected_button: Optional[QtWidgets.QPushButton] = None
-        self.ades_svc = None
 
-        self.button_widget_map = {
-            "settings": {
-                "button": self.settings_button,
-                "widget": SettingsWidget(parent=self),
-            },
-            "workflows": {
-                "button": self.workflows_button,
-                "widget": None,
-            },
-            "jobs": {
-                "button": self.jobs_button,
-                "widget": None,
-            },
-        }
-        self.content_widget.addWidget(self.button_widget_map["settings"]["widget"])
+        self.iface = iface
 
-        self.settings_button.clicked.connect(
-            lambda: self.handle_menu_button_clicked("settings")
-        )
-        self.workflows_button.clicked.connect(
-            lambda: self.handle_menu_button_clicked("workflows")
-        )
-        self.jobs_button.clicked.connect(
-            lambda: self.handle_menu_button_clicked("jobs")
-        )
+        # Type hints for UI elements (from .ui file)
+        self.tab_widget: QtWidgets.QTabWidget
 
-        self.logo.mousePressEvent = self.open_url
-        self.logo.setCursor(QtCore.Qt.CursorShape.PointingHandCursor)
+        # Add initial tabs
+        self.tab_widget.addTab(LandingWidget(parent=self), "Welcome")
+        # Overview and Search tabs added after credential validation
+        self.settings_widget = SettingsWidget(parent=self)
+        self.tab_widget.addTab(self.settings_widget, "Settings")
+
         self.setup_ui_after_token()
 
-    def missing_creds(self):
-        self.content_widget.setCurrentWidget(
-            self.button_widget_map["settings"]["widget"]
-        )
-        self.selected_button = self.settings_button
-        self.style_menu_button(self.selected_button)
-        QtWidgets.QMessageBox.warning(
-            self,
-            "Missing credentials",
-            "Configure authentication settings",
-        )
-
-    def setup_ui_after_token(self):
-        self.creds = self.get_creds()
-        if not self.creds:
-            self.missing_creds()
-            return
-
-        self.get_ades()
-        if self.ades_svc is None:
-            self.missing_creds()
-            return
-
-        self.button_widget_map["workflows"]["widget"] = WorkflowsWidget(
-            ades_svc=self.ades_svc, parent=self
-        )
-        self.content_widget.addWidget(self.button_widget_map["workflows"]["widget"])
-        self.button_widget_map["jobs"]["widget"] = JobsWidget(ades_svc=self.ades_svc)
-        self.content_widget.addWidget(self.button_widget_map["jobs"]["widget"])
-
-        if self.selected_button is None:
-            self.handle_menu_button_clicked("workflows")
-
-    def open_url(self, event):
-        QtGui.QDesktopServices.openUrl(QtCore.QUrl("https://eodatahub.org.uk/"))
-
-    def get_ades(self):
-        assert self.creds is not None
-        username = self.creds["username"]
-        token = self.creds["token"]
-        env = Settings().data["env"]
-
-        url = "https://eodatahub.org.uk"
-        if env == "production":
-            url = "https://eodatahub.org.uk"
-        elif env == "staging":
-            url = "https://staging.eodatahub.org.uk"
-        elif env == "test":
-            url = "https://test.eodatahub.org.uk"
-
-        try:
-            self.ades_svc = pyeodh.Client(
-                base_url=url, username=username, token=token
-            ).get_ades()
-        except requests.HTTPError:
-            QtWidgets.QMessageBox.critical(
-                self, "Error", "Error logging in, validate your credentials."
-            )
-
-    def handle_menu_button_clicked(
-        self,
-        action: Literal["settings", "workflows", "jobs"],
-        invoke_fn: Optional[Callable] = None,
-    ):
-        button = self.button_widget_map[action]["button"]
-        widget = self.button_widget_map[action]["widget"]
-        if button is self.selected_button:
-            return
-
-        if not widget:
-            self.setup_ui_after_token()
-            widget = self.button_widget_map[action]["widget"]
-
-        self.content_widget.setCurrentWidget(widget)
-        self.style_menu_button(button)
-
-        if invoke_fn is not None:
-            invoke_fn()
-
-    def style_menu_button(self, button: QtWidgets.QPushButton):
-        if self.selected_button:
-            self.selected_button.setProperty("selected", False)
-            self.selected_button.style().unpolish(self.selected_button)
-            self.selected_button.style().polish(self.selected_button)
-
-        self.selected_button = button
-        assert self.selected_button is not None
-        self.selected_button.setProperty("selected", True)
-        self.selected_button.style().unpolish(self.selected_button)
-        self.selected_button.style().polish(self.selected_button)
-
     def get_creds(self) -> Optional[dict[str, str]]:
+        """Retrieve stored authentication credentials.
+
+        Returns:
+            A dictionary with 'token' and 'username' if available, else None.
+        """
         settings = Settings()
         auth_config_id = settings.data["auth_config"]
         if not auth_config_id:
@@ -170,3 +59,39 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         if not creds.get("token") or not creds.get("username"):
             return
         return creds
+
+    def missing_creds(self):
+        """Handle missing credentials by prompting the user to configure them."""
+        settings_index = self.tab_widget.indexOf(self.settings_widget)
+        self.tab_widget.setCurrentIndex(settings_index)
+        QtWidgets.QMessageBox.warning(
+            self,
+            "Missing credentials",
+            "Configure authentication settings",
+        )
+
+    def setup_ui_after_token(self):
+        """Set up UI components that require authentication credentials."""
+        self.creds = self.get_creds()
+        if not self.creds:
+            self.missing_creds()
+            return
+
+        # Add Overview and Search tabs
+        self.overview_widget = OverviewWidget(creds=self.creds, parent=self)
+        self.search_widget = SearchWidget(
+            creds=self.creds, iface=self.iface, parent=self
+        )
+
+        # Connect overview catalogue selection to search widget
+        self.overview_widget.catalogue_changed.connect(self.search_widget.set_catalog)
+        # Connect overview collection selection to search widget
+        self.overview_widget.collection_changed.connect(
+            self.search_widget.set_collection
+        )
+
+        self.tab_widget.insertTab(1, self.overview_widget, "Overview")
+        self.tab_widget.insertTab(2, self.search_widget, "Search")
+
+        self.process_widget = ProcessWidget(creds=self.creds, parent=self)
+        self.tab_widget.insertTab(3, self.process_widget, "Process")

@@ -10,6 +10,8 @@ from .gui.main_dialog import MainDialog
 # Initialize Qt resources from file resources.py
 from .resources import *  # type: ignore # noqa: F401,F403
 
+MENU_NAME = "&EODH"
+
 
 class EodhQgis:
     """QGIS Plugin Implementation."""
@@ -39,7 +41,7 @@ class EodhQgis:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr("&EODH Workflows")
+        self.menu = self.tr(MENU_NAME)
 
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
@@ -139,7 +141,7 @@ class EodhQgis:
         icon_path = ":/plugins/eodh_qgis/icon.png"
         self.add_action(
             icon_path,
-            text=self.tr("Access workflows on the EODH"),
+            text=self.tr("Earth Observation Data Hub"),
             callback=self.run,
             parent=self.iface.mainWindow(),
         )
@@ -150,7 +152,7 @@ class EodhQgis:
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
-            self.iface.removePluginWebMenu(self.tr("&EODH Workflows"), action)
+            self.iface.removePluginWebMenu(self.menu, action)
             self.iface.removeToolBarIcon(action)
 
     def run(self):
@@ -161,7 +163,7 @@ class EodhQgis:
         # is started
         if self.first_start is True:
             self.first_start = False
-            self.dlg = MainDialog()
+            self.dlg = MainDialog(iface=self.iface)
 
         # show the dialog
         self.dlg.show()

@@ -91,17 +91,26 @@ def compile_resources(
 
 
 def patch_resources(build_dir: pathlib.Path = BUILD_DIR):
-    p = build_dir / "ui/main.ui"
-    # Read in the file
-    with open(p, "r") as file:
-        filedata = file.read()
+    # Patch all .ui files that reference the resources.qrc file
+    ui_files = [
+        build_dir / "ui/main.ui",
+        build_dir / "ui/landing.ui",
+    ]
 
-    # Replace the target string
-    filedata = filedata.replace("../../resources/resources.qrc", "resources.py")
+    for p in ui_files:
+        if not p.exists():
+            continue
+        # Read in the file
+        with open(p, "r") as file:
+            filedata = file.read()
 
-    # Write the file out again
-    with open(p, "w") as file:
-        file.write(filedata)
+        # Replace resource references - handle different relative paths
+        filedata = filedata.replace("../../resources/resources.qrc", "resources.py")
+        filedata = filedata.replace("../../../resources/resources.qrc", "resources.py")
+
+        # Write the file out again
+        with open(p, "w") as file:
+            file.write(filedata)
 
 
 def load_dotenv():
