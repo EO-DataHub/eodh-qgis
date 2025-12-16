@@ -1,4 +1,4 @@
-from qgis.core import Qgis, QgsMessageLog
+from qgis.core import Qgis, QgsMessageLog, QgsRasterLayer, QgsProject
 from qgis.PyQt import QtCore, QtWidgets
 
 from eodh_qgis.gui.v2.polygon_tool import PolygonCaptureTool
@@ -13,6 +13,7 @@ class SearchWidget(QtWidgets.QWidget):
         self.catalog = None
         self.bbox = None
         self.polygon_tool = None
+        self.search_results = []  # Store Item objects
 
         layout = QtWidgets.QVBoxLayout()
 
@@ -70,6 +71,7 @@ class SearchWidget(QtWidgets.QWidget):
 
         self.results_list = QtWidgets.QListWidget()
         self.results_list.setMinimumHeight(200)
+        self.results_list.itemDoubleClicked.connect(self.on_result_double_clicked)
         layout.addWidget(self.results_list)
 
         # Row 4: Search button (right aligned)
@@ -162,13 +164,13 @@ class SearchWidget(QtWidgets.QWidget):
                 end_datetime=end_date,
             )
 
-            count = 0
+            self.search_results = []
             for item in results:
-                count += 1
+                self.search_results.append(item)
                 datetime_str = str(item.datetime)[:10] if item.datetime else "No date"
                 self.results_list.addItem(f"{item.id} - {datetime_str}")
 
-            if count == 0:
+            if len(self.search_results) == 0:
                 self.results_list.addItem("No results found.")
 
         except Exception as e:
@@ -176,3 +178,100 @@ class SearchWidget(QtWidgets.QWidget):
         finally:
             self.search_button.setEnabled(True)
             self.search_button.setText("Search")
+
+    def on_result_double_clicked(self, list_item):
+        """Handle double-click on a search result to add it to the canvas."""
+        row = self.results_list.row(list_item)
+        if row < 0 or row >= len(self.search_results):
+            return
+
+        item = self.search_results[row]
+        QgsMessageLog.logMessage(f"Double-clicked item: {item.id}", "EODH", level=Qgis.Info)
+
+        # Log all available assets for debugging
+        for key, a in item.assets.items():
+            a_type = getattr(a, "type", "None")
+            a_href = getattr(a, "href", "None")
+            QgsMessageLog.logMessage(f"Asset '{key}': type={a_type}, href={a_href[:80]}...", "EODH", level=Qgis.Info)
+
+        # Find best asset to load - prioritize by role/key
+        asset = self._get_loadable_asset(item)
+        if not asset:
+            QgsMessageLog.logMessage(f"No loadable asset found for {item.id}", "EODH", level=Qgis.Warning)
+            return
+
+        url = asset.href
+        asset_type = getattr(asset, "type", "") or ""
+
+        # Use /vsicurl/ for COG and GeoTIFF assets (remote streaming)
+        cog_types = [
+            "image/tiff; application=geotiff; profile=cloud-optimized",
+            "image/tiff; application=geotiff",
+            "image/tiff",
+        ]
+        if any(cog_type in asset_type for cog_type in cog_types) or url.endswith(".tif") or url.endswith(".tiff"):
+            url = f"/vsicurl/{url}"
+
+        QgsMessageLog.logMessage(f"Loading asset: {url}", "EODH", level=Qgis.Info)
+        layer = QgsRasterLayer(url, item.id)
+        if layer.isValid():
+            QgsProject.instance().addMapLayer(layer)
+            QgsMessageLog.logMessage(f"Layer added: {item.id}", "EODH", level=Qgis.Info)
+        else:
+            QgsMessageLog.logMessage(f"Layer invalid: {layer.error().message()}", "EODH", level=Qgis.Warning)
+
+    def _get_loadable_asset(self, item):
+        """Find the best loadable asset from a STAC item.
+
+        Based on qgis-stac-plugin pattern: check asset.type against known layer types.
+        """
+        # Known loadable types from qgis-stac-plugin
+        loadable_types = [
+            "image/tiff; application=geotiff; profile=cloud-optimized",  # COG
+            "image/tiff; application=geotiff",  # GEOTIFF
+            "application/x-netcdf",  # NETCDF
+            "application/netcdf",
+            "image/tiff",
+            "image/png",
+            "image/jpeg",
+        ]
+
+        # Priority order for asset keys
+        priority_keys = ["visual", "data", "image", "B04", "B03", "B02", "red", "green", "blue", "quicklook"]
+
+        def is_loadable(asset, asset_key=None):
+            if not hasattr(asset, "href"):
+                return False
+            asset_type = getattr(asset, "type", None)
+            # Check if asset type contains any loadable type (substring match like qgis-stac-plugin)
+            if asset_type:
+                for lt in loadable_types:
+                    if lt in asset_type or asset_type in lt:
+                        return True
+            # Fallback: check file extension
+            href = asset.href.lower()
+            if href.endswith(".tif") or href.endswith(".tiff") or href.endswith(".nc"):
+                return True
+            if href.endswith(".png") or href.endswith(".jpg") or href.endswith(".jpeg"):
+                return True
+            # If type is None but it's a quicklook/data/visual asset, try it anyway
+            if asset_type is None and asset_key in ["quicklook", "data", "visual", "image"]:
+                return True
+            return False
+
+        # First try priority keys
+        for key in priority_keys:
+            if key in item.assets:
+                asset = item.assets[key]
+                if is_loadable(asset, key):
+                    return asset
+
+        # Fall back to first loadable asset (skip thumbnails)
+        for asset_key, asset in item.assets.items():
+            roles = getattr(asset, "roles", []) or []
+            if "thumbnail" in roles or asset_key == "thumbnail":
+                continue
+            if is_loadable(asset, asset_key):
+                return asset
+
+        return None
