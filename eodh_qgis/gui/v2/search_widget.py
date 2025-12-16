@@ -3,6 +3,19 @@ from qgis.PyQt import QtCore, QtWidgets
 
 from eodh_qgis.gui.v2.polygon_tool import PolygonCaptureTool
 
+# Coordinate ranges (WGS84 degrees, EPSG:4326)
+# Reference: https://github.com/radiantearth/stac-spec/blob/master/item-spec/item-spec.md
+LAT_MIN = -90.0
+LAT_MAX = 90.0
+LON_MIN = -180.0
+LON_MAX = 180.0
+
+# Default bounding box - UK (WGS84 degrees)
+DEFAULT_BBOX_NORTH = 60.85
+DEFAULT_BBOX_SOUTH = 49.9
+DEFAULT_BBOX_WEST = -8.65
+DEFAULT_BBOX_EAST = 1.77
+
 
 class SearchWidget(QtWidgets.QWidget):
     def __init__(self, creds: dict[str, str], iface=None, parent=None):
@@ -47,22 +60,13 @@ class SearchWidget(QtWidgets.QWidget):
         self.to_date.setDisplayFormat("dd.MM.yyyy")
         filter_layout.addWidget(self.to_date)
 
-        filter_layout.addSpacing(20)
-
-        # Spatial range buttons
-        filter_layout.addWidget(QtWidgets.QLabel("Spatial range"))
-        self.spatial_button = QtWidgets.QPushButton("Draw on map")
-        self.spatial_button.setCheckable(True)
-        self.spatial_button.clicked.connect(self.on_spatial_clicked)
-        filter_layout.addWidget(self.spatial_button)
-
-        self.clear_spatial_button = QtWidgets.QPushButton("Clear")
-        self.clear_spatial_button.clicked.connect(self.on_clear_spatial)
-        self.clear_spatial_button.setEnabled(False)
-        filter_layout.addWidget(self.clear_spatial_button)
-
         filter_layout.addStretch()
         layout.addLayout(filter_layout)
+
+        layout.addSpacing(10)
+
+        # Spatial filter section
+        self._setup_spatial_filter(layout)
 
         layout.addSpacing(10)
 
@@ -85,6 +89,119 @@ class SearchWidget(QtWidgets.QWidget):
         layout.addLayout(button_layout)
 
         self.setLayout(layout)
+
+    def _setup_spatial_filter(self, layout):
+        """Setup the spatial filter UI with radio buttons and coordinate inputs."""
+        spatial_label = QtWidgets.QLabel("Spatial range")
+        layout.addWidget(spatial_label)
+
+        # Radio buttons for input type
+        radio_layout = QtWidgets.QHBoxLayout()
+        self.direct_input_radio = QtWidgets.QRadioButton("Direct input")
+        self.draw_map_radio = QtWidgets.QRadioButton("Draw on map")
+        self.direct_input_radio.setChecked(True)
+        self.direct_input_radio.toggled.connect(self._on_spatial_mode_changed)
+        radio_layout.addWidget(self.direct_input_radio)
+        radio_layout.addWidget(self.draw_map_radio)
+        radio_layout.addStretch()
+        layout.addLayout(radio_layout)
+
+        # Coordinate input widget (compass-style layout)
+        self.coord_widget = QtWidgets.QWidget()
+        coord_layout = QtWidgets.QGridLayout(self.coord_widget)
+        coord_layout.setContentsMargins(0, 0, 0, 0)
+
+        # North (top center)
+        north_layout = QtWidgets.QHBoxLayout()
+        north_layout.addWidget(QtWidgets.QLabel("N"))
+        self.north_input = QtWidgets.QDoubleSpinBox()
+        self.north_input.setRange(LAT_MIN, LAT_MAX)
+        self.north_input.setDecimals(2)
+        self.north_input.setValue(DEFAULT_BBOX_NORTH)
+        north_layout.addWidget(self.north_input)
+        coord_layout.addLayout(north_layout, 0, 1, QtCore.Qt.AlignCenter)
+
+        # West (middle left)
+        west_layout = QtWidgets.QHBoxLayout()
+        west_layout.addWidget(QtWidgets.QLabel("W"))
+        self.west_input = QtWidgets.QDoubleSpinBox()
+        self.west_input.setRange(LON_MIN, LON_MAX)
+        self.west_input.setDecimals(2)
+        self.west_input.setValue(DEFAULT_BBOX_WEST)
+        west_layout.addWidget(self.west_input)
+        coord_layout.addLayout(west_layout, 1, 0, QtCore.Qt.AlignRight)
+
+        # East (middle right)
+        east_layout = QtWidgets.QHBoxLayout()
+        east_layout.addWidget(QtWidgets.QLabel("E"))
+        self.east_input = QtWidgets.QDoubleSpinBox()
+        self.east_input.setRange(LON_MIN, LON_MAX)
+        self.east_input.setDecimals(2)
+        self.east_input.setValue(DEFAULT_BBOX_EAST)
+        east_layout.addWidget(self.east_input)
+        coord_layout.addLayout(east_layout, 1, 2, QtCore.Qt.AlignLeft)
+
+        # South (bottom center)
+        south_layout = QtWidgets.QHBoxLayout()
+        south_layout.addWidget(QtWidgets.QLabel("S"))
+        self.south_input = QtWidgets.QDoubleSpinBox()
+        self.south_input.setRange(LAT_MIN, LAT_MAX)
+        self.south_input.setDecimals(2)
+        self.south_input.setValue(DEFAULT_BBOX_SOUTH)
+        south_layout.addWidget(self.south_input)
+        coord_layout.addLayout(south_layout, 2, 1, QtCore.Qt.AlignCenter)
+
+        layout.addWidget(self.coord_widget)
+
+        # Draw on map widget
+        self.draw_widget = QtWidgets.QWidget()
+        draw_layout = QtWidgets.QHBoxLayout(self.draw_widget)
+        draw_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.spatial_button = QtWidgets.QPushButton("Draw on map")
+        self.spatial_button.setCheckable(True)
+        self.spatial_button.clicked.connect(self.on_spatial_clicked)
+        draw_layout.addWidget(self.spatial_button)
+
+        self.clear_spatial_button = QtWidgets.QPushButton("Clear")
+        self.clear_spatial_button.clicked.connect(self.on_clear_spatial)
+        self.clear_spatial_button.setEnabled(False)
+        draw_layout.addWidget(self.clear_spatial_button)
+
+        draw_layout.addStretch()
+        layout.addWidget(self.draw_widget)
+        self.draw_widget.hide()  # Hidden by default (Direct input is selected)
+
+    def _on_spatial_mode_changed(self, checked):
+        """Handle switching between direct input and draw on map modes."""
+        if self.direct_input_radio.isChecked():
+            self.coord_widget.show()
+            self.draw_widget.hide()
+        else:
+            self.coord_widget.hide()
+            self.draw_widget.show()
+
+    def _get_bbox(self):
+        """Get the bounding box based on selected spatial mode.
+
+        Returns:
+            list: Bbox in format [west, south, east, north] or None if not available.
+        """
+        if self.direct_input_radio.isChecked():
+            return [
+                self.west_input.value(),
+                self.south_input.value(),
+                self.east_input.value(),
+                self.north_input.value(),
+            ]
+        elif self.bbox:
+            return [
+                self.bbox.xMinimum(),
+                self.bbox.yMinimum(),
+                self.bbox.xMaximum(),
+                self.bbox.yMaximum(),
+            ]
+        return None
 
     def set_catalog(self, catalog, catalog_name: str):
         """Receive catalog selection from Overview widget."""
@@ -151,18 +268,16 @@ class SearchWidget(QtWidgets.QWidget):
             start_date = self.from_date.date().toString("yyyy-MM-dd")
             end_date = self.to_date.date().toString("yyyy-MM-dd")
 
-            # Use drawn bbox or default world bbox
-            if self.bbox:
-                bbox = [
-                    self.bbox.xMinimum(),
-                    self.bbox.yMinimum(),
-                    self.bbox.xMaximum(),
-                    self.bbox.yMaximum(),
-                ]
-                QgsMessageLog.logMessage(f"Using drawn bbox: {bbox}", "EODH", level=Qgis.Info)
-            else:
-                bbox = [-180, -90, 180, 90]
-                QgsMessageLog.logMessage("Using default world bbox", "EODH", level=Qgis.Info)
+            # Get bbox based on selected mode
+            bbox = self._get_bbox()
+            if bbox is None:
+                self.search_button.setEnabled(True)
+                self.search_button.setText("Search")
+                QtWidgets.QMessageBox.warning(
+                    self, "Missing spatial filter", "Please draw a bounding box on the map."
+                )
+                return
+            QgsMessageLog.logMessage(f"Using bbox: {bbox}", "EODH", level=Qgis.Info)
 
             results = self.catalog.search(
                 limit=50,
