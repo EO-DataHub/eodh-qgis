@@ -92,11 +92,12 @@ class SearchWidget(QtWidgets.QWidget):
         self.collection = None  # Reset collection when catalog changes
         self.catalogue_dropdown.clear()
         self.catalogue_dropdown.addItem(catalog_name)
-        self.search_button.setEnabled(True)
+        self.search_button.setEnabled(False)  # Disable until collection is selected
 
     def set_collection(self, collection, collection_name: str):
         """Receive collection selection from Overview widget."""
         self.collection = collection
+        self.search_button.setEnabled(True)
 
     def on_spatial_clicked(self):
         """Activate polygon drawing tool on the map canvas."""
@@ -139,7 +140,7 @@ class SearchWidget(QtWidgets.QWidget):
 
     def on_search_clicked(self):
         """Handle search button click."""
-        if not self.catalog:
+        if not self.catalog or not self.collection:
             return
 
         self.results_list.clear()
@@ -168,6 +169,7 @@ class SearchWidget(QtWidgets.QWidget):
                 bbox=bbox,
                 start_datetime=start_date,
                 end_datetime=end_date,
+                collections=[self.collection.id],
             )
 
             self.search_results = []
