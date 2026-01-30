@@ -1,6 +1,7 @@
 import os
 
 import pyeodh.ades
+from qgis.core import Qgis, QgsMessageLog
 from qgis.PyQt import QtCore, QtWidgets, uic
 
 from eodh_qgis.gui.job_details_widget import JobDetailsWidget
@@ -33,6 +34,7 @@ class JobsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.load_jobs()
 
     def populate_table(self, jobs: list[pyeodh.ades.Job]):
+        QgsMessageLog.logMessage(f"Loaded {len(jobs)} jobs", "EODH", Qgis.Info)
         self.jobs = jobs
         headers = {
             "id": "ID",
@@ -70,8 +72,15 @@ class JobsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.parent().addWidget(details)
         self.parent().setCurrentWidget(details)
 
+    def _on_load_jobs_error(self, error_tuple):
+        exctype, value, tb = error_tuple
+        QgsMessageLog.logMessage(
+            f"Error loading jobs: {value}\n{tb}", "EODH", Qgis.Critical
+        )
+
     def load_jobs(self):
         self.lock_form(True)
+        QgsMessageLog.logMessage("Loading jobs...", "EODH", Qgis.Info)
 
         def load_data(*args, **kwargs):
             jobs = [
@@ -84,6 +93,7 @@ class JobsWidget(QtWidgets.QWidget, FORM_CLASS):
 
         worker = Worker(load_data)
         worker.signals.result.connect(self.populate_table)
+        worker.signals.error.connect(self._on_load_jobs_error)
         worker.signals.finished.connect(lambda: self.lock_form(False))
         self.threadpool.start(worker)
 

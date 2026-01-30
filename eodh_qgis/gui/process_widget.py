@@ -3,6 +3,7 @@ from typing import Callable, Literal, Optional
 
 import pyeodh
 import requests
+from qgis.core import Qgis, QgsMessageLog
 from qgis.PyQt import QtWidgets, uic
 
 from eodh_qgis.gui.jobs_widget import JobsWidget
@@ -74,13 +75,27 @@ class ProcessWidget(QtWidgets.QWidget, FORM_CLASS):
         elif env == "test":
             url = "https://test.eodatahub.org.uk"
 
+        QgsMessageLog.logMessage(
+            f"Initializing ADES: env={env}, url={url}, username={username}",
+            "EODH",
+            Qgis.Info,
+        )
+
         try:
             self.ades_svc = pyeodh.Client(
                 base_url=url, username=username, token=token
             ).get_ades()
-        except requests.HTTPError:
+            QgsMessageLog.logMessage(
+                "ADES service initialized successfully", "EODH", Qgis.Info
+            )
+        except requests.HTTPError as e:
+            QgsMessageLog.logMessage(f"ADES HTTPError: {e}", "EODH", Qgis.Critical)
             QtWidgets.QMessageBox.critical(
                 self, "Error", "Error logging in to ADES, validate your credentials."
+            )
+        except Exception as e:
+            QgsMessageLog.logMessage(
+                f"ADES unexpected error: {e}", "EODH", Qgis.Critical
             )
 
     def setup_widgets(self):

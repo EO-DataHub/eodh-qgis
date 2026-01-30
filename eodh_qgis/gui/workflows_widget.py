@@ -2,6 +2,7 @@ import os
 
 import pyeodh.ades
 import requests
+from qgis.core import Qgis, QgsMessageLog
 from qgis.PyQt import QtCore, QtWidgets, uic
 
 from eodh_qgis.gui.wf_editor_widget import WorkflowEditorWidget
@@ -82,6 +83,9 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.remove_button.setEnabled(True)
 
     def populate_table(self, processes: list[pyeodh.ades.Process]):
+        QgsMessageLog.logMessage(
+            f"Loaded {len(processes)} workflows", "EODH", Qgis.Info
+        )
         self.processes = processes
         headers = {
             "id": "ID",
@@ -104,14 +108,22 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
 
         self.table.show()
 
+    def _on_load_workflows_error(self, error_tuple):
+        exctype, value, tb = error_tuple
+        QgsMessageLog.logMessage(
+            f"Error loading workflows: {value}\n{tb}", "EODH", Qgis.Critical
+        )
+
     def load_workflows(self):
         self.lock_form(True)
+        QgsMessageLog.logMessage("Loading workflows...", "EODH", Qgis.Info)
 
         def load_data(*args, **kwargs):
             return self.ades_svc.get_processes()
 
         worker = Worker(load_data)
         worker.signals.result.connect(self.populate_table)
+        worker.signals.error.connect(self._on_load_workflows_error)
         worker.signals.finished.connect(lambda: self.lock_form(False))
         self.threadpool.start(worker)
 
