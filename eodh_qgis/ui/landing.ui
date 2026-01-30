@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Landing</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QFrame#main_frame {
+    background: #B8B8B8;
+}
+QGroupBox {
+    background-color: white;
+    border: 1px solid #888888;
+    border-radius: 3px;
+    margin-top: 0px;
+    padding: 10px;
+}
+QLabel {
+    color: #333333;
+}</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_outer">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QFrame" name="main_frame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>10</number>
+      </property>
+      <property name="leftMargin">
+       <number>20</number>
+      </property>
+      <property name="topMargin">
+       <number>20</number>
+      </property>
+      <property name="rightMargin">
+       <number>20</number>
+      </property>
+      <property name="bottomMargin">
+       <number>20</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="logoLayout">
+        <item>
+         <widget class="QLabel" name="logo_label">
+          <property name="minimumSize">
+           <size>
+            <width>108</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>108</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="pixmap">
+           <pixmap resource="../../../resources/resources.qrc">:/plugins/eodh_qgis/EODH-logo.png</pixmap>
+          </property>
+          <property name="scaledContents">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="title_label">
+          <property name="text">
+           <string>Earth Observation Data Hub</string>
+          </property>
+          <property name="styleSheet">
+           <string>font-size: 18px; font-weight: bold; color: #2A3559;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_logo">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="hello_group">
+        <layout class="QVBoxLayout" name="hello_layout">
+         <item>
+          <widget class="QLabel" name="hello_label">
+           <property name="text">
+            <string>&lt;p&gt;Welcome to the &lt;b&gt;Earth Observation Data Hub&lt;/b&gt; QGIS Plugin.&lt;/p&gt;
+&lt;p&gt;Discover, search, and load satellite imagery directly into QGIS from the EODataHub catalogues.&lt;/p&gt;</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="howto_group">
+        <property name="title">
+         <string>How to use this plugin</string>
+        </property>
+        <layout class="QVBoxLayout" name="howto_layout">
+         <item>
+          <widget class="QLabel" name="howto_label">
+           <property name="text">
+            <string>&lt;ol&gt;
+&lt;li&gt;&lt;b&gt;Settings&lt;/b&gt; - Configure your credentials (username and API token)&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Overview&lt;/b&gt; - Browse catalogues and collections&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Search&lt;/b&gt; - Define spatial extent and date range, then search&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Load&lt;/b&gt; - Double-click results to load assets into QGIS&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;Process&lt;/b&gt; - Submit data to workflows and monitor jobs&lt;/li&gt;
+&lt;/ol&gt;</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="docs_group">
+        <property name="title">
+         <string>Documentation</string>
+        </property>
+        <layout class="QVBoxLayout" name="docs_layout">
+         <item>
+          <widget class="QLabel" name="docs_label">
+           <property name="text">
+            <string>&lt;p&gt;For more information, visit: &lt;a href="https://eodatahub.org.uk"&gt;eodatahub.org.uk&lt;/a&gt;&lt;/p&gt;</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+           <property name="openExternalLinks">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../../../resources/resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>
