@@ -11,15 +11,13 @@ from eodh_qgis.worker import Worker
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer
-FORM_CLASS, _ = uic.loadUiType(
-    os.path.join(os.path.dirname(__file__), "../ui/workflows.ui")
-)
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../ui/workflows.ui"))
 
 
 class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
     def __init__(self, ades_svc: pyeodh.ades.Ades, parent=None):
         """Constructor."""
-        super(WorkflowsWidget, self).__init__(parent)
+        super().__init__(parent)
         self.setupUi(self)
         self.ades_svc = ades_svc
         self.processes: list[pyeodh.ades.Process] = []
@@ -83,9 +81,7 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.remove_button.setEnabled(True)
 
     def populate_table(self, processes: list[pyeodh.ades.Process]):
-        QgsMessageLog.logMessage(
-            f"Loaded {len(processes)} workflows", "EODH", Qgis.Info
-        )
+        QgsMessageLog.logMessage(f"Loaded {len(processes)} workflows", "EODH", Qgis.Info)
         self.processes = processes
         headers = {
             "id": "ID",
@@ -110,9 +106,7 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
 
     def _on_load_workflows_error(self, error_tuple):
         exctype, value, tb = error_tuple
-        QgsMessageLog.logMessage(
-            f"Error loading workflows: {value}\n{tb}", "EODH", Qgis.Critical
-        )
+        QgsMessageLog.logMessage(f"Error loading workflows: {value}\n{tb}", "EODH", Qgis.Critical)
 
     def load_workflows(self):
         self.lock_form(True)
@@ -146,12 +140,8 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         try:
             process.delete()
         except requests.HTTPError as e:
-            QtWidgets.QMessageBox.critical(
-                self, "Error", f"Error un-deploying process {process.id}!\n{e}"
-            )
+            QtWidgets.QMessageBox.critical(self, "Error", f"Error un-deploying process {process.id}!\n{e}")
         else:
-            QtWidgets.QMessageBox.information(
-                self, "Success", f"Successfully un-deployed {process.id}."
-            )
+            QtWidgets.QMessageBox.information(self, "Success", f"Successfully un-deployed {process.id}.")
         finally:
             self.load_workflows()

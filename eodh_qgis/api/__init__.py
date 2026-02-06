@@ -4,9 +4,9 @@ from .client import StacClient
 from .models import AssetInfo, ConnectionSettings, ItemResult, SearchFilters
 
 __all__ = [
-    "StacClient",
-    "ConnectionSettings",
-    "SearchFilters",
-    "ItemResult",
     "AssetInfo",
+    "ConnectionSettings",
+    "ItemResult",
+    "SearchFilters",
+    "StacClient",
 ]

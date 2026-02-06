@@ -8,7 +8,7 @@ from qgis.PyQt.QtWidgets import QAction
 from .gui.main_dialog import MainDialog
 
 # Initialize Qt resources from file resources.py
-from .resources import *  # type: ignore # noqa: F401,F403
+from .resources import *  # type: ignore # noqa: F403
 
 MENU_NAME = "&EODH"
 
@@ -30,9 +30,7 @@ class EodhQgis:
         self.plugin_dir = os.path.dirname(__file__)
         # initialize locale
         locale = QSettings().value("locale/userLocale")[0:2]
-        locale_path = os.path.join(
-            self.plugin_dir, "i18n", "EodhQgis_{}.qm".format(locale)
-        )
+        locale_path = os.path.join(self.plugin_dir, "i18n", f"EodhQgis_{locale}.qm")
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()

@@ -2,4 +2,4 @@
 
 from .stac_server import MockStacHandler, MockStacServer
 
-__all__ = ["MockStacServer", "MockStacHandler"]
+__all__ = ["MockStacHandler", "MockStacServer"]

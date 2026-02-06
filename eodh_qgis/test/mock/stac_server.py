@@ -120,9 +120,7 @@ class MockStacHandler(BaseHTTPRequestHandler):
         elif "/search" in path:
             self._respond_items(query_params)
         else:
-            self._respond_json(
-                {"type": "Catalog", "id": "root", "description": "Root catalog"}
-            )
+            self._respond_json({"type": "Catalog", "id": "root", "description": "Root catalog"})
 
     def do_POST(self) -> None:
         """Handle POST requests (search endpoint)."""

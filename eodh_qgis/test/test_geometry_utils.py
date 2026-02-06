@@ -155,9 +155,7 @@ class TestGetGeometryLonSpan(unittest.TestCase):
 
     def test_empty_coordinates(self):
         """Test empty coordinates returns None."""
-        self.assertIsNone(
-            _get_geometry_lon_span({"type": "Polygon", "coordinates": []})
-        )
+        self.assertIsNone(_get_geometry_lon_span({"type": "Polygon", "coordinates": []}))
 
     def test_no_coordinates_key(self):
         """Test missing coordinates key returns None."""

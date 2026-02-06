@@ -42,9 +42,7 @@ class TestParseKerchunkJson(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         self.test_data_dir = os.path.join(os.path.dirname(__file__), "data")
-        self.kerchunk_file = os.path.join(
-            self.test_data_dir, "example_netcdf_kerchunk.json"
-        )
+        self.kerchunk_file = os.path.join(self.test_data_dir, "example_netcdf_kerchunk.json")
 
     def test_parse_local_file(self):
         """Test parsing a local kerchunk JSON file."""
@@ -80,9 +78,7 @@ class TestExtractVariablesFromKerchunk(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         self.test_data_dir = os.path.join(os.path.dirname(__file__), "data")
-        self.kerchunk_file = os.path.join(
-            self.test_data_dir, "example_netcdf_kerchunk.json"
-        )
+        self.kerchunk_file = os.path.join(self.test_data_dir, "example_netcdf_kerchunk.json")
         self.kerchunk_data = parse_kerchunk_json(self.kerchunk_file)
 
     def test_extract_data_variables(self):
@@ -180,9 +176,7 @@ class TestLoadVariableFromKerchunk(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         self.test_data_dir = os.path.join(os.path.dirname(__file__), "data")
-        self.kerchunk_file = os.path.join(
-            self.test_data_dir, "example_netcdf_kerchunk.json"
-        )
+        self.kerchunk_file = os.path.join(self.test_data_dir, "example_netcdf_kerchunk.json")
         self.kerchunk_data = parse_kerchunk_json(self.kerchunk_file)
 
     def test_load_existing_variable(self):
@@ -210,9 +204,7 @@ class TestGetGeotransformFromKerchunk(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         self.test_data_dir = os.path.join(os.path.dirname(__file__), "data")
-        self.kerchunk_file = os.path.join(
-            self.test_data_dir, "example_netcdf_kerchunk.json"
-        )
+        self.kerchunk_file = os.path.join(self.test_data_dir, "example_netcdf_kerchunk.json")
         self.kerchunk_data = parse_kerchunk_json(self.kerchunk_file)
 
     def test_extract_geotransform(self):
@@ -296,9 +288,7 @@ class TestExtractEpsgFromKerchunk(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         self.test_data_dir = os.path.join(os.path.dirname(__file__), "data")
-        self.kerchunk_file = os.path.join(
-            self.test_data_dir, "example_netcdf_kerchunk.json"
-        )
+        self.kerchunk_file = os.path.join(self.test_data_dir, "example_netcdf_kerchunk.json")
         self.kerchunk_data = parse_kerchunk_json(self.kerchunk_file)
 
     def test_extract_epsg_from_real_kerchunk(self):

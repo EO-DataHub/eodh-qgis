@@ -68,9 +68,7 @@ def create_layers_for_asset(
     asset_type = getattr(asset, "type", "") or ""
 
     # Check if this is a NetCDF file
-    is_netcdf = any(
-        nc_type in asset_type for nc_type in NETCDF_MIME_TYPES
-    ) or url.endswith(".nc")
+    is_netcdf = any(nc_type in asset_type for nc_type in NETCDF_MIME_TYPES) or url.endswith(".nc")
 
     # For NetCDF, download to temp file first (geolocation warp requires local file)
     if is_netcdf and url.startswith("http"):
@@ -98,9 +96,7 @@ def create_layers_for_asset(
 
     # Use /vsicurl/ for remote streaming of COG/GeoTIFF (not NetCDF)
     needs_vsicurl = (
-        any(cog_type in asset_type for cog_type in COG_MIME_TYPES)
-        or url.endswith(".tif")
-        or url.endswith(".tiff")
+        any(cog_type in asset_type for cog_type in COG_MIME_TYPES) or url.endswith(".tif") or url.endswith(".tiff")
     )
     if needs_vsicurl and url.startswith("http"):
         url = f"/vsicurl/{url}"
@@ -164,9 +160,7 @@ def get_netcdf_layers(
 
         # Filter to selected variables if specified
         if selected_variables is not None:
-            data_vars = [
-                (uri, name) for uri, name in data_vars if name in selected_variables
-            ]
+            data_vars = [(uri, name) for uri, name in data_vars if name in selected_variables]
 
         if not data_vars:
             QgsMessageLog.logMessage(
@@ -217,8 +211,7 @@ def get_netcdf_layers(
                         layer = QgsRasterLayer(vrt_path, f"{layer_name}_{var_name}")
                         if layer.isValid():
                             QgsMessageLog.logMessage(
-                                f"Created georeferenced layer for {var_name} "
-                                f"with EPSG:{epsg}",
+                                f"Created georeferenced layer for {var_name} with EPSG:{epsg}",
                                 PLUGIN_NAME,
                                 level=Qgis.Info,
                             )

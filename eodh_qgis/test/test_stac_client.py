@@ -43,9 +43,7 @@ class TestStacClientInit(unittest.TestCase):
     def test_from_settings_creates_client(self):
         """Test from_settings creates a client from settings."""
         mock_manager = Mock()
-        mock_manager.get_connection.return_value = ConnectionSettings(
-            name="Test", url="https://api.example.com"
-        )
+        mock_manager.get_connection.return_value = ConnectionSettings(name="Test", url="https://api.example.com")
         client = StacClient.from_settings(mock_manager)
         self.assertIsInstance(client, StacClient)
 
@@ -164,9 +162,7 @@ class TestStacClientConnected(unittest.TestCase):
         self.client._catalog.search.return_value = mock_results_obj
 
         received = []
-        self.client.items_received.connect(
-            lambda items, count: received.append((items, count))
-        )
+        self.client.items_received.connect(lambda items, count: received.append((items, count)))
         self.client.search(SearchFilters(limit=10))
 
         self.assertEqual(len(received), 1)

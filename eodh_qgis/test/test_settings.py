@@ -31,9 +31,7 @@ class TestSettings(unittest.TestCase):
         self.settings.save("auth_config", "new_value")
 
         mock_qsettings.return_value.beginGroup.assert_called_with("/eodh")
-        mock_qsettings.return_value.setValue.assert_called_with(
-            "auth_config", "new_value"
-        )
+        mock_qsettings.return_value.setValue.assert_called_with("auth_config", "new_value")
         mock_qsettings.return_value.endGroup.assert_called()
 
     @patch.object(Settings, "load")

@@ -1,22 +1,47 @@
+uv-run ?= uv run --no-sync
+
+.PHONY: install
 install:
-	poetry install
+	uv sync --frozen
 
+.PHONY: update
+update:
+	uv sync
 
+.PHONY: format
 format:
-	poetry run isort eodh_qgis
-	poetry run black --preview eodh_qgis
+	${uv-run} ruff check --fix
+	${uv-run} ruff format
 
+.PHONY: check
 check:
-	poetry run black --preview --check eodh_qgis
-	poetry run flake8 eodh_qgis
-	poetry run isort --check --diff eodh_qgis
-	poetry run pyright eodh_qgis
+	${uv-run} ruff check
+	${uv-run} ruff format --check --diff
+	${uv-run} pyright
+	${uv-run} validate-pyproject pyproject.toml
 
+.PHONY: typecheck
 typecheck:
-	poetry run pyright eodh_qgis
+	${uv-run} pyright eodh_qgis
 
+.PHONY: test
 test:
 	.docker/stop.sh
 	.docker/start.sh
 	sleep 5
 	.docker/exec.sh
+
+.git/hooks/pre-commit:
+	${uv-run} pre-commit install
+	curl -o .pre-commit-config.yaml https://raw.githubusercontent.com/EO-DataHub/github-actions/main/.pre-commit-config-python.yaml
+
+.PHONY: setup
+setup: update .git/hooks/pre-commit
+
+.PHONY: pre-commit
+pre-commit:
+	${uv-run} pre-commit
+
+.PHONY: pre-commit-all
+pre-commit-all:
+	${uv-run} pre-commit run --all-files

@@ -8,7 +8,6 @@ from eodh_qgis.test.utilities import get_qgis_app
 
 
 class TestWorkflowsWidget(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.QGIS_APP = get_qgis_app()

@@ -1,5 +1,4 @@
 import os
-from typing import Optional
 
 from qgis.core import QgsApplication, QgsAuthMethodConfig
 from qgis.PyQt import QtWidgets, uic
@@ -23,7 +22,7 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
             iface: QGIS interface instance.
             parent: Parent widget.
         """
-        super(MainDialog, self).__init__(parent)
+        super().__init__(parent)
         self.setupUi(self)
 
         self.iface = iface
@@ -39,7 +38,7 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
 
         self.setup_ui_after_token()
 
-    def get_creds(self) -> Optional[dict[str, str]]:
+    def get_creds(self) -> dict[str, str] | None:
         """Retrieve stored authentication credentials.
 
         Returns:
@@ -79,16 +78,12 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
 
         # Add Overview and Search tabs
         self.overview_widget = OverviewWidget(creds=self.creds, parent=self)
-        self.search_widget = SearchWidget(
-            creds=self.creds, iface=self.iface, parent=self
-        )
+        self.search_widget = SearchWidget(creds=self.creds, iface=self.iface, parent=self)
 
         # Connect overview catalogue selection to search widget
         self.overview_widget.catalogue_changed.connect(self.search_widget.set_catalog)
         # Connect overview collection selection to search widget
-        self.overview_widget.collection_changed.connect(
-            self.search_widget.set_collection
-        )
+        self.overview_widget.collection_changed.connect(self.search_widget.set_collection)
 
         self.tab_widget.insertTab(1, self.overview_widget, "Overview")
         self.tab_widget.insertTab(2, self.search_widget, "Search")

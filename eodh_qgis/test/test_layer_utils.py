@@ -41,9 +41,7 @@ class TestDownloadWithProgress(unittest.TestCase):
                 reporthook(12, 8192, 100000)  # ~98%
 
         mock_retrieve.side_effect = fake_retrieve
-        download_with_progress(
-            "http://example.com/file.nc", "/tmp/file.nc", on_progress
-        )
+        download_with_progress("http://example.com/file.nc", "/tmp/file.nc", on_progress)
         self.assertTrue(len(progress_values) > 0)
 
     @patch("eodh_qgis.layer_utils.urllib.request.urlretrieve")
@@ -80,17 +78,13 @@ class TestGetNetcdfLayers(unittest.TestCase):
 
     def test_selected_variables_filter(self):
         """Test filtering to specific variables."""
-        layers = get_netcdf_layers(
-            self.netcdf_file, "test_layer", selected_variables=["sea_ice_thickness"]
-        )
+        layers = get_netcdf_layers(self.netcdf_file, "test_layer", selected_variables=["sea_ice_thickness"])
         self.assertEqual(len(layers), 1)
         self.assertIn("sea_ice_thickness", layers[0].name())
 
     def test_selected_variables_empty(self):
         """Test selecting no variables returns empty list."""
-        layers = get_netcdf_layers(
-            self.netcdf_file, "test_layer", selected_variables=[]
-        )
+        layers = get_netcdf_layers(self.netcdf_file, "test_layer", selected_variables=[])
         self.assertEqual(len(layers), 0)
 
     def test_nonexistent_file_returns_empty(self):
@@ -100,9 +94,7 @@ class TestGetNetcdfLayers(unittest.TestCase):
 
     def test_selected_nonexistent_variable(self):
         """Test selecting variable that doesn't exist returns empty."""
-        layers = get_netcdf_layers(
-            self.netcdf_file, "test_layer", selected_variables=["nonexistent_var"]
-        )
+        layers = get_netcdf_layers(self.netcdf_file, "test_layer", selected_variables=["nonexistent_var"])
         self.assertEqual(len(layers), 0)
 
 
@@ -139,9 +131,7 @@ class TestCreateLayersForAsset(unittest.TestCase):
         asset.href = self.netcdf_file
         asset.type = "application/x-netcdf"
 
-        layers = create_layers_for_asset(
-            item, "data", asset, selected_variables=["sea_ice_thickness"]
-        )
+        layers = create_layers_for_asset(item, "data", asset, selected_variables=["sea_ice_thickness"])
         self.assertEqual(len(layers), 1)
 
     def test_create_layers_invalid_file(self):

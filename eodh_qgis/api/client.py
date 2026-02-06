@@ -41,9 +41,7 @@ class StacClient(QtCore.QObject):
     items_received = QtCore.pyqtSignal(list, int)  # items, total_count
     error_received = QtCore.pyqtSignal(str)
 
-    def __init__(
-        self, connection: ConnectionSettings, parent: QtCore.QObject | None = None
-    ) -> None:
+    def __init__(self, connection: ConnectionSettings, parent: QtCore.QObject | None = None) -> None:
         """Initialize the STAC client.
 
         Args:
@@ -61,9 +59,7 @@ class StacClient(QtCore.QObject):
         return self._client is not None and self._catalog is not None
 
     @classmethod
-    def from_settings(
-        cls, settings_manager, parent: QtCore.QObject | None = None
-    ) -> StacClient:
+    def from_settings(cls, settings_manager, parent: QtCore.QObject | None = None) -> StacClient:
         """Create a StacClient from the settings manager.
 
         Args:

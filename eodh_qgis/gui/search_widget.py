@@ -31,15 +31,13 @@ from eodh_qgis.kerchunk_utils import extract_variables_from_kerchunk
 from eodh_qgis.layer_loader import LayerLoaderTask
 
 # Load the UI file
-FORM_CLASS, _ = uic.loadUiType(
-    os.path.join(os.path.dirname(__file__), "../ui/search.ui")
-)
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../ui/search.ui"))
 
 
 class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
     def __init__(self, creds: dict[str, str], iface=None, parent=None):
         """Constructor."""
-        super(SearchWidget, self).__init__(parent)
+        super().__init__(parent)
         self.setupUi(self)
 
         self.creds = creds
@@ -92,9 +90,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
         self.to_date.setDate(two_months_ago)
 
         # Configure draw map button with icon and tooltip
-        self.draw_map_button.setIcon(
-            QgsApplication.getThemeIcon("/mActionCapturePolygon.svg")
-        )
+        self.draw_map_button.setIcon(QgsApplication.getThemeIcon("/mActionCapturePolygon.svg"))
         self.draw_map_button.setToolTip(
             "Draw bounding box on map\n\n"
             "Click to activate drawing mode, then:\n"
@@ -105,9 +101,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
         )
 
         # Configure use extent button with icon and tooltip
-        self.use_extent_button.setIcon(
-            QgsApplication.getThemeIcon("/mActionZoomToArea.svg")
-        )
+        self.use_extent_button.setIcon(QgsApplication.getThemeIcon("/mActionZoomToArea.svg"))
         self.use_extent_button.setToolTip(
             "Use current map extent\n\n"
             "Sets the search bounding box to match the\n"
@@ -115,16 +109,12 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
         )
 
         # Configure sort controls
-        self.sort_field_combo.addItems(
-            ["Date (newest)", "Date (oldest)", "Item ID", "Collection"]
-        )
+        self.sort_field_combo.addItems(["Date (newest)", "Date (oldest)", "Item ID", "Collection"])
 
         # Connect signals
         self.search_button.clicked.connect(self.on_search_clicked)
         self.draw_map_button.clicked.connect(self.on_draw_map_clicked)
-        self.collection_dropdown.currentIndexChanged.connect(
-            self.on_collection_dropdown_changed
-        )
+        self.collection_dropdown.currentIndexChanged.connect(self.on_collection_dropdown_changed)
         self.use_extent_button.clicked.connect(self.on_use_extent_clicked)
         self.prev_page_btn.clicked.connect(self.on_prev_page)
         self.next_page_btn.clicked.connect(self.on_next_page)
@@ -165,7 +155,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
                 self.collection_dropdown.addItem(display_name, coll.id)
         except Exception as e:
             QgsMessageLog.logMessage(
-                f"Failed to load collections for dropdown: {str(e)}",
+                f"Failed to load collections for dropdown: {e!s}",
                 "EODH",
                 level=Qgis.Warning,
             )
@@ -224,9 +214,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
         wgs84_crs = QgsCoordinateReferenceSystem("EPSG:4326")
 
         if project_crs != wgs84_crs:
-            transformer = QgsCoordinateTransform(
-                project_crs, wgs84_crs, QgsProject.instance()
-            )
+            transformer = QgsCoordinateTransform(project_crs, wgs84_crs, QgsProject.instance())
             extent = transformer.transformBoundingBox(extent)
 
         # Populate the coordinate inputs
@@ -235,9 +223,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
         self.east_input.setValue(extent.xMaximum())
         self.west_input.setValue(extent.xMinimum())
 
-        QgsMessageLog.logMessage(
-            f"Extent set from map canvas: {extent.toString()}", "EODH", level=Qgis.Info
-        )
+        QgsMessageLog.logMessage(f"Extent set from map canvas: {extent.toString()}", "EODH", level=Qgis.Info)
 
     def on_polygon_captured(self, geometry):
         """Handle polygon capture completion.
@@ -251,15 +237,11 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
         wgs84_crs = QgsCoordinateReferenceSystem("EPSG:4326")
 
         if project_crs != wgs84_crs:
-            transformer = QgsCoordinateTransform(
-                project_crs, wgs84_crs, QgsProject.instance()
-            )
+            transformer = QgsCoordinateTransform(project_crs, wgs84_crs, QgsProject.instance())
             geometry.transform(transformer)
 
         bbox = geometry.boundingBox()
-        QgsMessageLog.logMessage(
-            f"bbox set to: {bbox.toString()}", "EODH", level=Qgis.Info
-        )
+        QgsMessageLog.logMessage(f"bbox set to: {bbox.toString()}", "EODH", level=Qgis.Info)
 
         # Populate the coordinate inputs with the transformed bbox
         self.north_input.setValue(bbox.yMaximum())
@@ -287,11 +269,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
         layout = QtWidgets.QVBoxLayout(dialog)
 
         # Info label
-        layout.addWidget(
-            QtWidgets.QLabel(
-                f"Found {len(loadable_assets)} loadable assets. Select which to load:"
-            )
-        )
+        layout.addWidget(QtWidgets.QLabel(f"Found {len(loadable_assets)} loadable assets. Select which to load:"))
 
         # Checkboxes for each asset
         checkboxes = []
@@ -312,20 +290,14 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
         btn_layout = QtWidgets.QHBoxLayout()
         select_all_btn = QtWidgets.QPushButton("Select All")
         deselect_all_btn = QtWidgets.QPushButton("Deselect All")
-        select_all_btn.clicked.connect(
-            lambda: [cb[0].setChecked(True) for cb in checkboxes]
-        )
-        deselect_all_btn.clicked.connect(
-            lambda: [cb[0].setChecked(False) for cb in checkboxes]
-        )
+        select_all_btn.clicked.connect(lambda: [cb[0].setChecked(True) for cb in checkboxes])
+        deselect_all_btn.clicked.connect(lambda: [cb[0].setChecked(False) for cb in checkboxes])
         btn_layout.addWidget(select_all_btn)
         btn_layout.addWidget(deselect_all_btn)
         layout.addLayout(btn_layout)
 
         # OK / Cancel buttons
-        button_box = QtWidgets.QDialogButtonBox(
-            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
-        )
+        button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
         button_box.accepted.connect(dialog.accept)
         button_box.rejected.connect(dialog.reject)
         layout.addWidget(button_box)
@@ -410,9 +382,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
             layout.setAlignment(card, QtCore.Qt.AlignTop)
 
         # Add vertical spacer at the bottom
-        spacer = QtWidgets.QSpacerItem(
-            20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
-        )
+        spacer = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         layout.addItem(spacer)
 
         # Set the container as the scroll area's widget
@@ -443,23 +413,17 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
         This method is called when double-clicking a card or clicking Load Assets.
         Uses QgsTask to prevent UI freeze during NetCDF downloads.
         """
-        QgsMessageLog.logMessage(
-            f"Loading assets for item: {item.id}", "EODH", level=Qgis.Info
-        )
+        QgsMessageLog.logMessage(f"Loading assets for item: {item.id}", "EODH", level=Qgis.Info)
 
         # Get ALL loadable assets
         loadable_assets = get_all_loadable_assets(item)
         if not loadable_assets:
-            QgsMessageLog.logMessage(
-                f"No loadable assets found for {item.id}", "EODH", level=Qgis.Warning
-            )
+            QgsMessageLog.logMessage(f"No loadable assets found for {item.id}", "EODH", level=Qgis.Warning)
             return
 
         # Show selection dialog if multiple assets
         if len(loadable_assets) > 1:
-            loadable_assets = self._show_asset_selection_dialog(
-                loadable_assets, item.id
-            )
+            loadable_assets = self._show_asset_selection_dialog(loadable_assets, item.id)
             if not loadable_assets:
                 return  # User cancelled or selected nothing
 
@@ -490,9 +454,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
             task = LayerLoaderTask(item, asset_key, asset, selected_variables)
 
             # Connect signals using partial to pass context
-            on_complete = partial(
-                self._on_task_completed, task, asset, item_epsg, metadata_epsg
-            )
+            on_complete = partial(self._on_task_completed, task, asset, item_epsg, metadata_epsg)
             task.taskCompleted.connect(on_complete)
             task.taskTerminated.connect(self._on_task_terminated)
 
@@ -510,9 +472,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
         """
         if not task.layers:
             if task.error:
-                QgsMessageLog.logMessage(
-                    f"Task failed: {task.error}", "EODH", level=Qgis.Warning
-                )
+                QgsMessageLog.logMessage(f"Task failed: {task.error}", "EODH", level=Qgis.Warning)
             return
 
         layers_added = 0
@@ -564,9 +524,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
 
     def _on_task_terminated(self):
         """Handle background task termination (cancelled or error)."""
-        QgsMessageLog.logMessage(
-            "Layer loading task was terminated", "EODH", level=Qgis.Warning
-        )
+        QgsMessageLog.logMessage("Layer loading task was terminated", "EODH", level=Qgis.Warning)
 
     def on_search_clicked(self):
         """Handle search button click."""
@@ -634,7 +592,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
                 self._show_no_results_message("No results found.")
 
         except Exception as e:
-            self._show_no_results_message(f"Error: {str(e)}")
+            self._show_no_results_message(f"Error: {e!s}")
             # Reset pagination on error
             self.total_results = 0
             self._update_pagination_controls()
@@ -678,9 +636,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
             self.all_fetched_results = []
             self.total_results = 0
         except Exception as e:
-            QgsMessageLog.logMessage(
-                f"Error fetching page: {str(e)}", "EODH", level=Qgis.Warning
-            )
+            QgsMessageLog.logMessage(f"Error fetching page: {e!s}", "EODH", level=Qgis.Warning)
             self.search_results = []
 
     def _update_pagination_controls(self):
@@ -692,9 +648,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
             self.next_page_btn.setEnabled(False)
             return
 
-        total_pages = max(
-            1, (self.total_results + self.page_size - 1) // self.page_size
-        )
+        total_pages = max(1, (self.total_results + self.page_size - 1) // self.page_size)
         current_page_display = self.current_page + 1
 
         self.page_label.setText(f"Page {current_page_display} of {total_pages}")
@@ -702,9 +656,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
         # Calculate result range for display
         start = self.current_page * self.page_size + 1
         end = min(start + len(self.search_results) - 1, self.total_results)
-        self.results_count_label.setText(
-            f"Showing {start}-{end} of {self.total_results}"
-        )
+        self.results_count_label.setText(f"Showing {start}-{end} of {self.total_results}")
 
         # Enable/disable navigation buttons
         self.prev_page_btn.setEnabled(self.current_page > 0)
@@ -722,9 +674,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
 
     def on_next_page(self):
         """Navigate to the next page of results."""
-        total_pages = max(
-            1, (self.total_results + self.page_size - 1) // self.page_size
-        )
+        total_pages = max(1, (self.total_results + self.page_size - 1) // self.page_size)
         if self.current_page + 1 < total_pages:
             self.current_page += 1
             self._fetch_current_page()
@@ -826,9 +776,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
         self.add_selected_footprints_btn.setEnabled(count > 0)
 
         # Enable "Add All" if we have any results with geometry
-        has_results_with_geometry = any(
-            item_has_geometry(item) for item in self.search_results
-        )
+        has_results_with_geometry = any(item_has_geometry(item) for item in self.search_results)
         self.add_all_footprints_btn.setEnabled(has_results_with_geometry)
 
     def _add_selected_footprints(self):
@@ -841,9 +789,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
             if self._add_footprint_layer(item):
                 added_count += 1
 
-        QgsMessageLog.logMessage(
-            f"Added {added_count} footprint layer(s) to map", "EODH", level=Qgis.Info
-        )
+        QgsMessageLog.logMessage(f"Added {added_count} footprint layer(s) to map", "EODH", level=Qgis.Info)
 
         # Clear selections after adding
         self.selected_footprint_items.clear()
@@ -865,9 +811,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
             if self._add_footprint_layer(item):
                 added_count += 1
 
-        QgsMessageLog.logMessage(
-            f"Added {added_count} footprint layer(s) to map", "EODH", level=Qgis.Info
-        )
+        QgsMessageLog.logMessage(f"Added {added_count} footprint layer(s) to map", "EODH", level=Qgis.Info)
 
     def _add_footprint_layer(self, item):
         """Add a single item's footprint as a vector layer.

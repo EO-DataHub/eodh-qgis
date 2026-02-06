@@ -15,7 +15,7 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../ui/jo
 class JobsWidget(QtWidgets.QWidget, FORM_CLASS):
     def __init__(self, ades_svc: pyeodh.ades.Ades, parent=None):
         """Constructor."""
-        super(JobsWidget, self).__init__(parent)
+        super().__init__(parent)
         self.setupUi(self)
         self.ades_svc = ades_svc
         self.jobs: list[pyeodh.ades.Job] = []
@@ -74,9 +74,7 @@ class JobsWidget(QtWidgets.QWidget, FORM_CLASS):
 
     def _on_load_jobs_error(self, error_tuple):
         exctype, value, tb = error_tuple
-        QgsMessageLog.logMessage(
-            f"Error loading jobs: {value}\n{tb}", "EODH", Qgis.Critical
-        )
+        QgsMessageLog.logMessage(f"Error loading jobs: {value}\n{tb}", "EODH", Qgis.Critical)
 
     def load_jobs(self):
         self.lock_form(True)
