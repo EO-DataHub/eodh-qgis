@@ -30,7 +30,7 @@ jobs:
 
       - name: Setup environment
         run: |
-          uv pip install pyqt5
+          uv pip install --system pyqt5
 
       - name: Start container
         run: |
