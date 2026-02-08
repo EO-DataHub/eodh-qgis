@@ -26,11 +26,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v7
-
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          
       - name: Setup environment
         run: |
-          uv pip install --system pyqt5
+          pip install pyqt5
 
       - name: Start container
         run: |
