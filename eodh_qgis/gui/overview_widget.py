@@ -8,9 +8,7 @@ from qgis.PyQt import QtCore, QtGui, QtWidgets, uic
 from eodh_qgis.gui.collection_details_dialog import CollectionDetailsDialog
 
 # Load the UI file
-FORM_CLASS, _ = uic.loadUiType(
-    os.path.join(os.path.dirname(__file__), "../ui/overview.ui")
-)
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../ui/overview.ui"))
 
 
 class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
@@ -22,7 +20,7 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
 
     def __init__(self, creds: dict[str, str], parent=None):
         """Constructor."""
-        super(OverviewWidget, self).__init__(parent)
+        super().__init__(parent)
         self.setupUi(self)
 
         self.creds = creds
@@ -59,9 +57,7 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
         """Initialize the tree view with a model and proxy for filtering."""
         # Create model with columns: Title, ID, Date Range, Spatial Extent
         self.collections_model = QtGui.QStandardItemModel()
-        self.collections_model.setHorizontalHeaderLabels(
-            ["Title", "ID", "Date Range", "Spatial Extent"]
-        )
+        self.collections_model.setHorizontalHeaderLabels(["Title", "ID", "Date Range", "Spatial Extent"])
 
         # Create proxy model for filtering
         self.collections_proxy = QtCore.QSortFilterProxyModel()
@@ -73,15 +69,11 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
         self.collections_tree.setModel(self.collections_proxy)
 
         # Connect selection changed signal
-        self.collections_tree.selectionModel().selectionChanged.connect(
-            self.on_collection_selection_changed
-        )
+        self.collections_tree.selectionModel().selectionChanged.connect(self.on_collection_selection_changed)
 
         # Configure tree view appearance - all columns manually resizable
         self.collections_tree.header().setStretchLastSection(True)
-        self.collections_tree.header().setSectionResizeMode(
-            QtWidgets.QHeaderView.Interactive
-        )
+        self.collections_tree.header().setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
         # Set reasonable default widths
         self.collections_tree.header().resizeSection(0, 250)  # Title
         self.collections_tree.header().resizeSection(1, 150)  # ID
@@ -107,9 +99,7 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
 
                 self.catalogue_dropdown.addItem(cat.title or cat.id, idx + 1)
         except Exception as e:
-            QtWidgets.QMessageBox.warning(
-                self, "Error", f"Failed to load catalogues: {str(e)}"
-            )
+            QtWidgets.QMessageBox.warning(self, "Error", f"Failed to load catalogues: {e!s}")
 
     def on_catalogue_changed(self, index):
         """Handle catalogue selection change."""
@@ -153,9 +143,7 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
                 spatial_extent = self._get_spatial_extent(collection)
                 spatial_extent_item = QtGui.QStandardItem(spatial_extent)
 
-                self.collections_model.appendRow(
-                    [title_item, id_item, date_range_item, spatial_extent_item]
-                )
+                self.collections_model.appendRow([title_item, id_item, date_range_item, spatial_extent_item])
                 collection_count += 1
 
             # Update count label
@@ -168,9 +156,7 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
             )
 
         except Exception as e:
-            QtWidgets.QMessageBox.warning(
-                self, "Error", f"Failed to load collections: {str(e)}"
-            )
+            QtWidgets.QMessageBox.warning(self, "Error", f"Failed to load collections: {e!s}")
 
     def on_filter_text_changed(self, text):
         """Filter collections by title or ID."""

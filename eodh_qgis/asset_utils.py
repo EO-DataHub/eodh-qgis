@@ -217,7 +217,7 @@ def find_kerchunk_reference(item) -> tuple[str, dict] | None:
     if not item.assets:
         return None
 
-    for asset_key, asset in item.assets.items():
+    for _asset_key, asset in item.assets.items():
         href = getattr(asset, "href", "")
         asset_type = getattr(asset, "type", "") or ""
 

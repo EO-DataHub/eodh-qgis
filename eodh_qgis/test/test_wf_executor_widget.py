@@ -92,9 +92,7 @@ class TestWorkflowExecutorWidget(unittest.TestCase):
     def test_handle_execute(self):
         """Test execute button functionality."""
         # Create patch context for JobDetailsWidget
-        with patch(
-            "eodh_qgis.gui.wf_executor_widget.JobDetailsWidget"
-        ) as mock_details_widget:
+        with patch("eodh_qgis.gui.wf_executor_widget.JobDetailsWidget") as mock_details_widget:
             # Create a real QWidget instance for the mock to return
             mock_details_instance = QtWidgets.QWidget()
             mock_details_widget.return_value = mock_details_instance
@@ -111,20 +109,14 @@ class TestWorkflowExecutorWidget(unittest.TestCase):
             self.widget.handle_execute()
 
             # Verify process execution was called with correct inputs
-            self.mock_process.execute.assert_called_once_with(
-                {"input1": "test_value1", "input2": "123"}
-            )
+            self.mock_process.execute.assert_called_once_with({"input1": "test_value1", "input2": "123"})
 
             # Verify JobDetailsWidget was created with correct parameters
-            mock_details_widget.assert_called_once_with(
-                job=mock_job, parent=self.stacked_widget
-            )
+            mock_details_widget.assert_called_once_with(job=mock_job, parent=self.stacked_widget)
 
             # Verify jobs were reloaded
             self.main_dialog.jobs_widget.load_jobs.assert_called_once()
-            self.main_dialog.style_menu_button.assert_called_once_with(
-                self.main_dialog.jobs_button
-            )
+            self.main_dialog.style_menu_button.assert_called_once_with(self.main_dialog.jobs_button)
 
 
 if __name__ == "__main__":

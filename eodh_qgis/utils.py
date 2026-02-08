@@ -188,7 +188,6 @@ def extract_epsg_from_netcdf(file_path: str) -> str | None:
         return None
 
     except Exception:
-
         return None
 
 

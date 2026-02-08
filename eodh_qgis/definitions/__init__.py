@@ -10,11 +10,11 @@ from .constants import (
 )
 
 __all__ = [
-    "PLUGIN_NAME",
     "DEFAULT_PAGE_SIZE",
-    "THUMBNAIL_SIZE",
-    "LOADABLE_MIME_TYPES",
     "LOADABLE_EXTENSIONS",
+    "LOADABLE_MIME_TYPES",
+    "PLUGIN_NAME",
+    "THUMBNAIL_SIZE",
     "AssetLayerType",
     "AssetRole",
 ]

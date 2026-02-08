@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import contextlib
-from typing import Generator
+from collections.abc import Generator
 
 from qgis.core import QgsSettings
 
@@ -12,9 +12,7 @@ from eodh_qgis.definitions.constants import DEFAULT_PAGE_SIZE, PLUGIN_NAME
 
 
 @contextlib.contextmanager
-def qgis_settings(
-    group: str, settings: QgsSettings | None = None
-) -> Generator[QgsSettings, None, None]:
+def qgis_settings(group: str, settings: QgsSettings | None = None) -> Generator[QgsSettings]:
     """Context manager for safe QgsSettings group management.
 
     Automatically handles beginGroup/endGroup to prevent group nesting issues.
@@ -176,9 +174,7 @@ class SettingsManager:
             collections = []
             collections_str = s.value(self.KEY_LAST_COLLECTIONS, "")
             if collections_str:
-                collections = [
-                    c.strip() for c in collections_str.split(",") if c.strip()
-                ]
+                collections = [c.strip() for c in collections_str.split(",") if c.strip()]
 
             return SearchFilters(
                 bbox=bbox,

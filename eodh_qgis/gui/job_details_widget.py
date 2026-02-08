@@ -14,9 +14,7 @@ from eodh_qgis.worker import Worker
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer
-FORM_CLASS, _ = uic.loadUiType(
-    str(Path(__file__).parent.parent / "ui" / "job_detail.ui")
-)
+FORM_CLASS, _ = uic.loadUiType(str(Path(__file__).parent.parent / "ui" / "job_detail.ui"))
 
 
 def get_temp_dir():
@@ -29,7 +27,7 @@ def get_temp_dir():
 class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
     def __init__(self, job: pyeodh.ades.Job, parent=None):
         """Constructor."""
-        super(JobDetailsWidget, self).__init__(parent)
+        super().__init__(parent)
         self.job = job
         self.outputs: list[pyeodh.resource_catalog.Item] = []
         self.setupUi(self)
@@ -62,9 +60,7 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
 
     def handle_close(self):
         self.parent().removeWidget(self)
-        self.parent().setCurrentWidget(
-            self.parent().parent().parent().button_widget_map["jobs"]["widget"]
-        )
+        self.parent().setCurrentWidget(self.parent().parent().parent().button_widget_map["jobs"]["widget"])
 
     def populate_table(self):
         headers = {
@@ -159,23 +155,13 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.outputs_table.setHorizontalHeaderLabels(headers)
         self.outputs_table.itemDoubleClicked.connect(self.handle_add_layer)
         for row_index, item in enumerate(items):
-            self.outputs_table.setItem(
-                row_index, 0, QtWidgets.QTableWidgetItem(str(item.id))
-            )
+            self.outputs_table.setItem(row_index, 0, QtWidgets.QTableWidgetItem(str(item.id)))
             name, asset = next(iter(item.assets.items()))
-            self.outputs_table.setItem(
-                row_index, 1, QtWidgets.QTableWidgetItem(str(name))
-            )
-            self.outputs_table.setItem(
-                row_index, 2, QtWidgets.QTableWidgetItem(str(asset.href))
-            )
+            self.outputs_table.setItem(row_index, 1, QtWidgets.QTableWidgetItem(str(name)))
+            self.outputs_table.setItem(row_index, 2, QtWidgets.QTableWidgetItem(str(asset.href)))
             header = self.outputs_table.horizontalHeader()
-            header.setSectionResizeMode(
-                0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents
-            )
-            header.setSectionResizeMode(
-                1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents
-            )
+            header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+            header.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
             header.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Stretch)
 
         self.outputs_table.show()
@@ -193,7 +179,7 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
         temp_dir = get_temp_dir()
 
         def load_data(url: str, *args, **kwargs):
-            local_filename = url.split("/")[-1]
+            local_filename = url.rsplit("/", maxsplit=1)[-1]
             path = temp_dir / local_filename
             print(f"Downloading {url} to {path}")
             with requests.get(

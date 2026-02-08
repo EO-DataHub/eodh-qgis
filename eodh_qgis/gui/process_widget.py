@@ -1,5 +1,6 @@
 import os
-from typing import Callable, Literal, Optional
+from collections.abc import Callable
+from typing import Literal
 
 import pyeodh
 import requests
@@ -11,9 +12,7 @@ from eodh_qgis.gui.workflows_widget import WorkflowsWidget
 from eodh_qgis.settings import Settings
 
 # Load the UI file
-FORM_CLASS, _ = uic.loadUiType(
-    os.path.join(os.path.dirname(__file__), "../ui/process.ui")
-)
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../ui/process.ui"))
 
 
 class ProcessWidget(QtWidgets.QWidget, FORM_CLASS):
@@ -24,12 +23,12 @@ class ProcessWidget(QtWidgets.QWidget, FORM_CLASS):
 
     def __init__(self, creds: dict[str, str], parent=None):
         """Constructor."""
-        super(ProcessWidget, self).__init__(parent)
+        super().__init__(parent)
         self.setupUi(self)
 
         self.creds = creds
         self.ades_svc = None
-        self.selected_button: Optional[QtWidgets.QPushButton] = None
+        self.selected_button: QtWidgets.QPushButton | None = None
 
         # Type hints for UI elements (from .ui file)
         self.workflows_button: QtWidgets.QPushButton
@@ -49,12 +48,8 @@ class ProcessWidget(QtWidgets.QWidget, FORM_CLASS):
         }
 
         # Connect button signals
-        self.workflows_button.clicked.connect(
-            lambda: self.handle_menu_button_clicked("workflows")
-        )
-        self.jobs_button.clicked.connect(
-            lambda: self.handle_menu_button_clicked("jobs")
-        )
+        self.workflows_button.clicked.connect(lambda: self.handle_menu_button_clicked("workflows"))
+        self.jobs_button.clicked.connect(lambda: self.handle_menu_button_clicked("jobs"))
 
         # Initialize ADES and widgets
         self.get_ades()
@@ -82,21 +77,13 @@ class ProcessWidget(QtWidgets.QWidget, FORM_CLASS):
         )
 
         try:
-            self.ades_svc = pyeodh.Client(
-                base_url=url, username=username, token=token
-            ).get_ades()
-            QgsMessageLog.logMessage(
-                "ADES service initialized successfully", "EODH", Qgis.Info
-            )
+            self.ades_svc = pyeodh.Client(base_url=url, username=username, token=token).get_ades()
+            QgsMessageLog.logMessage("ADES service initialized successfully", "EODH", Qgis.Info)
         except requests.HTTPError as e:
             QgsMessageLog.logMessage(f"ADES HTTPError: {e}", "EODH", Qgis.Critical)
-            QtWidgets.QMessageBox.critical(
-                self, "Error", "Error logging in to ADES, validate your credentials."
-            )
+            QtWidgets.QMessageBox.critical(self, "Error", "Error logging in to ADES, validate your credentials.")
         except Exception as e:
-            QgsMessageLog.logMessage(
-                f"ADES unexpected error: {e}", "EODH", Qgis.Critical
-            )
+            QgsMessageLog.logMessage(f"ADES unexpected error: {e}", "EODH", Qgis.Critical)
 
     def setup_widgets(self):
         """Create workflow and job widgets after ADES is initialized."""
@@ -106,9 +93,7 @@ class ProcessWidget(QtWidgets.QWidget, FORM_CLASS):
         )
         self.content_widget.addWidget(self.button_widget_map["workflows"]["widget"])
 
-        self.button_widget_map["jobs"]["widget"] = JobsWidget(
-            ades_svc=self.ades_svc, parent=self.content_widget
-        )
+        self.button_widget_map["jobs"]["widget"] = JobsWidget(ades_svc=self.ades_svc, parent=self.content_widget)
         self.content_widget.addWidget(self.button_widget_map["jobs"]["widget"])
 
         # Show workflows by default
@@ -117,7 +102,7 @@ class ProcessWidget(QtWidgets.QWidget, FORM_CLASS):
     def handle_menu_button_clicked(
         self,
         action: Literal["workflows", "jobs"],
-        invoke_fn: Optional[Callable] = None,
+        invoke_fn: Callable | None = None,
     ):
         """Handle menu button click - switch between workflows and jobs views."""
         button = self.button_widget_map[action]["button"]

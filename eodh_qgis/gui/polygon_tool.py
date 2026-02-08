@@ -16,16 +16,12 @@ class PolygonCaptureTool(QgsMapToolEmitPoint):
         self.rubber_band.setColor(QColor(255, 0, 0, 100))
         self.rubber_band.setWidth(2)
         self.points = []
-        QgsMessageLog.logMessage(
-            "PolygonCaptureTool initialized", "EODH", level=Qgis.Info
-        )
+        QgsMessageLog.logMessage("PolygonCaptureTool initialized", "EODH", level=Qgis.Info)
 
     def canvasPressEvent(self, event):
         """Handle mouse click - left-click adds point, right-click finishes polygon."""
         if event.button() == Qt.LeftButton:
-            QgsMessageLog.logMessage(
-                "canvasPressEvent called (left-click)", "EODH", level=Qgis.Info
-            )
+            QgsMessageLog.logMessage("canvasPressEvent called (left-click)", "EODH", level=Qgis.Info)
             point = self.toMapCoordinates(event.pos())
             self.points.append(point)
             QgsMessageLog.logMessage(
@@ -42,9 +38,7 @@ class PolygonCaptureTool(QgsMapToolEmitPoint):
             )
             if len(self.points) >= 3:
                 geometry = QgsGeometry.fromPolygonXY([self.points])
-                QgsMessageLog.logMessage(
-                    "Emitting polygon_captured signal", "EODH", level=Qgis.Info
-                )
+                QgsMessageLog.logMessage("Emitting polygon_captured signal", "EODH", level=Qgis.Info)
                 self.polygon_captured.emit(geometry)
             self.points = []
 

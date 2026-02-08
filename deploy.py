@@ -4,8 +4,8 @@ import argparse
 import os
 import pathlib
 import shutil
-import sys
 import subprocess
+import sys
 
 ROOT_DIR = pathlib.Path(__file__).parent.resolve()
 BUILD_DIR = ROOT_DIR / "build"
@@ -70,9 +70,7 @@ def uninstall(install_path: pathlib.Path):
         print(f"Removed {install_path}")
 
 
-def compile_resources(
-    build_dir: pathlib.Path = BUILD_DIR, resource_path: pathlib.Path = RESOURCE_PATH
-):
+def compile_resources(build_dir: pathlib.Path = BUILD_DIR, resource_path: pathlib.Path = RESOURCE_PATH):
     output_path = build_dir / "resources.py"
     try:
         subprocess.run(
@@ -101,7 +99,7 @@ def patch_resources(build_dir: pathlib.Path = BUILD_DIR):
         if not p.exists():
             continue
         # Read in the file
-        with open(p, "r") as file:
+        with open(p) as file:
             filedata = file.read()
 
         # Replace resource references - handle different relative paths
@@ -137,19 +135,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "install_path",
         nargs="?",
-        help=(
-            "Path to qgis plugin directory, if not provided, looks for EODH_QGIS_PATH "
-            "in .env file."
-        ),
+        help=("Path to qgis plugin directory, if not provided, looks for EODH_QGIS_PATH in .env file."),
     )
-    parser.add_argument(
-        "--dist", action="store_true", help="Use this when building a release package."
-    )
+    parser.add_argument("--dist", action="store_true", help="Use this when building a release package.")
     args = parser.parse_args()
     install_path = args.install_path or load_dotenv().get("EODH_QGIS_PATH")
     if not install_path:
-        raise ValueError(
-            "Provide path to qgis plugin, either via argument or .env variable."
-        )
+        raise ValueError("Provide path to qgis plugin, either via argument or .env variable.")
 
     main(pathlib.Path(install_path).resolve(), args.dist)

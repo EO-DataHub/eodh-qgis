@@ -47,15 +47,11 @@ def extract_epsg_from_metadata_xml(item) -> str | None:
     Returns:
         EPSG code as string, or None if not found
     """
-    QgsMessageLog.logMessage(
-        f"[CRS] Trying metadata XML for item {item.id}", "EODH", level=Qgis.Info
-    )
+    QgsMessageLog.logMessage(f"[CRS] Trying metadata XML for item {item.id}", "EODH", level=Qgis.Info)
 
     metadata_asset = item.assets.get("metadata")
     if not metadata_asset:
-        QgsMessageLog.logMessage(
-            f"[CRS] No metadata asset found for {item.id}", "EODH", level=Qgis.Info
-        )
+        QgsMessageLog.logMessage(f"[CRS] No metadata asset found for {item.id}", "EODH", level=Qgis.Info)
         return None
 
     href = getattr(metadata_asset, "href", None)
@@ -67,9 +63,7 @@ def extract_epsg_from_metadata_xml(item) -> str | None:
         )
         return None
 
-    QgsMessageLog.logMessage(
-        f"[CRS] Fetching metadata XML from: {href}", "EODH", level=Qgis.Info
-    )
+    QgsMessageLog.logMessage(f"[CRS] Fetching metadata XML from: {href}", "EODH", level=Qgis.Info)
 
     try:
         with urllib.request.urlopen(href, timeout=10) as response:
@@ -82,17 +76,11 @@ def extract_epsg_from_metadata_xml(item) -> str | None:
         }
 
         for ref_sys in root.findall(".//gmd:referenceSystemInfo", namespaces):
-            code_elem = ref_sys.find(
-                ".//gmd:RS_Identifier/gmd:code/gco:CharacterString", namespaces
-            )
-            codespace_elem = ref_sys.find(
-                ".//gmd:RS_Identifier/gmd:codeSpace/gco:CharacterString", namespaces
-            )
+            code_elem = ref_sys.find(".//gmd:RS_Identifier/gmd:code/gco:CharacterString", namespaces)
+            codespace_elem = ref_sys.find(".//gmd:RS_Identifier/gmd:codeSpace/gco:CharacterString", namespaces)
 
             if code_elem is not None and code_elem.text:
-                codespace = (
-                    codespace_elem.text if codespace_elem is not None else "unknown"
-                )
+                codespace = codespace_elem.text if codespace_elem is not None else "unknown"
                 QgsMessageLog.logMessage(
                     f"[CRS] Found in XML: code={code_elem.text}, codeSpace={codespace}",
                     "EODH",
@@ -103,19 +91,15 @@ def extract_epsg_from_metadata_xml(item) -> str | None:
                 if code_elem.text.isdigit():
                     return code_elem.text.strip()
 
-        QgsMessageLog.logMessage(
-            "[CRS] No EPSG found in metadata XML", "EODH", level=Qgis.Info
-        )
+        QgsMessageLog.logMessage("[CRS] No EPSG found in metadata XML", "EODH", level=Qgis.Info)
         return None
     except Exception as e:
-        QgsMessageLog.logMessage(
-            f"[CRS] Failed to parse metadata XML: {e}", "EODH", level=Qgis.Warning
-        )
+        QgsMessageLog.logMessage(f"[CRS] Failed to parse metadata XML: {e}", "EODH", level=Qgis.Warning)
         return None
 
 
 def apply_crs_to_layer(
-    layer: "QgsRasterLayer",
+    layer: QgsRasterLayer,
     asset,
     item_epsg: str | None,
     metadata_epsg: str | None,
@@ -196,8 +180,7 @@ def apply_crs_to_layer(
             if crs.isValid():
                 layer.setCrs(crs)
                 QgsMessageLog.logMessage(
-                    f"[CRS] {layer_name}: Applied NetCDF grid_mapping CRS "
-                    f"EPSG:{netcdf_epsg}",
+                    f"[CRS] {layer_name}: Applied NetCDF grid_mapping CRS EPSG:{netcdf_epsg}",
                     "EODH",
                     level=Qgis.Info,
                 )
@@ -209,7 +192,5 @@ def apply_crs_to_layer(
                 level=Qgis.Warning,
             )
 
-    QgsMessageLog.logMessage(
-        f"[CRS] {layer_name}: No CRS found", "EODH", level=Qgis.Info
-    )
+    QgsMessageLog.logMessage(f"[CRS] {layer_name}: No CRS found", "EODH", level=Qgis.Info)
     return False

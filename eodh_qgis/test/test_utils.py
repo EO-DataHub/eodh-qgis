@@ -53,9 +53,7 @@ class TestIsCoordinateVariable(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         self.test_data_dir = os.path.join(os.path.dirname(__file__), "data")
-        self.netcdf_file = os.path.join(
-            self.test_data_dir, "EOCIS-SEAICE-L3C-SITHICK-CS2-5KM-202302-fv1.0.nc"
-        )
+        self.netcdf_file = os.path.join(self.test_data_dir, "EOCIS-SEAICE-L3C-SITHICK-CS2-5KM-202302-fv1.0.nc")
         # Open file with multidim API
         self.md_ds = gdal.OpenEx(self.netcdf_file, gdal.OF_MULTIDIM_RASTER)
         self.root = self.md_ds.GetRootGroup() if self.md_ds else None
@@ -121,9 +119,7 @@ class TestGetNetcdfDataVariables(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         self.test_data_dir = os.path.join(os.path.dirname(__file__), "data")
-        self.netcdf_file = os.path.join(
-            self.test_data_dir, "EOCIS-SEAICE-L3C-SITHICK-CS2-5KM-202302-fv1.0.nc"
-        )
+        self.netcdf_file = os.path.join(self.test_data_dir, "EOCIS-SEAICE-L3C-SITHICK-CS2-5KM-202302-fv1.0.nc")
 
     def test_returns_data_variables(self):
         """Test that data variables are returned."""

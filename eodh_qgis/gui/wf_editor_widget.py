@@ -1,5 +1,4 @@
 import os
-from typing import Optional
 
 import pyeodh.ades
 import requests
@@ -7,9 +6,7 @@ from qgis.PyQt import Qsci, QtGui, QtWidgets, uic
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer
-FORM_CLASS, _ = uic.loadUiType(
-    os.path.join(os.path.dirname(__file__), "../ui/wf_editor.ui")
-)
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../ui/wf_editor.ui"))
 
 
 class YAMLEditor(Qsci.QsciScintilla):
@@ -28,11 +25,11 @@ class WorkflowEditorWidget(QtWidgets.QWidget, FORM_CLASS):
         self,
         ades_svc: pyeodh.ades.Ades,
         update_mode=False,
-        process: Optional[pyeodh.ades.Process] = None,
+        process: pyeodh.ades.Process | None = None,
         parent=None,
     ):
         """Constructor."""
-        super(WorkflowEditorWidget, self).__init__(parent)
+        super().__init__(parent)
         self.setupUi(self)
         self.ades_svc = ades_svc
         self.update_mode = update_mode
@@ -132,14 +129,10 @@ class WorkflowEditorWidget(QtWidgets.QWidget, FORM_CLASS):
             else:
                 proc = self.ades_svc.deploy_process(**kwargs)
         except requests.HTTPError as e:
-            QtWidgets.QMessageBox.critical(
-                self, "Error", f"Error deploying process!\n{e}"
-            )
+            QtWidgets.QMessageBox.critical(self, "Error", f"Error deploying process!\n{e}")
         else:
             self.parent().parent().parent().workflows_widget.load_workflows()
-            QtWidgets.QMessageBox.information(
-                self, "Success", f"Successfully deployed {proc.id}."
-            )
+            QtWidgets.QMessageBox.information(self, "Success", f"Successfully deployed {proc.id}.")
             self.handle_cancel()
 
     def lock_form(self, locked: bool):

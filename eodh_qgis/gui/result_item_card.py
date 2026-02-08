@@ -11,9 +11,7 @@ from qgis.PyQt.QtGui import QDesktopServices
 from eodh_qgis.asset_utils import format_bbox, get_asset_file_type
 
 # Load the UI file
-FORM_CLASS, _ = uic.loadUiType(
-    os.path.join(os.path.dirname(__file__), "../ui/result_item_card.ui")
-)
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../ui/result_item_card.ui"))
 
 
 class ResultItemCard(QtWidgets.QWidget, FORM_CLASS):
@@ -51,9 +49,7 @@ class ResultItemCard(QtWidgets.QWidget, FORM_CLASS):
 
         # Collection name
         if self.show_collection:
-            collection_name = (
-                str(self.item.collection) if self.item.collection else "N/A"
-            )
+            collection_name = str(self.item.collection) if self.item.collection else "N/A"
             self.collection_label.setText(collection_name)
         else:
             self.collection_label.setVisible(False)

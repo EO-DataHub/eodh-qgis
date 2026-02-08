@@ -88,9 +88,7 @@ def item_has_geometry(item) -> bool:
     return hasattr(item, "geometry") and item.geometry is not None
 
 
-def create_footprint_layer(
-    item, layer_name: str | None = None
-) -> QgsVectorLayer | None:
+def create_footprint_layer(item, layer_name: str | None = None) -> QgsVectorLayer | None:
     """Create a vector layer from a STAC item's geometry.
 
     Creates a GeoJSON temp file and loads it as an OGR vector layer.
@@ -117,8 +115,7 @@ def create_footprint_layer(
         lon_span, min_lat, max_lat = span_info
         geometry = _create_polar_cap_geometry(min_lat, max_lat)
         QgsMessageLog.logMessage(
-            f"Using polar cap footprint for {item.id}"
-            f" (lat {min_lat:.1f} to {max_lat:.1f})",
+            f"Using polar cap footprint for {item.id} (lat {min_lat:.1f} to {max_lat:.1f})",
             PLUGIN_NAME,
             level=Qgis.Info,
         )
@@ -160,9 +157,7 @@ def create_footprint_layer(
     return None
 
 
-def add_footprint_to_project(
-    item, layer_name: str | None = None, group_name: str | None = None
-) -> bool:
+def add_footprint_to_project(item, layer_name: str | None = None, group_name: str | None = None) -> bool:
     """Add a STAC item's footprint to the current QGIS project.
 
     Creates a vector layer from the item's geometry and adds it to the project.

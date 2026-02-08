@@ -333,9 +333,7 @@ class TestSearchWidget(unittest.TestCase):
         mock_paginated_list = MagicMock()
         mock_paginated_list.total_count = 120
         # Return 50 items for first page
-        mock_paginated_list.__getitem__ = MagicMock(
-            return_value=[MagicMock() for _ in range(50)]
-        )
+        mock_paginated_list.__getitem__ = MagicMock(return_value=[MagicMock() for _ in range(50)])
         mock_catalog.search.return_value = mock_paginated_list
 
         widget = SearchWidget(creds=self.creds, iface=None, parent=None)
@@ -543,19 +541,19 @@ class TestSearchWidget(unittest.TestCase):
         with patch("eodh_qgis.gui.search_widget.LayerLoaderTask") as mock_task_cls:
             mock_task = MagicMock()
             mock_task_cls.return_value = mock_task
-            with patch("eodh_qgis.gui.search_widget.QgsApplication"):
-                with patch.object(
-                    self.widget, "_show_asset_selection_dialog"
-                ) as mock_dialog:
-                    # Call _load_item_assets directly
-                    # (simulates clicking Load Assets button)
-                    self.widget._load_item_assets(mock_item)
+            with (
+                patch("eodh_qgis.gui.search_widget.QgsApplication"),
+                patch.object(self.widget, "_show_asset_selection_dialog") as mock_dialog,
+            ):
+                # Call _load_item_assets directly
+                # (simulates clicking Load Assets button)
+                self.widget._load_item_assets(mock_item)
 
-                    # Dialog should NOT be called for single asset
-                    mock_dialog.assert_not_called()
+                # Dialog should NOT be called for single asset
+                mock_dialog.assert_not_called()
 
-                    # A LayerLoaderTask should have been created
-                    mock_task_cls.assert_called_once()
+                # A LayerLoaderTask should have been created
+                mock_task_cls.assert_called_once()
 
     def test_footprint_toggle_tracks_selected_items(self):
         """Test that toggling footprint checkbox tracks/untracks items."""
@@ -628,9 +626,7 @@ class TestSearchWidget(unittest.TestCase):
         mock_item.datetime = "2024-01-15T10:30:00Z"
         mock_item.geometry = {
             "type": "Polygon",
-            "coordinates": [
-                [[-5.0, 50.0], [2.0, 50.0], [2.0, 55.0], [-5.0, 55.0], [-5.0, 50.0]]
-            ],
+            "coordinates": [[[-5.0, 50.0], [2.0, 50.0], [2.0, 55.0], [-5.0, 55.0], [-5.0, 50.0]]],
         }
 
         # Track layers added to project

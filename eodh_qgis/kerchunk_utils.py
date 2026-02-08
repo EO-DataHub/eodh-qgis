@@ -263,7 +263,7 @@ def load_variable_from_kerchunk(
 
         t1 = time.time()
         QgsMessageLog.logMessage(
-            f"[TIMING] fsspec mapper creation: {t1-t0:.2f}s",
+            f"[TIMING] fsspec mapper creation: {t1 - t0:.2f}s",
             "EODH",
             level=Qgis.Info,
         )
@@ -273,7 +273,7 @@ def load_variable_from_kerchunk(
 
         t2 = time.time()
         QgsMessageLog.logMessage(
-            f"[TIMING] zarr.open: {t2-t1:.2f}s",
+            f"[TIMING] zarr.open: {t2 - t1:.2f}s",
             "EODH",
             level=Qgis.Info,
         )
@@ -286,7 +286,7 @@ def load_variable_from_kerchunk(
         var = store[var_name]
         t3 = time.time()
         QgsMessageLog.logMessage(
-            f"[TIMING] access variable: {t3-t2:.2f}s",
+            f"[TIMING] access variable: {t3 - t2:.2f}s",
             "EODH",
             level=Qgis.Info,
         )
@@ -295,7 +295,7 @@ def load_variable_from_kerchunk(
 
         t4 = time.time()
         QgsMessageLog.logMessage(
-            f"[TIMING] read data (var[:]): {t4-t3:.2f}s, "
+            f"[TIMING] read data (var[:]): {t4 - t3:.2f}s, "
             f"shape: {data.shape}, size: {data.nbytes / 1024 / 1024:.2f} MB",
             "EODH",
             level=Qgis.Info,
@@ -311,7 +311,7 @@ def load_variable_from_kerchunk(
             attrs = {}
 
         QgsMessageLog.logMessage(
-            f"[TIMING] TOTAL load_variable_from_kerchunk: {time.time()-t0:.2f}s",
+            f"[TIMING] TOTAL load_variable_from_kerchunk: {time.time() - t0:.2f}s",
             "EODH",
             level=Qgis.Info,
         )
@@ -360,7 +360,7 @@ def get_geotransform_from_kerchunk(
 
         t1 = time.time()
         QgsMessageLog.logMessage(
-            f"[TIMING] geotransform - open store: {t1-t0:.2f}s",
+            f"[TIMING] geotransform - open store: {t1 - t0:.2f}s",
             "EODH",
             level=Qgis.Info,
         )
@@ -375,7 +375,7 @@ def get_geotransform_from_kerchunk(
 
         t2 = time.time()
         QgsMessageLog.logMessage(
-            f"[TIMING] geotransform - read xc: {t2-t1:.2f}s",
+            f"[TIMING] geotransform - read xc: {t2 - t1:.2f}s",
             "EODH",
             level=Qgis.Info,
         )
@@ -387,7 +387,7 @@ def get_geotransform_from_kerchunk(
 
         t3 = time.time()
         QgsMessageLog.logMessage(
-            f"[TIMING] geotransform - read yc: {t3-t2:.2f}s",
+            f"[TIMING] geotransform - read yc: {t3 - t2:.2f}s",
             "EODH",
             level=Qgis.Info,
         )
@@ -398,7 +398,7 @@ def get_geotransform_from_kerchunk(
         result = compute_geotransform(xc_data, yc_data)
 
         QgsMessageLog.logMessage(
-            f"[TIMING] geotransform TOTAL: {time.time()-t0:.2f}s",
+            f"[TIMING] geotransform TOTAL: {time.time() - t0:.2f}s",
             "EODH",
             level=Qgis.Info,
         )

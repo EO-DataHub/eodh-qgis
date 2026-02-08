@@ -5,9 +5,7 @@ import os
 from qgis.PyQt import QtWidgets, uic
 
 # Load the UI file
-FORM_CLASS, _ = uic.loadUiType(
-    os.path.join(os.path.dirname(__file__), "../ui/collection_details_dialog.ui")
-)
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../ui/collection_details_dialog.ui"))
 
 
 class CollectionDetailsDialog(QtWidgets.QDialog, FORM_CLASS):
@@ -141,9 +139,7 @@ class CollectionDetailsDialog(QtWidgets.QDialog, FORM_CLASS):
         links = getattr(self.collection, "links", None)
         if not links:
             self.links_table.setRowCount(1)
-            self.links_table.setItem(
-                0, 0, QtWidgets.QTableWidgetItem("No links available")
-            )
+            self.links_table.setItem(0, 0, QtWidgets.QTableWidgetItem("No links available"))
             return
 
         self.links_table.setRowCount(len(links))
@@ -154,12 +150,8 @@ class CollectionDetailsDialog(QtWidgets.QDialog, FORM_CLASS):
             self.links_table.setItem(row, 0, QtWidgets.QTableWidgetItem(title))
 
             # Type (media type)
-            media_type = getattr(link, "media_type", None) or getattr(
-                link, "type", None
-            )
-            self.links_table.setItem(
-                row, 1, QtWidgets.QTableWidgetItem(media_type or "")
-            )
+            media_type = getattr(link, "media_type", None) or getattr(link, "type", None)
+            self.links_table.setItem(row, 1, QtWidgets.QTableWidgetItem(media_type or ""))
 
             # Rel
             rel = getattr(link, "rel", None) or ""

@@ -8,15 +8,13 @@ from eodh_qgis.settings import Settings
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer
-FORM_CLASS, _ = uic.loadUiType(
-    os.path.join(os.path.dirname(__file__), "../ui/settings.ui")
-)
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../ui/settings.ui"))
 
 
 class SettingsWidget(QtWidgets.QWidget, FORM_CLASS):
     def __init__(self, parent=None):
         """Constructor."""
-        super(SettingsWidget, self).__init__(parent)
+        super().__init__(parent)
         self.setupUi(self)
 
         self.username_input: QtWidgets.QLineEdit

@@ -7,15 +7,13 @@ from eodh_qgis.gui.job_details_widget import JobDetailsWidget
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from
 # Qt Designer
-FORM_CLASS, _ = uic.loadUiType(
-    os.path.join(os.path.dirname(__file__), "../ui/wf_executor.ui")
-)
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../ui/wf_executor.ui"))
 
 
 class WorkflowExecutorWidget(QtWidgets.QWidget, FORM_CLASS):
     def __init__(self, process_id: str, ades_svc: pyeodh.ades.Ades, parent=None):
         """Constructor."""
-        super(WorkflowExecutorWidget, self).__init__(parent)
+        super().__init__(parent)
         self.process = ades_svc.get_process(process_id)
         self.setupUi(self)
         self.input_map: dict[str, QtWidgets.QLineEdit] = {}
@@ -42,14 +40,11 @@ class WorkflowExecutorWidget(QtWidgets.QWidget, FORM_CLASS):
             # Check for array input
             is_array = (
                 v.get("extended-schema", {}).get("type") == "array"
-                and v.get("extended-schema", {}).get("items", {}).get("type")
-                == "string"
+                and v.get("extended-schema", {}).get("items", {}).get("type") == "string"
             )
 
             horizontal_layout = QtWidgets.QHBoxLayout()
-            label = QtWidgets.QLabel(
-                f"{input_name} ({input_type}{'[]' if is_array else ''})"
-            )
+            label = QtWidgets.QLabel(f"{input_name} ({input_type}{'[]' if is_array else ''})")
             horizontal_layout.addWidget(label)
 
             if is_array:
@@ -107,9 +102,7 @@ class WorkflowExecutorWidget(QtWidgets.QWidget, FORM_CLASS):
 
                 add_btn.clicked.connect(handle_add)
 
-                self.input_map[k] = (
-                    line_edits  # Store the list of (QLineEdit, row_widget)
-                )
+                self.input_map[k] = line_edits  # Store the list of (QLineEdit, row_widget)
                 horizontal_layout.addWidget(array_widget)
             else:
                 line_edit = QtWidgets.QLineEdit()
@@ -128,15 +121,12 @@ class WorkflowExecutorWidget(QtWidgets.QWidget, FORM_CLASS):
             # Check for array input
             is_array = (
                 v.get("extended-schema", {}).get("type") == "array"
-                and v.get("extended-schema", {}).get("items", {}).get("type")
-                == "string"
+                and v.get("extended-schema", {}).get("items", {}).get("type") == "string"
             )
             if is_array:
                 # Collect all non-empty values from the list of QLineEdits
                 line_edits = self.input_map[k]
-                values = [
-                    le.text().strip() for le, _ in line_edits if le.text().strip()
-                ]
+                values = [le.text().strip() for le, _ in line_edits if le.text().strip()]
                 inputs[k] = values
             else:
                 inputs[k] = self.input_map[k].text().strip()
@@ -147,6 +137,4 @@ class WorkflowExecutorWidget(QtWidgets.QWidget, FORM_CLASS):
         self.parent().addWidget(job_details)
         self.parent().setCurrentWidget(job_details)
         self.parent().parent().parent().button_widget_map["jobs"]["widget"].load_jobs()
-        self.parent().parent().parent().style_menu_button(
-            self.parent().parent().parent().jobs_button
-        )
+        self.parent().parent().parent().style_menu_button(self.parent().parent().parent().jobs_button)

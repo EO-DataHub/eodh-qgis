@@ -40,8 +40,7 @@ class VariableSelectionDialog(QtWidgets.QDialog):
 
         # Info label
         info_label = QtWidgets.QLabel(
-            f"Found {len(self.variables)} data variables in {asset_key}.\n"
-            "Select which variables to load as layers:"
+            f"Found {len(self.variables)} data variables in {asset_key}.\nSelect which variables to load as layers:"
         )
         layout.addWidget(info_label)
 
@@ -74,9 +73,7 @@ class VariableSelectionDialog(QtWidgets.QDialog):
         layout.addLayout(btn_layout)
 
         # OK / Cancel
-        button_box = QtWidgets.QDialogButtonBox(
-            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
-        )
+        button_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
         layout.addWidget(button_box)
