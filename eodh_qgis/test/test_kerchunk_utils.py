@@ -8,10 +8,8 @@ from eodh_qgis.kerchunk_utils import (
     _is_coordinate_variable_kerchunk,
     extract_epsg_from_kerchunk,
     extract_variables_from_kerchunk,
-    get_geotransform_from_kerchunk,
     get_variable_display_info,
     is_kerchunk_file,
-    load_variable_from_kerchunk,
     parse_kerchunk_json,
 )
 
@@ -168,66 +166,6 @@ class TestGetVariableDisplayInfo(unittest.TestCase):
         display = get_variable_display_info(var)
         self.assertIn("data", display)
         self.assertIn("[10, 20]", display)
-
-
-class TestLoadVariableFromKerchunk(unittest.TestCase):
-    """Tests for load_variable_from_kerchunk function."""
-
-    def setUp(self):
-        """Set up test fixtures."""
-        self.test_data_dir = os.path.join(os.path.dirname(__file__), "data")
-        self.kerchunk_file = os.path.join(self.test_data_dir, "example_netcdf_kerchunk.json")
-        self.kerchunk_data = parse_kerchunk_json(self.kerchunk_file)
-
-    def test_load_existing_variable(self):
-        """Test loading an existing variable returns data and attrs."""
-        result = load_variable_from_kerchunk(self.kerchunk_data, "sea_ice_thickness")
-        self.assertIsNotNone(result)
-        data, attrs = result
-        self.assertEqual(len(data.shape), 3)  # (time, yc, xc)
-        self.assertIn("units", attrs)
-
-    def test_load_nonexistent_variable(self):
-        """Test loading a nonexistent variable returns None."""
-        result = load_variable_from_kerchunk(self.kerchunk_data, "nonexistent_var")
-        self.assertIsNone(result)
-
-    def test_load_invalid_kerchunk(self):
-        """Test loading from invalid kerchunk returns None."""
-        result = load_variable_from_kerchunk({"refs": {}}, "sea_ice_thickness")
-        self.assertIsNone(result)
-
-
-class TestGetGeotransformFromKerchunk(unittest.TestCase):
-    """Tests for get_geotransform_from_kerchunk function."""
-
-    def setUp(self):
-        """Set up test fixtures."""
-        self.test_data_dir = os.path.join(os.path.dirname(__file__), "data")
-        self.kerchunk_file = os.path.join(self.test_data_dir, "example_netcdf_kerchunk.json")
-        self.kerchunk_data = parse_kerchunk_json(self.kerchunk_file)
-
-    def test_extract_geotransform(self):
-        """Test extracting geotransform from kerchunk with xc/yc."""
-        gt = get_geotransform_from_kerchunk(self.kerchunk_data)
-        self.assertIsNotNone(gt)
-        self.assertEqual(len(gt), 6)
-
-    def test_geotransform_negative_pixel_height(self):
-        """Test pixel height is negative for north-up."""
-        gt = get_geotransform_from_kerchunk(self.kerchunk_data)
-        self.assertLess(gt[5], 0)
-
-    def test_geotransform_zero_skew(self):
-        """Test skew elements are zero."""
-        gt = get_geotransform_from_kerchunk(self.kerchunk_data)
-        self.assertEqual(gt[2], 0.0)
-        self.assertEqual(gt[4], 0.0)
-
-    def test_empty_kerchunk_returns_none(self):
-        """Test empty kerchunk returns None."""
-        gt = get_geotransform_from_kerchunk({"refs": {}})
-        self.assertIsNone(gt)
 
 
 class TestIsCoordinateVariableKerchunk(unittest.TestCase):
