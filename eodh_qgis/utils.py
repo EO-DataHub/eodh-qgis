@@ -1,5 +1,7 @@
 """Utility functions for the EODH QGIS plugin."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 from osgeo import gdal
