@@ -160,6 +160,66 @@ class TestCreateLayersForAsset(unittest.TestCase):
         # Remote TIF will fail but shouldn't crash
         self.assertIsInstance(layers, list)
 
+    @patch("eodh_qgis.layer_utils.QgsRasterLayer")
+    def test_vsicurl_applied_to_remote_cog(self, mock_layer_cls):
+        """Test that remote COG/GeoTIFF gets /vsicurl/ prefix."""
+        mock_layer = Mock(spec=QgsRasterLayer)
+        mock_layer.isValid.return_value = True
+        mock_layer_cls.return_value = mock_layer
+
+        item = Mock()
+        item.id = "test-item"
+
+        asset = Mock()
+        asset.href = "https://example.com/file.tif"
+        asset.type = "image/tiff; application=geotiff"
+
+        create_layers_for_asset(item, "data", asset)
+        mock_layer_cls.assert_called_once_with(
+            "/vsicurl/https://example.com/file.tif",
+            "test-item_data",
+        )
+
+    @patch("eodh_qgis.layer_utils.QgsRasterLayer")
+    def test_vsicurl_applied_to_remote_png(self, mock_layer_cls):
+        """Test that remote PNG gets /vsicurl/ prefix (sequential read optimization)."""
+        mock_layer = Mock(spec=QgsRasterLayer)
+        mock_layer.isValid.return_value = True
+        mock_layer_cls.return_value = mock_layer
+
+        item = Mock()
+        item.id = "test-item"
+
+        asset = Mock()
+        asset.href = "https://example.com/file.png"
+        asset.type = "image/png"
+
+        create_layers_for_asset(item, "data", asset)
+        mock_layer_cls.assert_called_once_with(
+            "/vsicurl/https://example.com/file.png",
+            "test-item_data",
+        )
+
+    @patch("eodh_qgis.layer_utils.QgsRasterLayer")
+    def test_vsicurl_not_applied_to_local_files(self, mock_layer_cls):
+        """Test that local files do NOT get /vsicurl/ prefix."""
+        mock_layer = Mock(spec=QgsRasterLayer)
+        mock_layer.isValid.return_value = True
+        mock_layer_cls.return_value = mock_layer
+
+        item = Mock()
+        item.id = "test-item"
+
+        asset = Mock()
+        asset.href = "/tmp/local_file.tif"
+        asset.type = "image/tiff"
+
+        create_layers_for_asset(item, "data", asset)
+        mock_layer_cls.assert_called_once_with(
+            "/tmp/local_file.tif",
+            "test-item_data",
+        )
+
     def test_netcdf_extension_detected(self):
         """Test that .nc extension triggers NetCDF handling."""
         item = Mock()

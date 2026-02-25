@@ -1,13 +1,12 @@
-"""Background layer loading task for QGIS.
-
-Simple wrapper around create_layers_for_asset() that runs in background thread.
-"""
+"""Background tasks for QGIS layer loading and kerchunk fetching."""
 
 from __future__ import annotations
 
 from qgis.core import Qgis, QgsMessageLog, QgsRasterLayer, QgsTask
 
+from eodh_qgis.asset_utils import find_kerchunk_reference
 from eodh_qgis.definitions.constants import PLUGIN_NAME
+from eodh_qgis.kerchunk_utils import NetCDFVariableInfo, extract_variables_from_kerchunk
 from eodh_qgis.layer_utils import create_layers_for_asset
 
 
@@ -93,3 +92,40 @@ class LayerLoaderTask(QgsTask):
                 PLUGIN_NAME,
                 level=Qgis.Warning,
             )
+
+
+class KerchunkFetchTask(QgsTask):
+    """Background task to fetch kerchunk reference and extract variables.
+
+    Moves the potentially slow HTTP fetch of kerchunk JSON files off the
+    main thread. On completion, access task.variables for the extracted
+    variable info list (empty if no kerchunk found).
+    """
+
+    def __init__(self, item):
+        super().__init__(f"Fetching kerchunk for {item.id}")
+        self.item = item
+        self.variables: list[NetCDFVariableInfo] = []
+        self.error: str | None = None
+
+    def run(self) -> bool:
+        """Fetch kerchunk reference in background thread."""
+        try:
+            QgsMessageLog.logMessage(
+                f"[Task] Fetching kerchunk for {self.item.id}",
+                PLUGIN_NAME,
+                level=Qgis.Info,
+            )
+            result = find_kerchunk_reference(self.item)
+            if result:
+                _href, kerchunk_data = result
+                self.variables = extract_variables_from_kerchunk(kerchunk_data)
+            return True
+        except Exception as e:
+            self.error = str(e)
+            QgsMessageLog.logMessage(
+                f"[Task] Kerchunk fetch error: {e}",
+                PLUGIN_NAME,
+                level=Qgis.Warning,
+            )
+            return False

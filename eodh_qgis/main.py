@@ -135,6 +135,9 @@ class EodhQgis:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
+        from eodh_qgis.gdal_config import configure_gdal_vsicurl
+
+        configure_gdal_vsicurl()
 
         icon_path = ":/plugins/eodh_qgis/icon.png"
         self.add_action(
@@ -152,6 +155,10 @@ class EodhQgis:
         for action in self.actions:
             self.iface.removePluginWebMenu(self.menu, action)
             self.iface.removeToolBarIcon(action)
+
+        from eodh_qgis.gdal_config import restore_gdal_vsicurl
+
+        restore_gdal_vsicurl()
 
     def run(self):
         """Run method that performs all the real work"""

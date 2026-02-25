@@ -1,7 +1,7 @@
 """Tests for CRS extraction utilities."""
 
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from qgis.core import QgsCoordinateReferenceSystem, QgsRasterLayer
 
@@ -108,8 +108,9 @@ class TestApplyCrsToLayer(unittest.TestCase):
         self.assertTrue(result)
         layer.setCrs.assert_called_once()
 
-    def test_apply_metadata_epsg(self):
-        """Test applying CRS from metadata XML EPSG."""
+    @patch("eodh_qgis.crs_utils.extract_epsg_from_metadata_xml", return_value="3413")
+    def test_apply_metadata_epsg(self, mock_xml):
+        """Test applying CRS from metadata XML EPSG (lazy fetch)."""
         layer = Mock(spec=QgsRasterLayer)
         layer.name.return_value = "test_layer"
         invalid_crs = QgsCoordinateReferenceSystem()
@@ -119,9 +120,11 @@ class TestApplyCrsToLayer(unittest.TestCase):
         asset.extra_fields = {}
         del asset.ext
 
-        result = apply_crs_to_layer(layer, asset, "N/A", "3413")
+        item = Mock()
+        result = apply_crs_to_layer(layer, asset, "N/A", item=item)
         self.assertTrue(result)
         layer.setCrs.assert_called_once()
+        mock_xml.assert_called_once_with(item)
 
     def test_no_crs_found(self):
         """Test returns False when no CRS source is available."""
@@ -152,6 +155,51 @@ class TestApplyCrsToLayer(unittest.TestCase):
 
         result = apply_crs_to_layer(layer, asset, "N/A", None)
         self.assertFalse(result)
+
+    @patch("eodh_qgis.crs_utils.extract_epsg_from_metadata_xml")
+    def test_no_xml_fetch_when_layer_has_crs(self, mock_xml):
+        """Metadata XML must NOT be fetched when layer already has CRS."""
+        layer = Mock(spec=QgsRasterLayer)
+        layer.name.return_value = "test_layer"
+        layer.crs.return_value = QgsCoordinateReferenceSystem("EPSG:4326")
+
+        asset = Mock()
+        asset.extra_fields = {}
+        del asset.ext
+
+        result = apply_crs_to_layer(layer, asset, None, item=Mock())
+        self.assertTrue(result)
+        mock_xml.assert_not_called()
+
+    @patch("eodh_qgis.crs_utils.extract_epsg_from_metadata_xml")
+    def test_no_xml_fetch_when_asset_has_crs(self, mock_xml):
+        """Metadata XML must NOT be fetched when asset provides CRS."""
+        layer = Mock(spec=QgsRasterLayer)
+        layer.name.return_value = "test_layer"
+        layer.crs.return_value = QgsCoordinateReferenceSystem()
+
+        asset = Mock()
+        asset.extra_fields = {"proj:epsg": 32632}
+        del asset.ext
+
+        result = apply_crs_to_layer(layer, asset, None, item=Mock())
+        self.assertTrue(result)
+        mock_xml.assert_not_called()
+
+    @patch("eodh_qgis.crs_utils.extract_epsg_from_metadata_xml")
+    def test_no_xml_fetch_when_item_has_crs(self, mock_xml):
+        """Metadata XML must NOT be fetched when item provides CRS."""
+        layer = Mock(spec=QgsRasterLayer)
+        layer.name.return_value = "test_layer"
+        layer.crs.return_value = QgsCoordinateReferenceSystem()
+
+        asset = Mock()
+        asset.extra_fields = {}
+        del asset.ext
+
+        result = apply_crs_to_layer(layer, asset, "4326", item=Mock())
+        self.assertTrue(result)
+        mock_xml.assert_not_called()
 
 
 if __name__ == "__main__":
