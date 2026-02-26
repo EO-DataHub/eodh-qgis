@@ -15,8 +15,8 @@ def extract_epsg_from_item(item) -> str:
     """Extract EPSG code from a STAC item's properties.
 
     Checks multiple possible property names used by different STAC providers.
-    Does NOT fetch metadata XML - use extract_epsg_from_metadata_xml() separately
-    for that when loading assets.
+    Does NOT fetch metadata XML - that is done lazily by apply_crs_to_layer()
+    only when needed.
 
     Args:
         item: STAC item object with 'properties' dict
@@ -102,7 +102,7 @@ def apply_crs_to_layer(
     layer: QgsRasterLayer,
     asset,
     item_epsg: str | None,
-    metadata_epsg: str | None,
+    item=None,
 ) -> bool:
     """Apply CRS to layer using priority order.
 
@@ -110,14 +110,14 @@ def apply_crs_to_layer(
     1. Layer's existing CRS (if already valid)
     2. Asset-level CRS from projection extension
     3. Item-level CRS from properties
-    4. Metadata XML CRS
+    4. Metadata XML CRS (fetched lazily — only if earlier sources fail)
     5. NetCDF grid_mapping CRS
 
     Args:
         layer: QGIS raster layer to apply CRS to
         asset: STAC asset object
         item_epsg: EPSG from item properties (or "N/A")
-        metadata_epsg: EPSG from metadata XML (or None)
+        item: STAC item object (for lazy metadata XML fetch, optional)
 
     Returns:
         True if CRS was successfully applied
@@ -159,17 +159,19 @@ def apply_crs_to_layer(
             )
             return True
 
-    # 3. Metadata XML CRS
-    if metadata_epsg:
-        crs = QgsCoordinateReferenceSystem(f"EPSG:{metadata_epsg}")
-        if crs.isValid():
-            layer.setCrs(crs)
-            QgsMessageLog.logMessage(
-                f"[CRS] {layer_name}: Applied metadata XML CRS EPSG:{metadata_epsg}",
-                "EODH",
-                level=Qgis.Info,
-            )
-            return True
+    # 3. Metadata XML CRS (lazy fetch — only when earlier sources failed)
+    if item is not None:
+        metadata_epsg = extract_epsg_from_metadata_xml(item)
+        if metadata_epsg:
+            crs = QgsCoordinateReferenceSystem(f"EPSG:{metadata_epsg}")
+            if crs.isValid():
+                layer.setCrs(crs)
+                QgsMessageLog.logMessage(
+                    f"[CRS] {layer_name}: Applied metadata XML CRS EPSG:{metadata_epsg}",
+                    "EODH",
+                    level=Qgis.Info,
+                )
+                return True
 
     # 4. NetCDF grid_mapping CRS (for files with polar_stereographic, etc.)
     source = layer.source()

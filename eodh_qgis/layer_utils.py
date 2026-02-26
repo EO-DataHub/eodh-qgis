@@ -9,7 +9,6 @@ from osgeo import gdal, osr
 from qgis.core import Qgis, QgsMessageLog, QgsRasterLayer
 
 from eodh_qgis.definitions.constants import (
-    COG_MIME_TYPES,
     NETCDF_MIME_TYPES,
     PLUGIN_NAME,
 )
@@ -94,11 +93,10 @@ def create_layers_for_asset(
             )
             return []
 
-    # Use /vsicurl/ for remote streaming of COG/GeoTIFF (not NetCDF)
-    needs_vsicurl = (
-        any(cog_type in asset_type for cog_type in COG_MIME_TYPES) or url.endswith(".tif") or url.endswith(".tiff")
-    )
-    if needs_vsicurl and url.startswith("http"):
+    # Use /vsicurl/ for remote streaming of any non-NetCDF raster.
+    # vsicurl supports most GDAL drivers and has sequential reading optimization
+    # (progressive chunk sizes) for non-tiled formats like PNG/JPEG.
+    if not is_netcdf and url.startswith("http"):
         url = f"/vsicurl/{url}"
 
     layer_name = f"{item.id}_{asset_key}"

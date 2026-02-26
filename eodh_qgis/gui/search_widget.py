@@ -16,21 +16,18 @@ from qgis.PyQt import QtCore, QtWidgets, uic
 
 from eodh_qgis.asset_utils import (
     extract_epsg_from_asset,
-    find_kerchunk_reference,
     get_all_loadable_assets,
     get_asset_file_type,
 )
 from eodh_qgis.crs_utils import (
     apply_crs_to_layer,
     extract_epsg_from_item,
-    extract_epsg_from_metadata_xml,
 )
 from eodh_qgis.geometry_utils import add_footprint_to_project, item_has_geometry
 from eodh_qgis.gui.polygon_tool import PolygonCaptureTool
 from eodh_qgis.gui.result_item_card import ResultItemCard
 from eodh_qgis.gui.variable_selection_dialog import VariableSelectionDialog
-from eodh_qgis.kerchunk_utils import extract_variables_from_kerchunk
-from eodh_qgis.layer_loader import LayerLoaderTask
+from eodh_qgis.layer_loader import KerchunkFetchTask, LayerLoaderTask
 
 # Load the UI file
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../ui/search.ui"))
@@ -308,57 +305,6 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
             return [(key, asset) for cb, key, asset in checkboxes if cb.isChecked()]
         return []
 
-    def _get_netcdf_variables(self, item, asset_key: str) -> list[str] | None:
-        """Get selected variables for a NetCDF asset.
-
-        Tries kerchunk reference first for fast metadata access,
-        then shows a selection dialog if multiple variables found.
-
-        Args:
-            item: STAC item object
-            asset_key: Key of the NetCDF asset
-
-        Returns:
-            List of selected variable names, or None to load all.
-            Returns empty list if user cancelled.
-        """
-        # Try to find kerchunk reference
-        kerchunk_result = find_kerchunk_reference(item)
-
-        if not kerchunk_result:
-            # No kerchunk available, fall back to loading all variables
-            QgsMessageLog.logMessage(
-                f"No kerchunk reference found for {item.id}, loading all variables",
-                "EODH",
-                level=Qgis.Info,
-            )
-            return None
-
-        href, kerchunk_data = kerchunk_result
-        QgsMessageLog.logMessage(
-            f"Found kerchunk reference: {href[:80]}...",
-            "EODH",
-            level=Qgis.Info,
-        )
-
-        # Extract variables from kerchunk
-        variables = extract_variables_from_kerchunk(kerchunk_data)
-
-        if not variables:
-            # No variables found in kerchunk, fall back
-            return None
-
-        if len(variables) == 1:
-            # Only one variable, no need for dialog
-            return [variables[0].name]
-
-        # Show selection dialog for multiple variables
-        dialog = VariableSelectionDialog(variables, item.id, asset_key, self)
-        if dialog.exec() == QtWidgets.QDialog.Accepted:
-            return dialog.get_selected_variables()
-
-        return []  # User cancelled
-
     def _populate_results_cards(self):
         """Populate the scroll area with result cards."""
         # Create new container widget with vertical layout
@@ -436,41 +382,64 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
             level=Qgis.Info,
         )
 
-        # Pre-fetch CRS data once (avoid redundant network calls)
+        # Extract item-level CRS (fast, no network call)
         item_epsg = extract_epsg_from_item(item)
-        metadata_epsg = extract_epsg_from_metadata_xml(item)
 
         for asset_key, asset in loadable_assets:
             # Check if this is a NetCDF file
             file_type = get_asset_file_type(asset)
-            selected_variables = None
 
             if file_type == "NetCDF":
-                # Try to get variable selection for NetCDF
-                selected_variables = self._get_netcdf_variables(item, asset_key)
-                if selected_variables == []:
-                    # User cancelled variable selection
-                    continue
+                # Fetch kerchunk in background, then show variable dialog on completion
+                self._start_netcdf_load(item, asset_key, asset, item_epsg)
+            else:
+                # Non-NetCDF: start layer loading directly
+                self._start_layer_load(item, asset_key, asset, None, item_epsg)
 
-            # Create background task for loading
-            task = LayerLoaderTask(item, asset_key, asset, selected_variables)
+    def _start_layer_load(self, item, asset_key, asset, selected_variables, item_epsg):
+        """Start a background layer loading task."""
+        task = LayerLoaderTask(item, asset_key, asset, selected_variables)
+        on_complete = partial(self._on_task_completed, task, asset, item_epsg, item)
+        task.taskCompleted.connect(on_complete)
+        task.taskTerminated.connect(self._on_task_terminated)
+        QgsApplication.taskManager().addTask(task)
 
-            # Connect signals using partial to pass context
-            on_complete = partial(self._on_task_completed, task, asset, item_epsg, metadata_epsg)
-            task.taskCompleted.connect(on_complete)
-            task.taskTerminated.connect(self._on_task_terminated)
+    def _start_netcdf_load(self, item, asset_key, asset, item_epsg):
+        """Start NetCDF loading with background kerchunk fetch.
 
-            # Add task to QGIS task manager (runs in background)
-            QgsApplication.taskManager().addTask(task)
+        Fetches kerchunk reference in background, shows variable selection
+        dialog on completion, then starts the actual layer loading task.
+        """
+        task = KerchunkFetchTask(item)
+        on_complete = partial(self._on_kerchunk_fetched, task, item, asset_key, asset, item_epsg)
+        task.taskCompleted.connect(on_complete)
+        task.taskTerminated.connect(self._on_task_terminated)
+        QgsApplication.taskManager().addTask(task)
 
-    def _on_task_completed(self, task, asset, item_epsg, metadata_epsg):
+    def _on_kerchunk_fetched(self, task, item, asset_key, asset, item_epsg):
+        """Handle kerchunk fetch completion — show variable dialog if needed."""
+        selected_variables = None
+
+        if task.variables:
+            if len(task.variables) == 1:
+                selected_variables = [task.variables[0].name]
+            else:
+                dialog = VariableSelectionDialog(task.variables, item.id, asset_key, self)
+                if dialog.exec() == QtWidgets.QDialog.Accepted:
+                    selected_variables = dialog.get_selected_variables()
+                else:
+                    return  # User cancelled
+
+        self._start_layer_load(item, asset_key, asset, selected_variables, item_epsg)
+
+    def _on_task_completed(self, task, asset, item_epsg, item):
         """Handle background task completion - add layers to project.
 
         Args:
             task: The completed LayerLoaderTask
             asset: The STAC asset object (for CRS extraction)
             item_epsg: Pre-fetched EPSG from item
-            metadata_epsg: Pre-fetched EPSG from metadata XML
+            item: STAC item object (for lazy metadata XML fetch if needed)
         """
         if not task.layers:
             if task.error:
@@ -482,7 +451,8 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
 
         for layer in task.layers:
             # Try to apply CRS using priority order
-            crs_applied = apply_crs_to_layer(layer, asset, item_epsg, metadata_epsg)
+            # Metadata XML is fetched lazily only if layer/asset/item CRS not found
+            crs_applied = apply_crs_to_layer(layer, asset, item_epsg, item=item)
 
             if crs_applied:
                 QgsProject.instance().addMapLayer(layer)

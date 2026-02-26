@@ -34,13 +34,6 @@ NETCDF_MIME_TYPES = [
     "application/netcdf",
 ]
 
-# COG/GeoTIFF MIME types (for vsicurl streaming)
-COG_MIME_TYPES = [
-    "image/tiff; application=geotiff; profile=cloud-optimized",
-    "image/tiff; application=geotiff",
-    "image/tiff",
-]
-
 # Asset keys that are typically data assets
 DATA_ASSET_KEYS = ["quicklook", "data", "visual", "image"]
 
