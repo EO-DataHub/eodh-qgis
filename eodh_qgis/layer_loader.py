@@ -129,3 +129,18 @@ class KerchunkFetchTask(QgsTask):
                 level=Qgis.Warning,
             )
             return False
+
+    def finished(self, result: bool):
+        """Called on main thread when task completes."""
+        if result and self.variables:
+            QgsMessageLog.logMessage(
+                f"[Task] Kerchunk fetch found {len(self.variables)} variable(s)",
+                PLUGIN_NAME,
+                level=Qgis.Info,
+            )
+        elif self.error:
+            QgsMessageLog.logMessage(
+                f"[Task] Kerchunk fetch failed: {self.error}",
+                PLUGIN_NAME,
+                level=Qgis.Warning,
+            )
