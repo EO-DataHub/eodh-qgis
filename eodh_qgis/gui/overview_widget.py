@@ -8,6 +8,7 @@ from qgis.core import Qgis, QgsMessageLog
 from qgis.PyQt import QtCore, QtGui, QtWidgets, uic
 
 from eodh_qgis.gui.collection_details_dialog import CollectionDetailsDialog
+from eodh_qgis.settings import Settings
 
 # Load the UI file
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../ui/overview.ui"))
@@ -20,12 +21,11 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
     # passes (collection, collection_name)
     collection_changed = QtCore.pyqtSignal(object, str)
 
-    def __init__(self, creds: dict[str, str], parent=None):
+    def __init__(self, parent=None):
         """Constructor."""
         super().__init__(parent)
         self.setupUi(self)
 
-        self.creds = creds
         self.catalog_service: CatalogService | None = None
         self.catalogs: dict[int, Catalog] = {}  # Store catalog objects by index
         self.collections: dict[str, Collection] = {}  # Store collections by ID
@@ -84,8 +84,11 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
     def _populate_catalogue_dropdown(self):
         """Populate the dropdown with available catalogues."""
         try:
+            creds = Settings().get_creds()
+            if not creds:
+                return
             self.catalog_service = pyeodh.Client(
-                username=self.creds["username"], token=self.creds["token"]
+                username=creds["username"], token=creds["token"]
             ).get_catalog_service()
 
             catalogs = self.catalog_service.get_catalogs()

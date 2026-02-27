@@ -15,11 +15,10 @@ class TestSearchWidget(unittest.TestCase):
         assert cls.QGIS_APP is not None
 
     def setUp(self):
-        self.creds = {"username": "test_user", "token": "test_token"}
         self.mock_iface = MagicMock()
         self.mock_canvas = MagicMock()
         self.mock_iface.mapCanvas.return_value = self.mock_canvas
-        self.widget = SearchWidget(creds=self.creds, iface=self.mock_iface, parent=None)
+        self.widget = SearchWidget(iface=self.mock_iface, parent=None)
 
     def tearDown(self):
         self.widget = None
@@ -33,7 +32,7 @@ class TestSearchWidget(unittest.TestCase):
         mock_catalog.search.return_value = []  # Empty results
 
         # Use widget without iface for this test
-        widget = SearchWidget(creds=self.creds, iface=None, parent=None)
+        widget = SearchWidget(iface=None, parent=None)
         widget.catalog = mock_catalog
         widget.collection = mock_collection
 
@@ -241,7 +240,7 @@ class TestSearchWidget(unittest.TestCase):
         mock_catalog.search.return_value = []  # Empty results
 
         # Use widget without iface for this test
-        widget = SearchWidget(creds=self.creds, iface=None, parent=None)
+        widget = SearchWidget(iface=None, parent=None)
         widget.catalog = mock_catalog
         widget.collection = mock_collection
 
@@ -273,7 +272,7 @@ class TestSearchWidget(unittest.TestCase):
         mock_catalog.search.return_value = []  # Empty results
 
         # Use widget without iface for this test
-        widget = SearchWidget(creds=self.creds, iface=None, parent=None)
+        widget = SearchWidget(iface=None, parent=None)
         widget.catalog = mock_catalog
         widget.collection = None  # No collection selected
 
@@ -306,7 +305,7 @@ class TestSearchWidget(unittest.TestCase):
         mock_collection.id = "sentinel-2"
         mock_catalog.search.return_value = []
 
-        widget = SearchWidget(creds=self.creds, iface=None, parent=None)
+        widget = SearchWidget(iface=None, parent=None)
         widget.catalog = mock_catalog
         widget.collection = mock_collection
 
@@ -336,7 +335,7 @@ class TestSearchWidget(unittest.TestCase):
         mock_paginated_list.__getitem__ = MagicMock(return_value=[MagicMock() for _ in range(50)])
         mock_catalog.search.return_value = mock_paginated_list
 
-        widget = SearchWidget(creds=self.creds, iface=None, parent=None)
+        widget = SearchWidget(iface=None, parent=None)
         widget.catalog = mock_catalog
 
         # Set bbox values
@@ -377,7 +376,7 @@ class TestSearchWidget(unittest.TestCase):
         mock_paginated_list.__getitem__ = mock_getitem
         mock_catalog.search.return_value = mock_paginated_list
 
-        widget = SearchWidget(creds=self.creds, iface=None, parent=None)
+        widget = SearchWidget(iface=None, parent=None)
         widget.catalog = mock_catalog
 
         # Set bbox values
@@ -416,7 +415,7 @@ class TestSearchWidget(unittest.TestCase):
         mock_paginated_list.__getitem__ = mock_getitem
         mock_catalog.search.return_value = mock_paginated_list
 
-        widget = SearchWidget(creds=self.creds, iface=None, parent=None)
+        widget = SearchWidget(iface=None, parent=None)
         widget.catalog = mock_catalog
 
         # Set bbox values
@@ -453,7 +452,7 @@ class TestSearchWidget(unittest.TestCase):
         mock_paginated_list.__getitem__ = mock_getitem
         mock_catalog.search.return_value = mock_paginated_list
 
-        widget = SearchWidget(creds=self.creds, iface=None, parent=None)
+        widget = SearchWidget(iface=None, parent=None)
         widget.catalog = mock_catalog
 
         # Set bbox values

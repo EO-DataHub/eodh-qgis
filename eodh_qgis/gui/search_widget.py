@@ -34,12 +34,11 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), "../ui/se
 
 
 class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
-    def __init__(self, creds: dict[str, str], iface=None, parent=None):
+    def __init__(self, iface=None, parent=None):
         """Constructor."""
         super().__init__(parent)
         self.setupUi(self)
 
-        self.creds = creds
         self.iface = iface
         self.catalog = None
         self.collection = None
