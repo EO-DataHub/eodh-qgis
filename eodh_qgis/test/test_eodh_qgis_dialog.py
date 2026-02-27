@@ -47,3 +47,18 @@ class EodhQgisDialogTest(unittest.TestCase):
         # Should switch to settings tab
         settings_index = self.dialog.tab_widget.indexOf(self.dialog.settings_widget)
         self.assertEqual(self.dialog.tab_widget.currentIndex(), settings_index)
+
+    @patch("eodh_qgis.gui.main_dialog.MainDialog.get_creds")
+    def test_setup_ui_after_token_no_tab_duplication(self, mock_get_creds):
+        """Test that calling setup_ui_after_token multiple times does not duplicate tabs."""
+        mock_get_creds.return_value = {"username": "user", "token": "tok"}
+
+        # Call setup twice (simulates credential update)
+        self.dialog.setup_ui_after_token()
+        self.dialog.setup_ui_after_token()
+
+        tab_names = [self.dialog.tab_widget.tabText(i) for i in range(self.dialog.tab_widget.count())]
+        # Should have exactly one of each, not duplicates
+        self.assertEqual(tab_names.count("Overview"), 1)
+        self.assertEqual(tab_names.count("Search"), 1)
+        self.assertEqual(tab_names.count("Process"), 1)

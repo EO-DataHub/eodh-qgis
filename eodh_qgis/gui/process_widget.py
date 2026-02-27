@@ -23,12 +23,11 @@ class ProcessWidget(QtWidgets.QWidget, FORM_CLASS):
     Based on v1 main_dialog.py patterns.
     """
 
-    def __init__(self, creds: dict[str, str], parent=None):
+    def __init__(self, parent=None):
         """Constructor."""
         super().__init__(parent)
         self.setupUi(self)
 
-        self.creds = creds
         self.ades_svc = None
         self.selected_button: QtWidgets.QPushButton | None = None
 
@@ -60,9 +59,13 @@ class ProcessWidget(QtWidgets.QWidget, FORM_CLASS):
 
     def get_ades(self):
         """Initialize the ADES service."""
-        username = self.creds["username"]
-        token = self.creds["token"]
-        env = Settings().data["env"]
+        settings = Settings()
+        creds = settings.get_creds()
+        if not creds:
+            return
+        username = creds["username"]
+        token = creds["token"]
+        env = settings.data["env"]
 
         url = "https://eodatahub.org.uk"
         if env == "production":

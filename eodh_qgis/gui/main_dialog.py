@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 
-from qgis.core import QgsApplication, QgsAuthMethodConfig
 from qgis.PyQt import QtWidgets, uic
 
 from eodh_qgis.gui.landing_widget import LandingWidget
@@ -32,11 +31,24 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         # Type hints for UI elements (from .ui file)
         self.tab_widget: QtWidgets.QTabWidget
 
-        # Add initial tabs
+        # Create all tabs once
         self.tab_widget.addTab(LandingWidget(parent=self), "Welcome")
-        # Overview and Search tabs added after credential validation
+
+        self.overview_widget = OverviewWidget(parent=self)
+        self.tab_widget.addTab(self.overview_widget, "Overview")
+
+        self.search_widget = SearchWidget(iface=self.iface, parent=self)
+        self.tab_widget.addTab(self.search_widget, "Search")
+
+        self.process_widget = ProcessWidget(parent=self)
+        self.tab_widget.addTab(self.process_widget, "Process")
+
         self.settings_widget = SettingsWidget(parent=self)
         self.tab_widget.addTab(self.settings_widget, "Settings")
+
+        # Connect overview catalogue/collection selection to search widget
+        self.overview_widget.catalogue_changed.connect(self.search_widget.set_catalog)
+        self.overview_widget.collection_changed.connect(self.search_widget.set_collection)
 
         self.setup_ui_after_token()
 
@@ -46,20 +58,7 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         Returns:
             A dictionary with 'token' and 'username' if available, else None.
         """
-        settings = Settings()
-        auth_config_id = settings.data["auth_config"]
-        if not auth_config_id:
-            return
-        auth_mgr = QgsApplication.authManager()
-        cfg = QgsAuthMethodConfig()
-        auth_mgr.loadAuthenticationConfig(auth_config_id, cfg, True)
-        creds = {
-            "token": cfg.configMap().get("token"),
-            "username": cfg.configMap().get("username"),
-        }
-        if not creds.get("token") or not creds.get("username"):
-            return
-        return creds
+        return Settings().get_creds()
 
     def missing_creds(self):
         """Handle missing credentials by prompting the user to configure them."""
@@ -72,23 +71,7 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         )
 
     def setup_ui_after_token(self):
-        """Set up UI components that require authentication credentials."""
+        """Check credentials and prompt the user if missing."""
         self.creds = self.get_creds()
         if not self.creds:
             self.missing_creds()
-            return
-
-        # Add Overview and Search tabs
-        self.overview_widget = OverviewWidget(creds=self.creds, parent=self)
-        self.search_widget = SearchWidget(creds=self.creds, iface=self.iface, parent=self)
-
-        # Connect overview catalogue selection to search widget
-        self.overview_widget.catalogue_changed.connect(self.search_widget.set_catalog)
-        # Connect overview collection selection to search widget
-        self.overview_widget.collection_changed.connect(self.search_widget.set_collection)
-
-        self.tab_widget.insertTab(1, self.overview_widget, "Overview")
-        self.tab_widget.insertTab(2, self.search_widget, "Search")
-
-        self.process_widget = ProcessWidget(creds=self.creds, parent=self)
-        self.tab_widget.insertTab(3, self.process_widget, "Process")
