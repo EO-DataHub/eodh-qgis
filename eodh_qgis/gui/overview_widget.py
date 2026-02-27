@@ -4,9 +4,11 @@ import os
 
 import pyeodh
 from pyeodh.resource_catalog import Catalog, CatalogService, Collection
+from pyeodh.utils import join_url
 from qgis.core import Qgis, QgsMessageLog
 from qgis.PyQt import QtCore, QtGui, QtWidgets, uic
 
+from eodh_qgis.gui import COMBOBOX_SCROLLABLE_STYLE
 from eodh_qgis.gui.collection_details_dialog import CollectionDetailsDialog
 from eodh_qgis.settings import Settings
 
@@ -45,6 +47,8 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
         self._setup_collections_tree()
 
         # Initialize UI state
+        self.catalogue_dropdown.setStyleSheet(COMBOBOX_SCROLLABLE_STYLE)
+        self.catalogue_dropdown.setMaxVisibleItems(20)
         self.catalogue_dropdown.addItem("Select a catalogue...", None)
 
         # Connect signals
@@ -81,6 +85,46 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
         self.collections_tree.header().resizeSection(1, 150)  # ID
         self.collections_tree.header().resizeSection(2, 180)  # Date Range
 
+    _MAX_CATALOG_PAGES = 50
+
+    def _get_all_catalogs(self, catalog_service: CatalogService) -> list[Catalog]:
+        """Fetch all catalogs, following pagination links.
+
+        TODO: Remove when pyeodh adds pagination support to get_catalogs().
+        Workaround for pyeodh's get_catalogs() not handling pagination.
+        """
+        url = join_url(catalog_service._pystac_object.self_href, "catalogs")
+        client = catalog_service._client
+        catalogs: list[Catalog] = []
+
+        pages_fetched = 0
+        while url and pages_fetched < self._MAX_CATALOG_PAGES:
+            headers, data = client._request_json("GET", url)
+            for cat_data in data.get("catalogs", []):
+                try:
+                    catalogs.append(Catalog(client, headers, cat_data, parent=catalog_service))
+                except Exception as e:
+                    QgsMessageLog.logMessage(
+                        f"Skipping malformed catalog entry: {e}",
+                        "EODH",
+                        level=Qgis.Warning,
+                    )
+            # Follow next page link if present
+            url = next(
+                (link["href"] for link in data.get("links", []) if link.get("rel") == "next"),
+                None,
+            )
+            pages_fetched += 1
+
+        if pages_fetched >= self._MAX_CATALOG_PAGES:
+            QgsMessageLog.logMessage(
+                f"Stopped fetching catalogs after {self._MAX_CATALOG_PAGES} pages",
+                "EODH",
+                level=Qgis.Warning,
+            )
+
+        return catalogs
+
     def _populate_catalogue_dropdown(self):
         """Populate the dropdown with available catalogues."""
         try:
@@ -91,7 +135,7 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
                 username=creds["username"], token=creds["token"]
             ).get_catalog_service()
 
-            catalogs = self.catalog_service.get_catalogs()
+            catalogs = self._get_all_catalogs(self.catalog_service)
             for idx, cat in enumerate(catalogs):
                 self.catalogs[idx + 1] = cat  # +1 because index 0 is "Select..."
 

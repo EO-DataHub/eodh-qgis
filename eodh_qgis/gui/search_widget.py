@@ -24,6 +24,7 @@ from eodh_qgis.crs_utils import (
     extract_epsg_from_item,
 )
 from eodh_qgis.geometry_utils import add_footprint_to_project, item_has_geometry
+from eodh_qgis.gui import COMBOBOX_SCROLLABLE_STYLE
 from eodh_qgis.gui.polygon_tool import PolygonCaptureTool
 from eodh_qgis.gui.result_item_card import ResultItemCard
 from eodh_qgis.gui.variable_selection_dialog import VariableSelectionDialog
@@ -79,6 +80,10 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
         self.sort_field_combo: QtWidgets.QComboBox
 
         # Initialize UI state
+        self.catalogue_dropdown.setStyleSheet(COMBOBOX_SCROLLABLE_STYLE)
+        self.catalogue_dropdown.setMaxVisibleItems(20)
+        self.collection_dropdown.setStyleSheet(COMBOBOX_SCROLLABLE_STYLE)
+        self.collection_dropdown.setMaxVisibleItems(20)
         self.catalogue_dropdown.addItem("Select a catalogue in Overview tab...")
         self.collection_dropdown.addItem("All collections")
 
