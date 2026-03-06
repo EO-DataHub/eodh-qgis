@@ -24,6 +24,20 @@ This plugin demonstrates the EO Application Package and workflow capabilities of
 6. Click `Install Plugin`
 7. We're using [QPIP plugin](https://github.com/opengisch/qpip) to install python dependencies using pip. Click OK to install them.
 
+### Version compatibility
+
+This plugin requires Python 3.9+ in the QGIS environment.
+
+The recommended QGIS version is always the latest LTR.
+
+On Windows, this plugin is compatible with QGIS version 3.34+. It is possible to install the plugin on older versions by first fixing the missing SSL libraries following this https://stackoverflow.com/a/71226425 (requires administrator priviledges). Without it, QPIP (another plugin we use to manage python dependencies) will fail to install anything from PyPI.
+
+On MacOS the plugin usually bundles it's own Python distribution which should be 3.9 or newer.
+
+If you encounter installation issues, please first try upgrading QGIS to the latest LTR.
+
+Please note that we can't test all possible combinations of operating systems and their versions, QGIS versions and various packaging and versions of python.
+
 ## Usage
 
 When opening the plugin for the first time, you need to configure authentication credentials to access EODH APIs.
