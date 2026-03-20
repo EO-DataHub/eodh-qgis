@@ -6,6 +6,13 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
 
+    try:
+        import truststore
+
+        truststore.inject_into_ssl()
+    except Exception:
+        pass
+
     from .main import EodhQgis
 
     return EodhQgis(iface)
