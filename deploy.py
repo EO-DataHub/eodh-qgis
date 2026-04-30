@@ -20,7 +20,7 @@ def main(install_path: pathlib.Path, is_dist=False):
     if not is_dist:
         verify_install_path(install_path)
     uninstall(install_path)
-    build()
+    build(is_dist=is_dist)
     compile_resources()
     patch_resources()
     install(install_path)
@@ -29,6 +29,7 @@ def main(install_path: pathlib.Path, is_dist=False):
 def build(
     build_dir: pathlib.Path = BUILD_DIR,
     src_dir: pathlib.Path = SRC_DIR,
+    is_dist: bool = False,
 ):
     try:
         build_dir.mkdir()
@@ -38,7 +39,10 @@ def build(
         shutil.rmtree(build_dir)
         build_dir.mkdir()
         print(f"Re-created empty {build_dir}")
-    shutil.copytree(src_dir, build_dir, dirs_exist_ok=True)
+    copy_kwargs = {"dirs_exist_ok": True}
+    if is_dist:
+        copy_kwargs["ignore"] = shutil.ignore_patterns("test")
+    shutil.copytree(src_dir, build_dir, **copy_kwargs)
     print(f"Copied {src_dir} to {build_dir}")
     shutil.copy2("metadata.txt", build_dir)
     print(f"Copied metadata.txt to {build_dir}")
@@ -46,8 +50,9 @@ def build(
     print(f"Copied LICENSE to {build_dir}")
     shutil.copy2("requirements.txt", build_dir)
     print(f"Copied requirements.txt to {build_dir}")
-    shutil.copytree(ROOT_DIR / ".docker", build_dir / ".docker")
-    shutil.copy2(ROOT_DIR / ".coveragerc", build_dir / ".coveragerc")
+    if not is_dist:
+        shutil.copytree(ROOT_DIR / ".docker", build_dir / ".docker")
+        shutil.copy2(ROOT_DIR / ".coveragerc", build_dir / ".coveragerc")
 
 
 def verify_install_path(install_path: pathlib.Path):
