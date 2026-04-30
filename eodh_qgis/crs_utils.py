@@ -2,13 +2,11 @@
 
 from __future__ import annotations
 
-import urllib.request
-
 from defusedxml import ElementTree as ET
 from qgis.core import Qgis, QgsCoordinateReferenceSystem, QgsMessageLog, QgsRasterLayer
 
 from eodh_qgis.asset_utils import extract_epsg_from_asset
-from eodh_qgis.utils import extract_epsg_from_netcdf, validate_http_url
+from eodh_qgis.utils import extract_epsg_from_netcdf, safe_urlopen
 
 
 def extract_epsg_from_item(item) -> str:
@@ -66,8 +64,7 @@ def extract_epsg_from_metadata_xml(item) -> str | None:
     QgsMessageLog.logMessage(f"[CRS] Fetching metadata XML from: {href}", "EODH", level=Qgis.Info)
 
     try:
-        validate_http_url(href)
-        with urllib.request.urlopen(href, timeout=10) as response:
+        with safe_urlopen(href, timeout=10) as response:
             xml_content = response.read()
 
         root = ET.fromstring(xml_content)

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import tempfile
-import urllib.request
 
 from osgeo import gdal, osr
 from qgis.core import Qgis, QgsMessageLog, QgsRasterLayer
@@ -12,7 +11,7 @@ from eodh_qgis.definitions.constants import (
     NETCDF_MIME_TYPES,
     PLUGIN_NAME,
 )
-from eodh_qgis.utils import get_netcdf_metadata, validate_http_url
+from eodh_qgis.utils import get_netcdf_metadata, safe_urlretrieve
 
 
 def download_with_progress(url: str, dest_path: str, callback=None):
@@ -36,8 +35,7 @@ def download_with_progress(url: str, dest_path: str, callback=None):
                 last_percent = percent
                 callback(percent)
 
-    validate_http_url(url)
-    urllib.request.urlretrieve(url, dest_path, reporthook=reporthook)
+    safe_urlretrieve(url, dest_path, reporthook=reporthook)
 
 
 def create_layers_for_asset(

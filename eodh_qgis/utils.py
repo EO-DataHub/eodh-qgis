@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import urllib.request
 from dataclasses import dataclass
+from typing import Callable
 from urllib.parse import urlparse
 
 from osgeo import gdal
@@ -27,6 +29,63 @@ def validate_http_url(url: str) -> None:
     scheme = urlparse(url).scheme.lower()
     if scheme not in _ALLOWED_URL_SCHEMES:
         raise ValueError(f"URL scheme {scheme!r} not permitted; expected http or https")
+
+
+def _build_safe_opener() -> urllib.request.OpenerDirector:
+    """OpenerDirector that handles only http(s) — no file://, ftp://, data://.
+
+    Without FileHandler/FTPHandler/etc. registered, urllib has no machinery
+    to follow non-http(s) URLs even if scheme validation were bypassed; the
+    redirect handler also rejects redirects to schemes it has no opener for.
+    """
+    opener = urllib.request.OpenerDirector()
+    for handler_cls in (
+        urllib.request.HTTPHandler,
+        urllib.request.HTTPSHandler,
+        urllib.request.HTTPDefaultErrorHandler,
+        urllib.request.HTTPRedirectHandler,
+        urllib.request.HTTPErrorProcessor,
+    ):
+        opener.add_handler(handler_cls())
+    return opener
+
+
+_SAFE_OPENER = _build_safe_opener()
+
+
+def safe_urlopen(url: str, *, timeout: float):
+    """http(s)-only replacement for urllib.request.urlopen."""
+    validate_http_url(url)
+    return _SAFE_OPENER.open(url, timeout=timeout)  # nosec B310 - scheme restricted by validate_http_url + opener handler list
+
+
+def safe_urlretrieve(
+    url: str,
+    dest_path: str,
+    *,
+    reporthook: Callable[[int, int, int], None] | None = None,
+    chunk_size: int = 64 * 1024,
+) -> None:
+    """Stream `url` to `dest_path`. http(s) only.
+
+    Reimplements the bits of urllib.request.urlretrieve that callers use,
+    but routes I/O through the restricted opener so non-http(s) schemes
+    (and redirects to them) cannot be followed.
+    """
+    validate_http_url(url)
+    with _SAFE_OPENER.open(url) as resp, open(dest_path, "wb") as out:  # nosec B310
+        total_size = int(resp.headers.get("Content-Length") or 0)
+        block_num = 0
+        if reporthook is not None:
+            reporthook(block_num, chunk_size, total_size)
+        while True:
+            chunk = resp.read(chunk_size)
+            if not chunk:
+                break
+            out.write(chunk)
+            block_num += 1
+            if reporthook is not None:
+                reporthook(block_num, chunk_size, total_size)
 
 
 @dataclass

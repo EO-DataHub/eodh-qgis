@@ -16,7 +16,7 @@ from eodh_qgis.layer_utils import (
 class TestDownloadWithProgress(unittest.TestCase):
     """Tests for download_with_progress function."""
 
-    @patch("eodh_qgis.layer_utils.urllib.request.urlretrieve")
+    @patch("eodh_qgis.layer_utils.safe_urlretrieve")
     def test_calls_urlretrieve(self, mock_retrieve):
         """Test that urlretrieve is called with correct args."""
         download_with_progress("http://example.com/file.nc", "/tmp/file.nc")
@@ -25,7 +25,7 @@ class TestDownloadWithProgress(unittest.TestCase):
         self.assertEqual(args[0][0], "http://example.com/file.nc")
         self.assertEqual(args[0][1], "/tmp/file.nc")
 
-    @patch("eodh_qgis.layer_utils.urllib.request.urlretrieve")
+    @patch("eodh_qgis.layer_utils.safe_urlretrieve")
     def test_callback_called_with_progress(self, mock_retrieve):
         """Test that progress callback is invoked."""
         progress_values = []
@@ -44,7 +44,7 @@ class TestDownloadWithProgress(unittest.TestCase):
         download_with_progress("http://example.com/file.nc", "/tmp/file.nc", on_progress)
         self.assertTrue(len(progress_values) > 0)
 
-    @patch("eodh_qgis.layer_utils.urllib.request.urlretrieve")
+    @patch("eodh_qgis.layer_utils.safe_urlretrieve")
     def test_no_callback_is_fine(self, mock_retrieve):
         """Test that None callback doesn't crash."""
 

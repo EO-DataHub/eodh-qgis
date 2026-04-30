@@ -1,16 +1,23 @@
 """Tests for utility functions."""
 
+import http.server
 import os
+import threading
 import unittest
+import urllib.request
 
 from osgeo import gdal
 
 from eodh_qgis.utils import (
+    _SAFE_OPENER,
     extract_epsg_from_netcdf,
     get_netcdf_data_variables,
     get_netcdf_geotransform,
     get_netcdf_metadata,
     is_coordinate_variable,
+    safe_urlopen,
+    safe_urlretrieve,
+    validate_http_url,
 )
 
 
@@ -261,6 +268,140 @@ class TestGetNetcdfMetadata(unittest.TestCase):
         meta = get_netcdf_metadata(path)
         self.assertIsNotNone(meta)
         self.assertIsInstance(meta.data_variables, list)
+
+
+class TestValidateHttpUrl(unittest.TestCase):
+    """Tests for validate_http_url scheme allowlist."""
+
+    def test_accepts_http(self):
+        validate_http_url("http://example.com/path")
+
+    def test_accepts_https(self):
+        validate_http_url("https://example.com/path?q=1")
+
+    def test_accepts_mixed_case(self):
+        validate_http_url("HTTPS://Example.COM/X")
+
+    def test_rejects_file_scheme(self):
+        with self.assertRaises(ValueError):
+            validate_http_url("file:///etc/passwd")
+
+    def test_rejects_ftp_scheme(self):
+        with self.assertRaises(ValueError):
+            validate_http_url("ftp://example.com/x")
+
+    def test_rejects_javascript_scheme(self):
+        with self.assertRaises(ValueError):
+            validate_http_url("javascript:alert(1)")
+
+    def test_rejects_data_scheme(self):
+        with self.assertRaises(ValueError):
+            validate_http_url("data:text/plain,abc")
+
+    def test_rejects_empty_string(self):
+        with self.assertRaises(ValueError):
+            validate_http_url("")
+
+    def test_rejects_scheme_relative(self):
+        # No scheme at all — `//example.com/x` parses to scheme=''
+        with self.assertRaises(ValueError):
+            validate_http_url("//example.com/x")
+
+
+class TestSafeOpenerStructure(unittest.TestCase):
+    """The restricted opener must not carry handlers for non-http(s) schemes."""
+
+    def test_no_file_handler_registered(self):
+        types = {type(h) for h in _SAFE_OPENER.handlers}
+        self.assertNotIn(urllib.request.FileHandler, types)
+
+    def test_no_ftp_handler_registered(self):
+        types = {type(h) for h in _SAFE_OPENER.handlers}
+        self.assertNotIn(urllib.request.FTPHandler, types)
+
+    def test_http_and_https_handlers_present(self):
+        types = {type(h) for h in _SAFE_OPENER.handlers}
+        self.assertIn(urllib.request.HTTPHandler, types)
+        self.assertIn(urllib.request.HTTPSHandler, types)
+
+
+class TestSafeUrlopen(unittest.TestCase):
+    """Tests for safe_urlopen scheme rejection."""
+
+    def test_rejects_file_url(self):
+        with self.assertRaises(ValueError):
+            safe_urlopen("file:///etc/passwd", timeout=5)
+
+    def test_rejects_ftp_url(self):
+        with self.assertRaises(ValueError):
+            safe_urlopen("ftp://example.com/x", timeout=5)
+
+
+class _QuietHandler(http.server.BaseHTTPRequestHandler):
+    """HTTP handler that serves a fixed payload and stays quiet in test logs."""
+
+    payload = b"hello-eodh-" * 100  # ~1.1 KB — small but multi-chunk friendly
+
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-Type", "application/octet-stream")
+        self.send_header("Content-Length", str(len(self.payload)))
+        self.end_headers()
+        self.wfile.write(self.payload)
+
+    def log_message(self, format, *args):
+        pass
+
+
+class TestSafeUrlretrieve(unittest.TestCase):
+    """Tests for safe_urlretrieve — scheme rejection and end-to-end download."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.server = http.server.HTTPServer(("127.0.0.1", 0), _QuietHandler)
+        cls.host, cls.port = cls.server.server_address
+        cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
+        cls.thread.start()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.shutdown()
+        cls.server.server_close()
+        cls.thread.join(timeout=2)
+
+    def test_rejects_file_url(self):
+        with self.assertRaises(ValueError):
+            safe_urlretrieve("file:///etc/passwd", "/tmp/should-not-exist")
+
+    def test_downloads_file(self):
+        url = f"http://{self.host}:{self.port}/payload.bin"
+        dest = os.path.join(os.path.dirname(__file__), "_safe_urlretrieve_tmp.bin")
+        try:
+            safe_urlretrieve(url, dest, chunk_size=128)
+            with open(dest, "rb") as f:
+                self.assertEqual(f.read(), _QuietHandler.payload)
+        finally:
+            if os.path.exists(dest):
+                os.remove(dest)
+
+    def test_reporthook_invoked(self):
+        url = f"http://{self.host}:{self.port}/payload.bin"
+        dest = os.path.join(os.path.dirname(__file__), "_safe_urlretrieve_tmp2.bin")
+        calls: list[tuple[int, int, int]] = []
+
+        def hook(block_num, block_size, total_size):
+            calls.append((block_num, block_size, total_size))
+
+        try:
+            safe_urlretrieve(url, dest, reporthook=hook, chunk_size=128)
+        finally:
+            if os.path.exists(dest):
+                os.remove(dest)
+
+        self.assertGreater(len(calls), 1)
+        # Initial call reports block 0; total_size matches Content-Length header.
+        self.assertEqual(calls[0][0], 0)
+        self.assertEqual(calls[0][2], len(_QuietHandler.payload))
 
 
 if __name__ == "__main__":
