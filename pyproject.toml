@@ -7,6 +7,7 @@ license = { text = "BSD-3-Clause" }
 readme = "README.md"
 requires-python = ">=3.9,<3.14"
 dependencies = [
+    "defusedxml>=0.7.1",
     "pyeodh>=0.0.7",
     "qgis-plugin-ci>=2.8.10",
 ]

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from urllib.parse import urlparse
 
 from osgeo import gdal
 
@@ -13,6 +14,19 @@ from eodh_qgis.definitions.constants import (
     X_COORDINATE_NAMES,
     Y_COORDINATE_NAMES,
 )
+
+_ALLOWED_URL_SCHEMES = ("http", "https")
+
+
+def validate_http_url(url: str) -> None:
+    """Raise ValueError if url is not http(s).
+
+    Defends urllib.request.urlopen / urlretrieve against file://, ftp://,
+    and custom schemes (bandit B310).
+    """
+    scheme = urlparse(url).scheme.lower()
+    if scheme not in _ALLOWED_URL_SCHEMES:
+        raise ValueError(f"URL scheme {scheme!r} not permitted; expected http or https")
 
 
 @dataclass

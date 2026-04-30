@@ -15,6 +15,7 @@ from eodh_qgis.definitions.constants import (
     EPSG_ATTRIBUTE_NAMES,
     GRID_MAPPING_NAMES,
 )
+from eodh_qgis.utils import validate_http_url
 
 
 @dataclass
@@ -52,6 +53,7 @@ def parse_kerchunk_json(json_path: str) -> dict | None:
     """
     try:
         if json_path.startswith(("http://", "https://")):
+            validate_http_url(json_path)
             with urllib.request.urlopen(json_path, timeout=30) as response:
                 data = json.loads(response.read().decode("utf-8"))
         else:

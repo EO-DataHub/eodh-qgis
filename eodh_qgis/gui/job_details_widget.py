@@ -186,6 +186,7 @@ class JobDetailsWidget(QtWidgets.QWidget, FORM_CLASS):
                 url,
                 stream=True,
                 headers={"Authorization": f"Bearer {self.job._client.token}"},
+                timeout=(10, 600),
             ) as r:
                 print(r.status_code)
                 with path.open("wb") as f:

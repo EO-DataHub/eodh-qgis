@@ -12,7 +12,7 @@ from eodh_qgis.definitions.constants import (
     NETCDF_MIME_TYPES,
     PLUGIN_NAME,
 )
-from eodh_qgis.utils import get_netcdf_metadata
+from eodh_qgis.utils import get_netcdf_metadata, validate_http_url
 
 
 def download_with_progress(url: str, dest_path: str, callback=None):
@@ -36,6 +36,7 @@ def download_with_progress(url: str, dest_path: str, callback=None):
                 last_percent = percent
                 callback(percent)
 
+    validate_http_url(url)
     urllib.request.urlretrieve(url, dest_path, reporthook=reporthook)
 
 
