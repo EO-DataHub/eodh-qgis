@@ -13,14 +13,14 @@ SRC_DIR = ROOT_DIR / "eodh_qgis"
 RESOURCE_PATH = ROOT_DIR / "resources/resources.qrc"
 
 
-def main(install_path: pathlib.Path, is_dist=False):
+def main(install_path: pathlib.Path, is_dist=False, is_test=False):
     if not install_path:
         print("Provide qgis plugin path")
         sys.exit(1)
-    if not is_dist:
+    if not is_dist and not is_test:
         verify_install_path(install_path)
     uninstall(install_path)
-    build(is_dist=is_dist)
+    build(is_dist=is_dist, is_test=is_test)
     compile_resources()
     patch_resources()
     install(install_path)
@@ -30,6 +30,7 @@ def build(
     build_dir: pathlib.Path = BUILD_DIR,
     src_dir: pathlib.Path = SRC_DIR,
     is_dist: bool = False,
+    is_test: bool = False,
 ):
     try:
         build_dir.mkdir()
@@ -50,7 +51,7 @@ def build(
     print(f"Copied LICENSE to {build_dir}")
     shutil.copy2("requirements.txt", build_dir)
     print(f"Copied requirements.txt to {build_dir}")
-    if not is_dist:
+    if is_test:
         shutil.copytree(ROOT_DIR / ".docker", build_dir / ".docker")
         shutil.copy2(ROOT_DIR / ".coveragerc", build_dir / ".coveragerc")
 
@@ -143,9 +144,14 @@ if __name__ == "__main__":
         help=("Path to qgis plugin directory, if not provided, looks for EODH_QGIS_PATH in .env file."),
     )
     parser.add_argument("--dist", action="store_true", help="Use this when building a release package.")
+    parser.add_argument(
+        "--test",
+        action="store_true",
+        help="Build for the docker/CI test container (includes test/, .docker/, .coveragerc; skips qgis profile path check).",
+    )
     args = parser.parse_args()
     install_path = args.install_path or load_dotenv().get("EODH_QGIS_PATH")
     if not install_path:
         raise ValueError("Provide path to qgis plugin, either via argument or .env variable.")
 
-    main(pathlib.Path(install_path).resolve(), args.dist)
+    main(pathlib.Path(install_path).resolve(), args.dist, args.test)
