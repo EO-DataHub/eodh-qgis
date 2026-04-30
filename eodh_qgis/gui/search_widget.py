@@ -69,6 +69,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
         self.west_input: QtWidgets.QDoubleSpinBox
         self.draw_map_button: QtWidgets.QPushButton
         self.use_extent_button: QtWidgets.QPushButton
+        self.clear_drawn_button: QtWidgets.QPushButton
         self.results_scroll_area: QtWidgets.QScrollArea
         self.search_button: QtWidgets.QPushButton
         self.prev_page_btn: QtWidgets.QPushButton
@@ -111,6 +112,10 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
             "current visible area of the map canvas."
         )
 
+        # Configure clear-drawn-area button with icon and tooltip
+        self.clear_drawn_button.setIcon(QgsApplication.getThemeIcon("/mActionDeleteSelected.svg"))
+        self.clear_drawn_button.setToolTip("Clear drawn area\n\nRemoves the polygon previously drawn on the map.")
+
         # Configure sort controls
         self.sort_field_combo.addItems(["Date (newest)", "Date (oldest)", "Item ID", "Collection"])
 
@@ -119,6 +124,7 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
         self.draw_map_button.clicked.connect(self.on_draw_map_clicked)
         self.collection_dropdown.currentIndexChanged.connect(self.on_collection_dropdown_changed)
         self.use_extent_button.clicked.connect(self.on_use_extent_clicked)
+        self.clear_drawn_button.clicked.connect(self.on_clear_drawn_clicked)
         self.prev_page_btn.clicked.connect(self.on_prev_page)
         self.next_page_btn.clicked.connect(self.on_next_page)
         self.add_selected_footprints_btn.clicked.connect(self._add_selected_footprints)
@@ -197,11 +203,32 @@ class SearchWidget(QtWidgets.QWidget, FORM_CLASS):
             self.draw_map_button.setChecked(False)
             return
 
+        # Drop any previous tool/rubber band so we don't accumulate overlays.
+        self.cleanup_polygon_tool()
+
         QgsMessageLog.logMessage("Creating PolygonCaptureTool", "EODH", level=Qgis.Info)
         self.polygon_tool = PolygonCaptureTool(self.iface.mapCanvas())
         self.polygon_tool.polygon_captured.connect(self.on_polygon_captured)
         self.iface.mapCanvas().setMapTool(self.polygon_tool)
         QgsMessageLog.logMessage("Map tool set", "EODH", level=Qgis.Info)
+
+    def on_clear_drawn_clicked(self):
+        """Remove the polygon currently drawn on the map canvas."""
+        self.cleanup_polygon_tool()
+        self.draw_map_button.setChecked(False)
+
+    def cleanup_polygon_tool(self):
+        """Deactivate the polygon tool and remove its rubber band from the canvas."""
+        tool = self.polygon_tool
+        if tool is None:
+            return
+        if self.iface is not None:
+            self.iface.mapCanvas().unsetMapTool(tool)
+        try:
+            tool.cleanup()
+        except RuntimeError:
+            pass
+        self.polygon_tool = None
 
     def on_use_extent_clicked(self):
         """Use the current map canvas extent as the bounding box."""

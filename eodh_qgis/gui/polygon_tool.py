@@ -44,11 +44,27 @@ class PolygonCaptureTool(QgsMapToolEmitPoint):
 
     def _update_rubber_band(self):
         """Update the visual rubber band as points are added."""
+        if self.rubber_band is None:
+            return
         self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
         for point in self.points:
             self.rubber_band.addPoint(point)
 
-    def reset(self):
-        """Reset the tool state."""
+    def clear(self):
+        """Clear the drawn polygon from the canvas without destroying the tool."""
         self.points = []
-        self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+        if self.rubber_band is not None:
+            self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+            self.rubber_band.hide()
+
+    def cleanup(self):
+        """Fully tear down the rubber band — call when the tool is no longer needed."""
+        self.clear()
+        if self.rubber_band is not None:
+            try:
+                scene = self.canvas.scene()
+                if scene is not None:
+                    scene.removeItem(self.rubber_band)
+            except RuntimeError:
+                pass
+            self.rubber_band = None

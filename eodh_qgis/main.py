@@ -152,6 +152,15 @@ class EodhQgis:
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
+        dlg = getattr(self, "dlg", None)
+        if dlg is not None:
+            search_widget = getattr(dlg, "search_widget", None)
+            if search_widget is not None:
+                try:
+                    search_widget.cleanup_polygon_tool()
+                except RuntimeError:
+                    pass
+
         for action in self.actions:
             self.iface.removePluginWebMenu(self.menu, action)
             self.iface.removeToolBarIcon(action)

@@ -75,3 +75,12 @@ class MainDialog(QtWidgets.QDialog, FORM_CLASS):
         self.creds = self.get_creds()
         if not self.creds:
             self.missing_creds()
+
+    def closeEvent(self, event):
+        """Clear any drawn AOI from the map canvas when the dialog is closed."""
+        if getattr(self, "search_widget", None) is not None:
+            try:
+                self.search_widget.cleanup_polygon_tool()
+            except RuntimeError:
+                pass
+        super().closeEvent(event)
