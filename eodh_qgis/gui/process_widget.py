@@ -78,17 +78,17 @@ class ProcessWidget(QtWidgets.QWidget, FORM_CLASS):
         QgsMessageLog.logMessage(
             f"Initializing ADES: env={env}, url={url}, username={username}",
             "EODH",
-            Qgis.Info,
+            Qgis.MessageLevel.Info,
         )
 
         try:
             self.ades_svc = pyeodh.Client(base_url=url, username=username, token=token).get_ades()
-            QgsMessageLog.logMessage("ADES service initialized successfully", "EODH", Qgis.Info)
+            QgsMessageLog.logMessage("ADES service initialized successfully", "EODH", Qgis.MessageLevel.Info)
         except requests.HTTPError as e:
-            QgsMessageLog.logMessage(f"ADES HTTPError: {e}", "EODH", Qgis.Critical)
+            QgsMessageLog.logMessage(f"ADES HTTPError: {e}", "EODH", Qgis.MessageLevel.Critical)
             QtWidgets.QMessageBox.critical(self, "Error", "Error logging in to ADES, validate your credentials.")
         except Exception as e:
-            QgsMessageLog.logMessage(f"ADES unexpected error: {e}", "EODH", Qgis.Critical)
+            QgsMessageLog.logMessage(f"ADES unexpected error: {e}", "EODH", Qgis.MessageLevel.Critical)
 
     def setup_widgets(self):
         """Create workflow and job widgets after ADES is initialized."""

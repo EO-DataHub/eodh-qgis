@@ -71,7 +71,7 @@ class WorkflowEditorWidget(QtWidgets.QWidget, FORM_CLASS):
                 QtGui.QFont(
                     "Fira Sans",
                     pointSize=11,
-                    weight=QtGui.QFont.Bold,
+                    weight=QtGui.QFont.Weight.Bold,
                 )
             )
             if btn.page_index == 0:
@@ -83,7 +83,7 @@ class WorkflowEditorWidget(QtWidgets.QWidget, FORM_CLASS):
                 QtGui.QFont(
                     "Fira Sans",
                     pointSize=11,
-                    weight=QtGui.QFont.Normal,
+                    weight=QtGui.QFont.Weight.Normal,
                 )
             )
 

@@ -81,7 +81,7 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.remove_button.setEnabled(True)
 
     def populate_table(self, processes: list[pyeodh.ades.Process]):
-        QgsMessageLog.logMessage(f"Loaded {len(processes)} workflows", "EODH", Qgis.Info)
+        QgsMessageLog.logMessage(f"Loaded {len(processes)} workflows", "EODH", Qgis.MessageLevel.Info)
         self.processes = processes
         headers = {
             "id": "ID",
@@ -106,11 +106,11 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
 
     def _on_load_workflows_error(self, error_tuple):
         exctype, value, tb = error_tuple
-        QgsMessageLog.logMessage(f"Error loading workflows: {value}\n{tb}", "EODH", Qgis.Critical)
+        QgsMessageLog.logMessage(f"Error loading workflows: {value}\n{tb}", "EODH", Qgis.MessageLevel.Critical)
 
     def load_workflows(self):
         self.lock_form(True)
-        QgsMessageLog.logMessage("Loading workflows...", "EODH", Qgis.Info)
+        QgsMessageLog.logMessage("Loading workflows...", "EODH", Qgis.MessageLevel.Info)
 
         def load_data(*args, **kwargs):
             return self.ades_svc.get_processes()
@@ -133,7 +133,7 @@ class WorkflowsWidget(QtWidgets.QWidget, FORM_CLASS):
         process = self.get_selected_process()
 
         resp = QtWidgets.QMessageBox.question(self, "Confirm", f"Delete {process.id}?")
-        if resp != QtWidgets.QMessageBox.Yes:
+        if resp != QtWidgets.QMessageBox.StandardButton.Yes:
             self.lock_form(False)
             return
 

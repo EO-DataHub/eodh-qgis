@@ -43,7 +43,7 @@ class LayerLoaderTask(QgsTask):
             QgsMessageLog.logMessage(
                 f"[Task] Starting background load for {self.item.id}/{self.asset_key}",
                 PLUGIN_NAME,
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
 
             # Progress callback - scale download to 0-80%, leave 20% for layer creation
@@ -72,7 +72,7 @@ class LayerLoaderTask(QgsTask):
             QgsMessageLog.logMessage(
                 f"[Task] Error: {e}",
                 PLUGIN_NAME,
-                level=Qgis.Warning,
+                level=Qgis.MessageLevel.Warning,
             )
             return False
 
@@ -84,13 +84,13 @@ class LayerLoaderTask(QgsTask):
             QgsMessageLog.logMessage(
                 f"[Task] Finished loading {len(self.layers)} layer(s)",
                 PLUGIN_NAME,
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
         elif self.error:
             QgsMessageLog.logMessage(
                 f"[Task] Failed: {self.error}",
                 PLUGIN_NAME,
-                level=Qgis.Warning,
+                level=Qgis.MessageLevel.Warning,
             )
 
 
@@ -114,7 +114,7 @@ class KerchunkFetchTask(QgsTask):
             QgsMessageLog.logMessage(
                 f"[Task] Fetching kerchunk for {self.item.id}",
                 PLUGIN_NAME,
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
             result = find_kerchunk_reference(self.item)
             if result:
@@ -126,7 +126,7 @@ class KerchunkFetchTask(QgsTask):
             QgsMessageLog.logMessage(
                 f"[Task] Kerchunk fetch error: {e}",
                 PLUGIN_NAME,
-                level=Qgis.Warning,
+                level=Qgis.MessageLevel.Warning,
             )
             return False
 
@@ -136,11 +136,11 @@ class KerchunkFetchTask(QgsTask):
             QgsMessageLog.logMessage(
                 f"[Task] Kerchunk fetch found {len(self.variables)} variable(s)",
                 PLUGIN_NAME,
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
         elif self.error:
             QgsMessageLog.logMessage(
                 f"[Task] Kerchunk fetch failed: {self.error}",
                 PLUGIN_NAME,
-                level=Qgis.Warning,
+                level=Qgis.MessageLevel.Warning,
             )

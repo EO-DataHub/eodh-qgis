@@ -73,7 +73,7 @@ def create_layers_for_asset(
         QgsMessageLog.logMessage(
             f"Downloading NetCDF file: {url[:80]}...",
             PLUGIN_NAME,
-            level=Qgis.Info,
+            level=Qgis.MessageLevel.Info,
         )
         try:
             temp_file = tempfile.NamedTemporaryFile(suffix=".nc", delete=False)
@@ -82,13 +82,13 @@ def create_layers_for_asset(
             QgsMessageLog.logMessage(
                 f"NetCDF downloaded to: {url}",
                 PLUGIN_NAME,
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
         except Exception as e:
             QgsMessageLog.logMessage(
                 f"Failed to download NetCDF: {e}",
                 PLUGIN_NAME,
-                level=Qgis.Warning,
+                level=Qgis.MessageLevel.Warning,
             )
             return []
 
@@ -102,7 +102,7 @@ def create_layers_for_asset(
     QgsMessageLog.logMessage(
         f"Creating layer(s) '{layer_name}' from: {url[:80]}...",
         PLUGIN_NAME,
-        level=Qgis.Info,
+        level=Qgis.MessageLevel.Info,
     )
 
     # For NetCDF, try to load data variables
@@ -120,7 +120,7 @@ def create_layers_for_asset(
         QgsMessageLog.logMessage(
             f"Layer invalid for {asset_key}: {error_msg}",
             PLUGIN_NAME,
-            level=Qgis.Warning,
+            level=Qgis.MessageLevel.Warning,
         )
         return []
 
@@ -163,28 +163,28 @@ def get_netcdf_layers(
             QgsMessageLog.logMessage(
                 f"NetCDF has no loadable data variables: {url[:80]}...",
                 PLUGIN_NAME,
-                level=Qgis.Warning,
+                level=Qgis.MessageLevel.Warning,
             )
             return layers
 
         QgsMessageLog.logMessage(
             f"NetCDF has {len(data_vars)} data variables to load",
             PLUGIN_NAME,
-            level=Qgis.Info,
+            level=Qgis.MessageLevel.Info,
         )
 
         if geotransform and epsg:
             QgsMessageLog.logMessage(
                 f"NetCDF geotransform from xc/yc: {geotransform}, EPSG:{epsg}",
                 PLUGIN_NAME,
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
 
         for subdataset_uri, var_name in data_vars:
             QgsMessageLog.logMessage(
                 f"Loading NetCDF variable: {var_name}",
                 PLUGIN_NAME,
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
 
             layer = None
@@ -210,7 +210,7 @@ def get_netcdf_layers(
                             QgsMessageLog.logMessage(
                                 f"Created georeferenced layer for {var_name} with EPSG:{epsg}",
                                 PLUGIN_NAME,
-                                level=Qgis.Info,
+                                level=Qgis.MessageLevel.Info,
                             )
 
             if not layer or not layer.isValid():
@@ -218,7 +218,7 @@ def get_netcdf_layers(
                 QgsMessageLog.logMessage(
                     f"Georeferencing failed for {var_name}, trying direct load",
                     PLUGIN_NAME,
-                    level=Qgis.Warning,
+                    level=Qgis.MessageLevel.Warning,
                 )
                 layer = QgsRasterLayer(subdataset_uri, f"{layer_name}_{var_name}")
 
@@ -229,13 +229,13 @@ def get_netcdf_layers(
                     f"Failed to load NetCDF variable {var_name}: "
                     f"{layer.error().message() if layer else 'Unknown error'}",
                     PLUGIN_NAME,
-                    level=Qgis.Warning,
+                    level=Qgis.MessageLevel.Warning,
                 )
 
     except Exception as e:
         QgsMessageLog.logMessage(
             f"Error reading NetCDF variables: {e}",
             PLUGIN_NAME,
-            level=Qgis.Warning,
+            level=Qgis.MessageLevel.Warning,
         )
     return layers

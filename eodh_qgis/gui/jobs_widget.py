@@ -34,7 +34,7 @@ class JobsWidget(QtWidgets.QWidget, FORM_CLASS):
         self.load_jobs()
 
     def populate_table(self, jobs: list[pyeodh.ades.Job]):
-        QgsMessageLog.logMessage(f"Loaded {len(jobs)} jobs", "EODH", Qgis.Info)
+        QgsMessageLog.logMessage(f"Loaded {len(jobs)} jobs", "EODH", Qgis.MessageLevel.Info)
         self.jobs = jobs
         headers = {
             "id": "ID",
@@ -74,11 +74,11 @@ class JobsWidget(QtWidgets.QWidget, FORM_CLASS):
 
     def _on_load_jobs_error(self, error_tuple):
         exctype, value, tb = error_tuple
-        QgsMessageLog.logMessage(f"Error loading jobs: {value}\n{tb}", "EODH", Qgis.Critical)
+        QgsMessageLog.logMessage(f"Error loading jobs: {value}\n{tb}", "EODH", Qgis.MessageLevel.Critical)
 
     def load_jobs(self):
         self.lock_form(True)
-        QgsMessageLog.logMessage("Loading jobs...", "EODH", Qgis.Info)
+        QgsMessageLog.logMessage("Loading jobs...", "EODH", Qgis.MessageLevel.Info)
 
         def load_data(*args, **kwargs):
             jobs = [

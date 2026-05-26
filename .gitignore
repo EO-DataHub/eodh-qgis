@@ -166,3 +166,5 @@ libs/*
 playground/*
 
 .pre-commit-config.yaml
+
+.pi/

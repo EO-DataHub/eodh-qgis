@@ -2,7 +2,11 @@ import os.path
 
 from qgis.PyQt.QtCore import QCoreApplication, QSettings, QTranslator
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction
+
+try:
+    from qgis.PyQt.QtGui import QAction
+except ImportError:
+    from qgis.PyQt.QtWidgets import QAction
 
 # Import the code for the dialog
 from .gui.main_dialog import MainDialog
@@ -182,7 +186,10 @@ class EodhQgis:
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
-        result = self.dlg.exec_()
+        exec_fn = getattr(self.dlg, "exec", None)
+        if exec_fn is None:
+            exec_fn = self.dlg.exec_
+        result = exec_fn()
         # See if OK was pressed
         if result:
             # Do something useful here - delete the line containing pass and

@@ -117,7 +117,7 @@ def create_footprint_layer(item, layer_name: str | None = None) -> QgsVectorLaye
         QgsMessageLog.logMessage(
             f"Using polar cap footprint for {item.id} (lat {min_lat:.1f} to {max_lat:.1f})",
             PLUGIN_NAME,
-            level=Qgis.Info,
+            level=Qgis.MessageLevel.Info,
         )
 
     # Create GeoJSON FeatureCollection with the geometry
@@ -152,7 +152,7 @@ def create_footprint_layer(item, layer_name: str | None = None) -> QgsVectorLaye
     QgsMessageLog.logMessage(
         f"Failed to create footprint layer for {item.id}",
         PLUGIN_NAME,
-        level=Qgis.Warning,
+        level=Qgis.MessageLevel.Warning,
     )
     return None
 

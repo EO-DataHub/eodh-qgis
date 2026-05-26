@@ -55,7 +55,7 @@ def configure_gdal_vsicurl() -> None:
     QgsMessageLog.logMessage(
         f"GDAL vsicurl configuration applied ({len(GDAL_VSICURL_OPTIONS)} options)",
         PLUGIN_NAME,
-        level=Qgis.Info,
+        level=Qgis.MessageLevel.Info,
     )
 
 
@@ -72,5 +72,5 @@ def restore_gdal_vsicurl() -> None:
     QgsMessageLog.logMessage(
         "GDAL vsicurl configuration restored",
         PLUGIN_NAME,
-        level=Qgis.Info,
+        level=Qgis.MessageLevel.Info,
     )

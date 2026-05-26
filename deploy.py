@@ -57,7 +57,10 @@ def build(
 
 
 def verify_install_path(install_path: pathlib.Path):
-    if "/QGIS/QGIS3/profiles/" not in install_path.as_posix():
+    if (
+        "/QGIS/QGIS3/profiles/" not in install_path.as_posix()
+        and "/QGIS/QGIS4/profiles/" not in install_path.as_posix()
+    ):
         print("Provided plugin path argument doesn't look like a qgis path!")
         sys.exit(1)
     if install_path.name == "plugins":
@@ -78,23 +81,35 @@ def uninstall(install_path: pathlib.Path):
 
 def compile_resources(build_dir: pathlib.Path = BUILD_DIR, resource_path: pathlib.Path = RESOURCE_PATH):
     output_path = build_dir / "resources.py"
+    compiler = os.environ.get("PYRCC") or shutil.which("pyrcc5") or shutil.which("pyrcc6")
+    if compiler is None:
+        print("Could not find pyrcc5 or pyrcc6. Install a PyQt resource compiler or set PYRCC.")
+        sys.exit(1)
+
     try:
         subprocess.run(
             [
-                "pyrcc5",
+                compiler,
                 "-o",
-                output_path,
-                resource_path,
+                str(output_path),
+                str(resource_path),
             ],
             check=True,
         )
-        print(f"Compiled {resource_path}")
+        print(f"Compiled {resource_path} with {pathlib.Path(compiler).name}")
     except subprocess.CalledProcessError as e:
         print(f"Error compiling resource files: {e}")
         sys.exit(1)
 
 
 def patch_resources(build_dir: pathlib.Path = BUILD_DIR):
+    resources_py = build_dir / "resources.py"
+    if resources_py.exists():
+        filedata = resources_py.read_text(encoding="utf-8")
+        filedata = filedata.replace("from PyQt5 import QtCore", "from qgis.PyQt import QtCore")
+        filedata = filedata.replace("from PyQt6 import QtCore", "from qgis.PyQt import QtCore")
+        resources_py.write_text(filedata, encoding="utf-8")
+
     # Patch all .ui files that reference the resources.qrc file
     ui_files = [
         build_dir / "ui/main.ui",

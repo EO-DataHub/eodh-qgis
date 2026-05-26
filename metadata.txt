@@ -5,6 +5,7 @@
 [general]
 name=EODH Workflows
 qgisMinimumVersion=3.0
+qgisMaximumVersion=4.99
 description=Access and run workflows on the EODH
 version=0.2.6
 author=Oxidian

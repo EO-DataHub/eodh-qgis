@@ -89,7 +89,7 @@ class StacClient(QtCore.QObject):
             QgsMessageLog.logMessage(
                 f"Connecting to STAC API: {self._connection.url}",
                 PLUGIN_NAME,
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
 
             self._client = PyeodhClient(
@@ -101,13 +101,13 @@ class StacClient(QtCore.QObject):
             QgsMessageLog.logMessage(
                 "Successfully connected to STAC API",
                 PLUGIN_NAME,
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
             return True
 
         except Exception as e:
             error_msg = f"Failed to connect to STAC API: {e}"
-            QgsMessageLog.logMessage(error_msg, PLUGIN_NAME, level=Qgis.Warning)
+            QgsMessageLog.logMessage(error_msg, PLUGIN_NAME, level=Qgis.MessageLevel.Warning)
             self.error_received.emit(error_msg)
             return False
 
@@ -127,7 +127,7 @@ class StacClient(QtCore.QObject):
             self.catalogs_received.emit(catalogs)
         except Exception as e:
             error_msg = f"Failed to fetch catalogs: {e}"
-            QgsMessageLog.logMessage(error_msg, PLUGIN_NAME, level=Qgis.Warning)
+            QgsMessageLog.logMessage(error_msg, PLUGIN_NAME, level=Qgis.MessageLevel.Warning)
             self.error_received.emit(error_msg)
 
     def get_collections(self, catalog_id: str | None = None) -> None:
@@ -151,7 +151,7 @@ class StacClient(QtCore.QObject):
             self.collections_received.emit(collections)
         except Exception as e:
             error_msg = f"Failed to fetch collections: {e}"
-            QgsMessageLog.logMessage(error_msg, PLUGIN_NAME, level=Qgis.Warning)
+            QgsMessageLog.logMessage(error_msg, PLUGIN_NAME, level=Qgis.MessageLevel.Warning)
             self.error_received.emit(error_msg)
 
     def search(self, filters: SearchFilters) -> None:
@@ -172,7 +172,7 @@ class StacClient(QtCore.QObject):
             QgsMessageLog.logMessage(
                 f"Searching STAC API with params: {params}",
                 PLUGIN_NAME,
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
 
             # Execute search
@@ -189,14 +189,14 @@ class StacClient(QtCore.QObject):
             QgsMessageLog.logMessage(
                 f"Search returned {len(items)} items (total: {total_count})",
                 PLUGIN_NAME,
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
 
             self.items_received.emit(items, total_count)
 
         except Exception as e:
             error_msg = f"Search failed: {e}"
-            QgsMessageLog.logMessage(error_msg, PLUGIN_NAME, level=Qgis.Warning)
+            QgsMessageLog.logMessage(error_msg, PLUGIN_NAME, level=Qgis.MessageLevel.Warning)
             self.error_received.emit(error_msg)
 
     def get_item(self, collection_id: str, item_id: str) -> ItemResult | None:
@@ -219,6 +219,6 @@ class StacClient(QtCore.QObject):
             return ItemResult.from_stac_item(item)
         except Exception as e:
             error_msg = f"Failed to fetch item {item_id}: {e}"
-            QgsMessageLog.logMessage(error_msg, PLUGIN_NAME, level=Qgis.Warning)
+            QgsMessageLog.logMessage(error_msg, PLUGIN_NAME, level=Qgis.MessageLevel.Warning)
             self.error_received.emit(error_msg)
             return None

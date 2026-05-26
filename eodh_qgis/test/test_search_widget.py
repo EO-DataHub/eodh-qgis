@@ -481,7 +481,7 @@ class TestSearchWidget(unittest.TestCase):
     def test_asset_selection_dialog_returns_selected_assets(self, mock_exec):
         """Test that asset selection dialog returns only selected assets."""
         # Mock dialog to return Accepted
-        mock_exec.return_value = QtWidgets.QDialog.Accepted
+        mock_exec.return_value = QtWidgets.QDialog.DialogCode.Accepted
 
         # Create mock assets
         mock_asset1 = MagicMock()
@@ -507,7 +507,7 @@ class TestSearchWidget(unittest.TestCase):
     def test_asset_selection_dialog_returns_empty_on_cancel(self, mock_exec):
         """Test that asset selection dialog returns empty list when cancelled."""
         # Mock dialog to return Rejected (cancelled)
-        mock_exec.return_value = QtWidgets.QDialog.Rejected
+        mock_exec.return_value = QtWidgets.QDialog.DialogCode.Rejected
 
         mock_asset = MagicMock()
         mock_asset.type = "image/tiff"

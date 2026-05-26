@@ -63,7 +63,7 @@ class ResultItemCard(QtWidgets.QWidget, FORM_CLASS):
         self.bbox_label.setText(bbox_str)
 
         # Assets list with clickable links
-        self.assets_label.setTextFormat(QtCore.Qt.RichText)
+        self.assets_label.setTextFormat(QtCore.Qt.TextFormat.RichText)
         self.assets_label.setOpenExternalLinks(False)  # Handle clicks ourselves
         self.assets_label.linkActivated.connect(self._on_asset_link_clicked)
         self.assets_label.setText(self._format_assets_as_html())
@@ -146,7 +146,7 @@ class ResultItemCard(QtWidgets.QWidget, FORM_CLASS):
             task: QgsNetworkContentFetcherTask that completed
         """
         reply = task.reply()
-        if reply.error() == QtNetwork.QNetworkReply.NoError:
+        if reply.error() == QtNetwork.QNetworkReply.NetworkError.NoError:
             content = reply.readAll()
             self._set_thumbnail_image(content)
         else:
@@ -164,8 +164,8 @@ class ResultItemCard(QtWidgets.QWidget, FORM_CLASS):
             scaled = pixmap.scaled(
                 150,
                 150,
-                QtCore.Qt.KeepAspectRatio,
-                QtCore.Qt.SmoothTransformation,
+                QtCore.Qt.AspectRatioMode.KeepAspectRatio,
+                QtCore.Qt.TransformationMode.SmoothTransformation,
             )
             self.thumbnail_label.setPixmap(scaled)
         else:

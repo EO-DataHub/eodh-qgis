@@ -12,33 +12,33 @@ class PolygonCaptureTool(QgsMapToolEmitPoint):
     def __init__(self, canvas):
         super().__init__(canvas)
         self.canvas = canvas
-        self.rubber_band = QgsRubberBand(canvas, QgsWkbTypes.PolygonGeometry)
+        self.rubber_band = QgsRubberBand(canvas, QgsWkbTypes.GeometryType.PolygonGeometry)
         self.rubber_band.setColor(QColor(255, 0, 0, 100))
         self.rubber_band.setWidth(2)
         self.points = []
-        QgsMessageLog.logMessage("PolygonCaptureTool initialized", "EODH", level=Qgis.Info)
+        QgsMessageLog.logMessage("PolygonCaptureTool initialized", "EODH", level=Qgis.MessageLevel.Info)
 
     def canvasPressEvent(self, event):
         """Handle mouse click - left-click adds point, right-click finishes polygon."""
-        if event.button() == Qt.LeftButton:
-            QgsMessageLog.logMessage("canvasPressEvent called (left-click)", "EODH", level=Qgis.Info)
+        if event.button() == Qt.MouseButton.LeftButton:
+            QgsMessageLog.logMessage("canvasPressEvent called (left-click)", "EODH", level=Qgis.MessageLevel.Info)
             point = self.toMapCoordinates(event.pos())
             self.points.append(point)
             QgsMessageLog.logMessage(
                 f"Point added: {point}, total points: {len(self.points)}",
                 "EODH",
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
             self._update_rubber_band()
-        elif event.button() == Qt.RightButton:
+        elif event.button() == Qt.MouseButton.RightButton:
             QgsMessageLog.logMessage(
                 f"canvasPressEvent called (right-click), points: {len(self.points)}",
                 "EODH",
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
             if len(self.points) >= 3:
                 geometry = QgsGeometry.fromPolygonXY([self.points])
-                QgsMessageLog.logMessage("Emitting polygon_captured signal", "EODH", level=Qgis.Info)
+                QgsMessageLog.logMessage("Emitting polygon_captured signal", "EODH", level=Qgis.MessageLevel.Info)
                 self.polygon_captured.emit(geometry)
             self.points = []
 
@@ -46,7 +46,7 @@ class PolygonCaptureTool(QgsMapToolEmitPoint):
         """Update the visual rubber band as points are added."""
         if self.rubber_band is None:
             return
-        self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+        self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
         for point in self.points:
             self.rubber_band.addPoint(point)
 
@@ -54,7 +54,7 @@ class PolygonCaptureTool(QgsMapToolEmitPoint):
         """Clear the drawn polygon from the canvas without destroying the tool."""
         self.points = []
         if self.rubber_band is not None:
-            self.rubber_band.reset(QgsWkbTypes.PolygonGeometry)
+            self.rubber_band.reset(QgsWkbTypes.GeometryType.PolygonGeometry)
             self.rubber_band.hide()
 
     def cleanup(self):

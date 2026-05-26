@@ -45,11 +45,11 @@ def extract_epsg_from_metadata_xml(item) -> str | None:
     Returns:
         EPSG code as string, or None if not found
     """
-    QgsMessageLog.logMessage(f"[CRS] Trying metadata XML for item {item.id}", "EODH", level=Qgis.Info)
+    QgsMessageLog.logMessage(f"[CRS] Trying metadata XML for item {item.id}", "EODH", level=Qgis.MessageLevel.Info)
 
     metadata_asset = item.assets.get("metadata")
     if not metadata_asset:
-        QgsMessageLog.logMessage(f"[CRS] No metadata asset found for {item.id}", "EODH", level=Qgis.Info)
+        QgsMessageLog.logMessage(f"[CRS] No metadata asset found for {item.id}", "EODH", level=Qgis.MessageLevel.Info)
         return None
 
     href = getattr(metadata_asset, "href", None)
@@ -57,11 +57,11 @@ def extract_epsg_from_metadata_xml(item) -> str | None:
         QgsMessageLog.logMessage(
             f"[CRS] Metadata asset href invalid or not XML: {href}",
             "EODH",
-            level=Qgis.Info,
+            level=Qgis.MessageLevel.Info,
         )
         return None
 
-    QgsMessageLog.logMessage(f"[CRS] Fetching metadata XML from: {href}", "EODH", level=Qgis.Info)
+    QgsMessageLog.logMessage(f"[CRS] Fetching metadata XML from: {href}", "EODH", level=Qgis.MessageLevel.Info)
 
     try:
         with safe_urlopen(href, timeout=10) as response:
@@ -82,17 +82,17 @@ def extract_epsg_from_metadata_xml(item) -> str | None:
                 QgsMessageLog.logMessage(
                     f"[CRS] Found in XML: code={code_elem.text}, codeSpace={codespace}",
                     "EODH",
-                    level=Qgis.Info,
+                    level=Qgis.MessageLevel.Info,
                 )
                 if codespace_elem is not None and codespace_elem.text == "EPSG":
                     return code_elem.text.strip()
                 if code_elem.text.isdigit():
                     return code_elem.text.strip()
 
-        QgsMessageLog.logMessage("[CRS] No EPSG found in metadata XML", "EODH", level=Qgis.Info)
+        QgsMessageLog.logMessage("[CRS] No EPSG found in metadata XML", "EODH", level=Qgis.MessageLevel.Info)
         return None
     except Exception as e:
-        QgsMessageLog.logMessage(f"[CRS] Failed to parse metadata XML: {e}", "EODH", level=Qgis.Warning)
+        QgsMessageLog.logMessage(f"[CRS] Failed to parse metadata XML: {e}", "EODH", level=Qgis.MessageLevel.Warning)
         return None
 
 
@@ -128,7 +128,7 @@ def apply_crs_to_layer(
         QgsMessageLog.logMessage(
             f"[CRS] {layer_name}: Layer already has CRS {existing_crs.authid()}",
             "EODH",
-            level=Qgis.Info,
+            level=Qgis.MessageLevel.Info,
         )
         return True
 
@@ -141,7 +141,7 @@ def apply_crs_to_layer(
             QgsMessageLog.logMessage(
                 f"[CRS] {layer_name}: Applied asset CRS EPSG:{asset_epsg}",
                 "EODH",
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
             return True
 
@@ -153,7 +153,7 @@ def apply_crs_to_layer(
             QgsMessageLog.logMessage(
                 f"[CRS] {layer_name}: Applied item CRS EPSG:{item_epsg}",
                 "EODH",
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
             return True
 
@@ -167,7 +167,7 @@ def apply_crs_to_layer(
                 QgsMessageLog.logMessage(
                     f"[CRS] {layer_name}: Applied metadata XML CRS EPSG:{metadata_epsg}",
                     "EODH",
-                    level=Qgis.Info,
+                    level=Qgis.MessageLevel.Info,
                 )
                 return True
 
@@ -182,15 +182,15 @@ def apply_crs_to_layer(
                 QgsMessageLog.logMessage(
                     f"[CRS] {layer_name}: Applied NetCDF grid_mapping CRS EPSG:{netcdf_epsg}",
                     "EODH",
-                    level=Qgis.Info,
+                    level=Qgis.MessageLevel.Info,
                 )
                 return True
         else:
             QgsMessageLog.logMessage(
                 f"[CRS] {layer_name}: No NetCDF grid_mapping CRS found",
                 "EODH",
-                level=Qgis.Warning,
+                level=Qgis.MessageLevel.Warning,
             )
 
-    QgsMessageLog.logMessage(f"[CRS] {layer_name}: No CRS found", "EODH", level=Qgis.Info)
+    QgsMessageLog.logMessage(f"[CRS] {layer_name}: No CRS found", "EODH", level=Qgis.MessageLevel.Info)
     return False

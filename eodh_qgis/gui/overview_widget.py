@@ -68,7 +68,7 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
         # Create proxy model for filtering
         self.collections_proxy = QtCore.QSortFilterProxyModel()
         self.collections_proxy.setSourceModel(self.collections_model)
-        self.collections_proxy.setFilterCaseSensitivity(QtCore.Qt.CaseInsensitive)
+        self.collections_proxy.setFilterCaseSensitivity(QtCore.Qt.CaseSensitivity.CaseInsensitive)
         self.collections_proxy.setFilterKeyColumn(-1)  # Filter all columns
 
         # Set model on tree view
@@ -79,7 +79,7 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
 
         # Configure tree view appearance - all columns manually resizable
         self.collections_tree.header().setStretchLastSection(True)
-        self.collections_tree.header().setSectionResizeMode(QtWidgets.QHeaderView.Interactive)
+        self.collections_tree.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
         # Set reasonable default widths
         self.collections_tree.header().resizeSection(0, 250)  # Title
         self.collections_tree.header().resizeSection(1, 150)  # ID
@@ -107,7 +107,7 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
                     QgsMessageLog.logMessage(
                         f"Skipping malformed catalog entry: {e}",
                         "EODH",
-                        level=Qgis.Warning,
+                        level=Qgis.MessageLevel.Warning,
                     )
             # Follow next page link if present
             url = next(
@@ -120,7 +120,7 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
             QgsMessageLog.logMessage(
                 f"Stopped fetching catalogs after {self._MAX_CATALOG_PAGES} pages",
                 "EODH",
-                level=Qgis.Warning,
+                level=Qgis.MessageLevel.Warning,
             )
 
         return catalogs
@@ -143,7 +143,7 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
                     QgsMessageLog.logMessage(
                         f"Catalogue with ID {cat.id} has no title",
                         "EODH",
-                        level=Qgis.Info,
+                        level=Qgis.MessageLevel.Info,
                     )
 
                 self.catalogue_dropdown.addItem(cat.title or cat.id, idx + 1)
@@ -181,7 +181,7 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
 
                 # Create row items
                 title_item = QtGui.QStandardItem(collection.title or collection.id)
-                title_item.setData(collection_id, QtCore.Qt.UserRole)
+                title_item.setData(collection_id, QtCore.Qt.ItemDataRole.UserRole)
                 id_item = QtGui.QStandardItem(collection.id)
 
                 # Extract temporal extent for date range
@@ -201,7 +201,7 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
             QgsMessageLog.logMessage(
                 f"Loaded {collection_count} collections from {cat_name}",
                 "EODH",
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
 
         except Exception as e:
@@ -224,7 +224,7 @@ class OverviewWidget(QtWidgets.QWidget, FORM_CLASS):
         proxy_index = indexes[0]
         source_index = self.collections_proxy.mapToSource(proxy_index)
         title_item = self.collections_model.item(source_index.row(), 0)
-        collection_id = title_item.data(QtCore.Qt.UserRole)
+        collection_id = title_item.data(QtCore.Qt.ItemDataRole.UserRole)
 
         if collection_id not in self.collections:
             return
