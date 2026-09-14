@@ -36,30 +36,32 @@ are cleared and the sign-in screen displays the service error. If QGIS cannot sa
 the key, the plugin tells you that it will only be available for this session.
 
 **Workspace documentation** opens the EODH credentials guide. **Get workspace
-credentials** opens the portal for the workspace entered in the form. The in-app
-usage guide is available in the header after connecting.
+credentials** opens the portal for the workspace entered in the form. This usage
+guide is linked from the repository README and included in the plugin ZIP.
 
 Workspace API keys expire after at most 30 days and are not renewed automatically. If access is denied, check the workspace and create or copy a current key from the [workspace credentials page](https://docs.eodatahub.org.uk/Getting-Started/workspaces/workspace-credentials/).
 
-**Sign Out** clears saved EODH credentials, results and temporary map overlays. Credentials are never written into the QGIS project. EODH bearer credentials are sent only to the Production EODH host, including when loading assets.
+**Switch** and **Log out** return to the login screen and clear saved EODH credentials, results and temporary map overlays. Credentials are never written into the QGIS project. EODH bearer credentials are sent only to the Production EODH host, including when loading assets.
 
 ## Searching for data
 
 Search provides exactly two curated catalogue groups: **Public** and **Commercial**. The plugin discovers descendant catalogues and collections and displays a sorted **Provider — Collection** list. Type in the collection picker to find a collection. Internal and workspace catalogues are not search roots.
 
-Define your area of interest with **Draw on Map** (drag a rectangle), **Map Extent**, or **Import GeoJSON**. Imported Polygon and MultiPolygon boundaries, including FeatureCollections, are searched using their combined WGS84 bounding box. **Clear** removes the AOI. Areas crossing the antimeridian should be searched separately on each side.
+Selecting a collection applies its published spatial and temporal extents. You can replace the area with **Draw on Map** (drag a rectangle), **Map Extent**, or **Import AOI**. Import accepts GeoJSON/JSON polygons, shapefiles and GeoPackages; projected vector extents are transformed to WGS84. The combined bounding box is searched without adding the imported file to the map. **Clear** removes the AOI and hides result footprints. Search requires an area and a collection. Areas crossing the antimeridian should be searched separately on each side.
 
-Dates default to the last two calendar months. The end date includes the whole day. **Max Cloud Cover** appears when the selected collection publishes cloud metadata. At 100%, no cloud predicate is sent. Select **Search** to open Results. Use **Refresh collections / Retry** if discovery fails.
+Dates follow the selected collection's temporal extent, with today for an open end and one month ago when no start is published. The end date includes the whole day. **Max Cloud Cover** appears when the collection publishes cloud metadata. At 100%, no cloud predicate is sent. Select **Search** to open Results. If discovery fails, select the other catalog group and switch back to retry.
 
 ## Results, timeline and footprints
 
-The acquisition timeline and result list share their selection. Select a scene in either view to see its metadata, thumbnail and assets. **Previous** and **Next** browse result pages. Empty results include a suggestion to broaden the search.
+The thumbnail timeline is ordered by acquisition date and initially selects the newest dated scene. It shares its selection with the inline result cards. Arrow buttons step through dated scenes; **‹ Previous** and **Next ›** browse cached result pages. Page errors retain the current results. An empty search displays **No results found**.
 
-**Show footprints** is enabled by default. Valid Polygon and MultiPolygon geometries on the current page appear as temporary canvas overlays, with the selected scene emphasized. They never become project layers. Hiding footprints, clearing results, starting another search, signing out or closing the dock removes them. **Show AOI** independently controls the AOI overlay. **Zoom to item** fits the map to the selected footprint.
+**Show footprints** is initially enabled. Valid Polygon and MultiPolygon geometries on the current page appear as blue outlines, with the selected scene outlined in gold. They never become project layers. Hiding footprints, clearing results, starting another search, signing out or closing the dock removes them. **Show AOI** independently controls the blue AOI outline and faint fill.
 
-Result details include item and collection IDs, acquisition time, resolution, cloud cover, locational accuracy, licence and AOI overlap where available. AOI overlap is a planar WGS84 area approximation.
+Each card includes item and collection IDs, acquisition time, resolution, cloud cover, locational accuracy, licence and AOI overlap where available. Items with zero bounding-box overlap are excluded from the current page and counted in its summary. AOI overlap is a planar WGS84 area approximation.
 
-Check supported **COG**, **GeoTIFF** or **NetCDF** assets and choose **Load Selected Assets**, or double-click the result. Files are downloaded locally in a background task before loading, so protected assets can be authenticated without storing a token in a layer source. NetCDF data variables use the existing georeferencing support. Downloaded files remain in the local temporary directory so loaded layers keep working; copy needed data to a durable location before saving a long-lived project.
+Select **N loadable / N total assets** to expand a card. Supported **COG**, **GeoTIFF** and **NetCDF** files can be checked; metadata and thumbnail assets remain visible but disabled. Collection-specific defaults follow ArcGIS. **Load Selected Assets** downloads selected files in a background task before adding them to the map. Double-clicking a card with default assets loads its selection; otherwise it expands the assets. NetCDF variables use the existing georeferencing support. Temporary files remain available for loaded layers; copy needed data to durable storage before saving a long-lived project.
+
+**Quick view** appears when the collection has a supported render configuration and the item contains its required assets. It adds the same default TiTiler rendering as ArcGIS as an XYZ layer. The layer references QGIS's encrypted authentication configuration, never the API key itself.
 
 ## Commercial quotes and orders
 
@@ -72,23 +74,23 @@ Check supported **COG**, **GeoTIFF** or **NetCDF** assets and choose **Load Sele
 
 1. Complete all visible provider fields.
 2. Select **Get Quote** and review the returned value, units and message.
-3. Review the linked commercial documentation and accept the applicable licensing terms.
-4. Select **Place Order**. The final confirmation identifies the item and quote and explains that the purchase is irreversible. **No** is the default.
+3. Review **Provider account and licensing guidance**.
+4. Select **Purchase**. The **EODH — Confirm Order** dialog states the quoted price and explains that the action is irreversible. **No** is the default. Successful submission displays **Ordered — check workspace for delivery status**.
 
-A quote belongs to the exact item, provider, AOI, licence, bundle, country and applicable radar options. Changing an input clears the quote and licensing acceptance. A quote arriving after an input change cannot enable ordering. After an order error, check Workspace before attempting another purchase, since a network failure may occur after the backend accepted an order.
+A quote belongs to the exact item, provider, AOI, licence, bundle, country and applicable radar options. Each result card maintains its own quote. Changing an input clears it; a stale response cannot enable ordering. The country field defaults to GB and accepts up to three characters. After an order error, check Workspace before attempting another purchase, since a network failure may occur after the backend accepted an order.
 
 If provider credentials are missing, link the Airbus or Planet account in EODH Workspace settings. See [linked accounts guidance](https://docs.eodatahub.org.uk/Getting-Started/workspaces/linked-accounts/).
 
 ## Workspace commercial data
 
-The Workspace tab shows commercial records for the connected workspace. Filter by provider and status; review order IDs, dates and backend messages. Completed records with supported assets allow asset selection and **Load into map**. Pending, processing and failed records cannot be loaded. Use **Refresh / Retry** for updated delivery status or after an error.
+The Workspace tab shows **Commercial data** for the connected workspace. **Provider:** and **Status:** filters list values returned by the service. Cards show the provider, collection, item ID, status, order details and backend messages. Delivered records with supported assets expose **Available loadable files**; expand it, select files and choose **Load into map**. Filtering retains selections and expanded cards. Pending, processing and failed records cannot be loaded. Use **Refresh** for delivery updates or **Retry** after an error.
 
 This view follows the ArcGIS add-in: it does not include workflow execution tabs, members or a raw object-store browser. The plugin's registry name is retained as requested by the project ticket.
 
 ## Troubleshooting
 
 - **Cannot connect:** check the workspace, network and API key; replace expired keys.
-- **No collections or results:** use Retry, choose another collection, broaden dates or clear the AOI.
+- **No collections or results:** select another catalog group and switch back, choose another collection, broaden dates or choose a different AOI.
 - **No loadable assets:** metadata and thumbnails are not raster assets. Commercial data must be delivered first.
 - **Dependencies unavailable:** open qpip, review its package prompt, and restart QGIS after installation.
-- **Usage guide:** after connecting, the dock's Usage guide button opens this guide locally.
+- **Usage guide:** follow the README link or open `USAGE_GUIDE.md` from the installed plugin directory.

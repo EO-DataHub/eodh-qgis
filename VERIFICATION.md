@@ -10,14 +10,14 @@ request models, and Search / Results / Workspace views.
 | --- | --- |
 | Rename plugin | `metadata.txt`: Access and run workflows on the EODH |
 | Remove CWL tag | Removed from registry metadata |
-| Explain qpip and dependencies | `USAGE_GUIDE.md`, linked from README and available inside the dock |
+| Explain qpip and dependencies | `USAGE_GUIDE.md`, linked from README and included in the plugin ZIP |
 | QGIS 4 and QGIS 3 LTR | `qgis.PyQt`, scoped enums, runtime-independent branding; tested on Qt 6 and Qt 5 |
 | Remove workflow navigation | Plugin entry point opens `HubDock` with Search, Results and Workspace only |
 | Public/commercial catalogue groups | Recursive discovery, provider labels, cycle handling, pagination and owning search endpoints |
-| Search filters | Map extent, rectangle drawing, GeoJSON import, dates and conditional cloud cover |
-| Results | Acquisition timeline, synchronized selection, metadata, thumbnails, paging and asset checkboxes |
+| Search filters | Collection extent/date defaults, map extent, rectangle drawing, GeoJSON/shapefile/GeoPackage import and conditional cloud cover |
+| Results | Thumbnail timeline, inline cards, synchronized selection, metadata, cached paging, asset checkboxes and configured Quick view |
 | Temporary map geometry | Polygon/MultiPolygon footprints, selected highlight, independent AOI visibility and cleanup |
-| Commercial flow | Airbus Optical/SAR, Planet and Open Cosmos capabilities; quote context, licensing acceptance and final purchase confirmation |
+| Commercial flow | Airbus Optical/SAR, Planet and Open Cosmos capabilities; independent inline quotes, provider guidance and final purchase confirmation |
 | Workspace | Authenticated-workspace commercial records, provider/status filters, backend messages and completed-record asset loading |
 
 The old workflow/widget modules remain as inactive legacy source for existing unit
@@ -31,7 +31,9 @@ tests; they are no longer reachable through the plugin's menu or toolbar.
   rendering without project layers, synchronized timeline selection, quote
   invalidation, stale asynchronous quote responses, AOI changes and workspace
   loading gates.
-- Ran nine pure-Python contract tests in `tests/test_hub_contract.py`.
+- Ran twelve pure-Python contract tests in `tests/test_hub_contract.py` and
+  `tests/test_presentation.py`, including default asset selection, metadata/overlap
+  formatting and the exact ArcGIS TiTiler render query parameters.
 - Updated the login against ArcGIS `LoginView.xaml`: single centered logo,
   Segoe UI typography, matching orbital paths and dots, stacked fields, exact
   copy and both documentation links/icons. Production is fixed; credentials are
@@ -56,6 +58,31 @@ tests; they are no longer reachable through the plugin's menu or toolbar.
   three valid raster layers were created.
 - QGIS 4's Workspace tab retrieved existing Airbus commercial records, including
   succeeded status, order IDs, timestamps and supported delivered COG assets.
+- Follow-up screen pass compared the current ArcGIS signed-in Search and
+  Workspace screens and their XAML/view models with QGIS. Updated the compact
+  workspace header, footer, catalog labels/links, collection extent defaults,
+  calendar fields, cloud slider, inline result cards, thumbnail timeline,
+  commercial field rows, purchase copy, workspace cards and expandable files.
+- Ran `tests/qgis_screen_check.py` on QGIS 4.2.2 and 3.44.14 LTR. It checks
+  collection dates/AOI defaults, disabled search without AOI, newest timeline
+  selection and date labels, inline assets and defaults, outside-AOI filtering,
+  cached next/previous pages, omitted totals and paging errors, independent
+  commercial quotes, declining purchase confirmation, workspace selection
+  persistence, and a GeoPackage with layers in different coordinate systems.
+- In the updated QGIS 4 UI, a live Sentinel-2 search returned 72,037 matches,
+  with 50 inline cards. Expanded assets and added the Natural Color Quick view
+  XYZ layer. A separate authenticated request using the same render URL returned
+  a valid 256 × 256 JPEG tile. Native map tile rendering was not established in
+  the initial layer-creation check. The final thumbnail strip was visually
+  verified with visible images and date labels after fixing Qt widget clipping.
+- In QGIS 3 LTR, visually verified the updated signed-in search, commercial
+  catalog selection, delivered workspace cards and expanded file checkboxes.
+- The live Airbus search exposed nullable match counts. Pagination now ignores
+  null counts, preserves known totals on later pages and falls back to the
+  returned item count when no total is available; both Qt runtime checks cover it.
+- Repeated the live Airbus PHR search in the fixed QGIS 3 LTR plugin: 3,826,860
+  matches, 50 cards, and visible per-card licence, bundle, GB country and Get Quote
+  controls. Checked the corrected thumbnail timeline in that runtime as well.
 - QGIS 3 LTR successfully performed a live Airbus catalogue search and displayed
   the empty-results guidance for the chosen current-date range and map extent.
 - Built `dist/eodh_qgis.zip` and checked that its contents do not contain the

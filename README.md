@@ -7,7 +7,7 @@ commercial quotes and orders, and workspace commercial records. Its dockable Sea
 Results and Workspace interface follows the EODH ArcGIS Pro add-in.
 
 See the [usage guide](USAGE_GUIDE.md) for installation, qpip dependencies, signing in,
-search filters, footprints, asset loading and commercial ordering.
+search filters, thumbnail timeline, Quick view, asset loading and commercial ordering.
 
 ## Installation
 
@@ -82,3 +82,8 @@ To setup language server support in VSCode if you've installed QGIS from Flatpak
 
 4. Run `tests/qgis_runtime_check.py` with each QGIS installation's Python launcher
    to check actual Qt widgets, map overlays, quote invalidation and workspace asset gates.
+
+5. Run `tests/qgis_login_check.py` and `tests/qgis_screen_check.py` with the same
+   launchers for login state, collection defaults, projected AOI import, inline
+   cards, timeline dates, page caching/errors, purchase cancellation and workspace
+   selection persistence. These checks use local fixtures and do not place orders.
