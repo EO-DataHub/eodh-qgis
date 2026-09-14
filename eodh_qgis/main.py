@@ -1,6 +1,6 @@
 import os.path
 
-from qgis.PyQt.QtCore import QCoreApplication, QSettings, QTranslator
+from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator
 from qgis.PyQt.QtGui import QIcon
 
 try:
@@ -9,10 +9,10 @@ except ImportError:
     from qgis.PyQt.QtWidgets import QAction
 
 # Import the code for the dialog
-from .gui.main_dialog import MainDialog
+from .gui.hub_dock import HubDock
 
 # Initialize Qt resources from file resources.py
-from .resources import *  # type: ignore # noqa: F403
+# Branding is shipped as ordinary image files, avoiding Qt-version-specific rcc output.
 
 MENU_NAME = "&EODH"
 
@@ -33,7 +33,7 @@ class EodhQgis:
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
         # initialize locale
-        locale = QSettings().value("locale/userLocale")[0:2]
+        locale = str(QSettings().value("locale/userLocale", "en"))[0:2]
         locale_path = os.path.join(self.plugin_dir, "i18n", f"EodhQgis_{locale}.qm")
 
         if os.path.exists(locale_path):
@@ -143,7 +143,7 @@ class EodhQgis:
 
         configure_gdal_vsicurl()
 
-        icon_path = ":/plugins/eodh_qgis/icon.png"
+        icon_path = os.path.join(self.plugin_dir, "brand", "eodh-mark.png")
         self.add_action(
             icon_path,
             text=self.tr("Earth Observation Data Hub"),
@@ -158,6 +158,8 @@ class EodhQgis:
         """Removes the plugin menu item and icon from QGIS GUI."""
         dlg = getattr(self, "dlg", None)
         if dlg is not None:
+            dlg.shutdown()
+            self.iface.removeDockWidget(dlg)
             search_widget = getattr(dlg, "search_widget", None)
             if search_widget is not None:
                 try:
@@ -181,17 +183,9 @@ class EodhQgis:
         # is started
         if self.first_start is True:
             self.first_start = False
-            self.dlg = MainDialog(iface=self.iface)
+            self.dlg = HubDock(iface=self.iface)
+            self.iface.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dlg)
 
         # show the dialog
         self.dlg.show()
-        # Run the dialog event loop
-        exec_fn = getattr(self.dlg, "exec", None)
-        if exec_fn is None:
-            exec_fn = self.dlg.exec_
-        result = exec_fn()
-        # See if OK was pressed
-        if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            pass
+        self.dlg.raise_()

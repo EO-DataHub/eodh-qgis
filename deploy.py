@@ -21,8 +21,10 @@ def main(install_path: pathlib.Path, is_dist=False, is_test=False):
         verify_install_path(install_path)
     uninstall(install_path)
     build(is_dist=is_dist, is_test=is_test)
-    compile_resources()
-    patch_resources()
+    if is_test:
+        # Retained legacy widget tests still load the historical .ui resources.
+        compile_resources()
+        patch_resources()
     install(install_path)
 
 
@@ -50,6 +52,8 @@ def build(
     shutil.copy2("LICENSE", build_dir)
     print(f"Copied LICENSE to {build_dir}")
     shutil.copy2("requirements.txt", build_dir)
+    shutil.copy2(ROOT_DIR / "USAGE_GUIDE.md", build_dir)
+    shutil.copy2(ROOT_DIR / "resources" / "icon.png", build_dir)
     print(f"Copied requirements.txt to {build_dir}")
     if is_test:
         shutil.copytree(ROOT_DIR / ".docker", build_dir / ".docker")

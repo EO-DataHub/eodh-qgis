@@ -3,8 +3,8 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=EODH Workflows
-qgisMinimumVersion=3.0
+name=Access and run workflows on the EODH
+qgisMinimumVersion=3.44
 qgisMaximumVersion=4.99
 description=Access and run workflows on the EODH
 version=0.2.6
@@ -24,7 +24,7 @@ hasProcessingProvider=no
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=climate, Earth observation, CWL
+tags=climate, Earth observation
 
 homepage=https://github.com/EO-DataHub/eodh-qgis
 category=Web
