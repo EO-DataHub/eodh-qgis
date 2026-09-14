@@ -26,14 +26,22 @@ Review qpip's full dependency list before agreeing; it can include dependencies 
 
 ## Signing in
 
-1. Choose Production, Staging or Test.
-2. Enter your **Workspace name** and **Workspace API key**. Paste the API Key, not the Token ID.
-3. Optionally enable **Remember credentials in QGIS authentication manager**. QGIS may ask you to unlock or configure its authentication database. Otherwise the key stays in memory for this session.
-4. Select **Connect**.
+1. Enter your **Workspace name** and **Workspace API key**. Paste the API Key, not the Token ID.
+2. Select **Connect**. The plugin always connects to Production.
+
+Credentials are automatically saved in the encrypted QGIS authentication manager.
+QGIS may ask you to unlock or configure its authentication database. Saved
+credentials are validated automatically when the plugin opens; invalid saved keys
+are cleared and the sign-in screen displays the service error. If QGIS cannot save
+the key, the plugin tells you that it will only be available for this session.
+
+**Workspace documentation** opens the EODH credentials guide. **Get workspace
+credentials** opens the portal for the workspace entered in the form. The in-app
+usage guide is available in the header after connecting.
 
 Workspace API keys expire after at most 30 days and are not renewed automatically. If access is denied, check the workspace and create or copy a current key from the [workspace credentials page](https://docs.eodatahub.org.uk/Getting-Started/workspaces/workspace-credentials/).
 
-**Sign Out** clears saved EODH credentials, results and temporary map overlays. Credentials are never written into the QGIS project. EODH bearer credentials are sent only to the selected EODH host, including when loading assets.
+**Sign Out** clears saved EODH credentials, results and temporary map overlays. Credentials are never written into the QGIS project. EODH bearer credentials are sent only to the Production EODH host, including when loading assets.
 
 ## Searching for data
 
@@ -79,8 +87,8 @@ This view follows the ArcGIS add-in: it does not include workflow execution tabs
 
 ## Troubleshooting
 
-- **Cannot connect:** check the environment, workspace, network and API key; replace expired keys.
+- **Cannot connect:** check the workspace, network and API key; replace expired keys.
 - **No collections or results:** use Retry, choose another collection, broaden dates or clear the AOI.
 - **No loadable assets:** metadata and thumbnails are not raster assets. Commercial data must be delivered first.
 - **Dependencies unavailable:** open qpip, review its package prompt, and restart QGIS after installation.
-- **Usage guide:** the dock's Usage guide button opens this guide locally.
+- **Usage guide:** after connecting, the dock's Usage guide button opens this guide locally.

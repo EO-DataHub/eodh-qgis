@@ -21,6 +21,7 @@ from eodh_qgis.api.hub import (
     validate_bbox,
 )
 
+from .hub_login import LoginPage
 from .hub_map import Overlays, RectangleTool, geometry
 from .hub_widgets import CommercialPanel, Timeline, button, label
 
@@ -67,8 +68,11 @@ class HubDock(QtWidgets.QDockWidget):
         self.root.setMinimumWidth(370)
         self.setWidget(self.root)
         layout = QtWidgets.QVBoxLayout(self.root)
-        layout.setContentsMargins(12, 10, 12, 10)
-        header = QtWidgets.QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        self.header = QtWidgets.QWidget()
+        header = QtWidgets.QHBoxLayout(self.header)
+        header.setContentsMargins(12, 10, 12, 10)
         mark = QtWidgets.QLabel()
         mark.setPixmap(
             QtGui.QPixmap(str(Path(__file__).parents[1] / "brand" / "eodh-logo-colour.png")).scaledToWidth(
@@ -80,14 +84,18 @@ class HubDock(QtWidgets.QDockWidget):
         header.addWidget(button("Usage guide", self.show_guide))
         self.sign_out = button("Sign Out", self.disconnect)
         header.addWidget(self.sign_out)
-        self.sign_out.hide()
-        layout.addLayout(header)
+        self.header.hide()
+        layout.addWidget(self.header)
         self.workspace_label = label("Earth Observation Data Hub")
+        self.workspace_label.setContentsMargins(12, 0, 12, 6)
+        self.workspace_label.hide()
         layout.addWidget(self.workspace_label)
         self.stack = QtWidgets.QStackedWidget()
         layout.addWidget(self.stack, 1)
         self.status = label("Ready")
         self.status.setAccessibleName("EODH status")
+        self.status.setContentsMargins(12, 4, 12, 10)
+        self.status.hide()
         layout.addWidget(self.status)
         self.progress = QtWidgets.QProgressBar()
         self.progress.setRange(0, 0)
@@ -108,6 +116,8 @@ class HubDock(QtWidgets.QDockWidget):
         self.build_workspace()
         self.visibilityChanged.connect(self.visibility_changed)
         self.iface.mapCanvas().destinationCrsChanged.connect(self.update_overlays)
+        if self.auth_id and QtCore.QSettings().value("eodh/hub_environment", "Production") == "Production":
+            QtCore.QTimer.singleShot(0, self.load_credentials)
 
     def page(self, title):
         page = QtWidgets.QWidget()
@@ -121,78 +131,43 @@ class HubDock(QtWidgets.QDockWidget):
         return page, layout
 
     def build_login(self):
-        page = QtWidgets.QWidget()
-        layout = QtWidgets.QVBoxLayout(page)
-        layout.addStretch()
-        logo = QtWidgets.QLabel()
-        logo.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        logo.setPixmap(
-            QtGui.QPixmap(str(Path(__file__).parents[1] / "brand" / "eodh-logo-colour.png")).scaledToWidth(
-                218, QtCore.Qt.TransformationMode.SmoothTransformation
-            )
-        )
-        layout.addWidget(logo)
-        title = label("Connect your workspace")
-        title.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        font = title.font()
-        font.setPointSize(18)
-        title.setFont(font)
-        layout.addWidget(title)
-        layout.addWidget(label("Sign in with your EODH workspace credentials to search and access satellite imagery."))
-        form = QtWidgets.QFormLayout()
-        self.environment = QtWidgets.QComboBox()
-        self.environment.addItems(ENVIRONMENTS)
-        self.workspace = QtWidgets.QLineEdit()
-        self.key = QtWidgets.QLineEdit()
-        self.key.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
-        self.workspace.setAccessibleName("Workspace name")
-        self.key.setAccessibleName("Workspace API key")
-        form.addRow("Environment", self.environment)
-        form.addRow("Workspace name", self.workspace)
-        form.addRow("Workspace API key", self.key)
-        layout.addLayout(form)
-        layout.addWidget(label("Paste the API Key, not the Token ID. Workspace keys expire after at most 30 days."))
-        self.remember = QtWidgets.QCheckBox("Remember credentials in QGIS authentication manager")
-        layout.addWidget(self.remember)
-        self.connect_button = button("Connect", self.connect_workspace, True)
-        layout.addWidget(self.connect_button)
-        self.key.returnPressed.connect(self.connect_workspace)
-        layout.addWidget(
-            button(
-                "Workspace credentials documentation",
-                lambda: QtGui.QDesktopServices.openUrl(
-                    QtCore.QUrl("https://docs.eodatahub.org.uk/Getting-Started/workspaces/workspace-credentials/")
-                ),
-            )
-        )
-        layout.addStretch()
-        self.stack.addWidget(page)
+        self.login = LoginPage(self.connect_workspace)
+        self.workspace, self.key = self.login.workspace, self.login.key
+        self.connect_button = self.login.connect_button
+        self.login_scroll = QtWidgets.QScrollArea()
+        self.login_scroll.setWidgetResizable(True)
+        self.login_scroll.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
+        self.login_scroll.setWidget(self.login)
+        self.stack.addWidget(self.login_scroll)
         settings = QtCore.QSettings()
         self.workspace.setText(settings.value("eodh/hub_workspace", ""))
-        self.environment.setCurrentText(settings.value("eodh/hub_environment", "Production"))
         self.auth_id = settings.value("eodh/hub_auth", "")
-        if self.auth_id:
-            layout.insertWidget(layout.count() - 1, button("Use saved credentials", self.load_credentials))
 
     def load_credentials(self):
+        if not self.auth_id or self.client or self.login.loading:
+            return
         config = QgsAuthMethodConfig()
         if QgsApplication.authManager().loadAuthenticationConfig(self.auth_id, config, True):
             self.key.setText(config.config("token"))
-            self.remember.setChecked(True)
-            self.connect_workspace()
+            self.connect_workspace(saved=True)
 
-    def connect_workspace(self):
-        workspace, key = self.workspace.text().strip(), self.key.text().strip()
-        if not workspace or not key:
-            self.status.setText("Enter a workspace name and Workspace API key.")
+    def connect_workspace(self, checked=False, *, saved=False):
+        if self.login.loading:
             return
-        client = HubClient(ENVIRONMENTS[self.environment.currentText()], workspace, key)
-        self.connect_button.setEnabled(False)
+        workspace, key = self.workspace.text().strip(), self.key.text().strip()
+        if not workspace:
+            return
+        if not key:
+            self.login.set_error("Please enter your workspace API key (not the Token ID).")
+            return
+        client = HubClient(ENVIRONMENTS["Production"], workspace, key)
+        self.login.set_error("")
+        self.login.set_loading(True)
 
         def done(result):
             self.client = client
-            self.connect_button.setEnabled(True)
-            if self.remember.isChecked():
+            self.login.set_loading(False)
+            if not saved:
                 config = QgsAuthMethodConfig()
                 config.setName("EODH workspace")
                 config.setMethod("APIHeader")
@@ -201,24 +176,36 @@ class HubDock(QtWidgets.QDockWidget):
                 manager = QgsApplication.authManager()
                 if self.auth_id:
                     config.setId(self.auth_id)
-                    saved = manager.updateAuthenticationConfig(config)
+                    stored = manager.updateAuthenticationConfig(config)
                 else:
-                    saved = manager.storeAuthenticationConfig(config)
-                if saved:
+                    stored = manager.storeAuthenticationConfig(config)
+                if stored:
                     self.auth_id = config.id()
                     QtCore.QSettings().setValue("eodh/hub_auth", self.auth_id)
+                else:
+                    QtWidgets.QMessageBox.warning(
+                        self,
+                        "EODH",
+                        "Connected, but QGIS could not save your credentials. Unlock or configure the QGIS "
+                        "authentication database to remember them next time.",
+                    )
             settings = QtCore.QSettings()
             settings.setValue("eodh/hub_workspace", workspace)
-            settings.setValue("eodh/hub_environment", self.environment.currentText())
+            settings.setValue("eodh/hub_environment", "Production")
             self.key.clear()
-            self.workspace_label.setText(workspace + " • " + self.environment.currentText())
+            self.workspace_label.setText(workspace + " • Production")
             self.stack.setCurrentWidget(self.tabs)
-            self.sign_out.show()
+            self.header.show()
+            self.workspace_label.show()
+            self.status.show()
             self.discover()
 
         def failed(error):
-            self.connect_button.setEnabled(True)
-            self.status.setText(str(error))
+            self.login.set_loading(False)
+            if saved:
+                self.clear_saved_credentials()
+                self.key.clear()
+            self.login.set_error(str(error))
 
         self.submit("Connecting…", client.validate, done, failed)
 
@@ -235,26 +222,33 @@ class HubDock(QtWidgets.QDockWidget):
         self.order_assets.clear()
         self.set_bbox(None)
         self.cleanup_map()
-        if self.auth_id:
-            QgsApplication.authManager().removeAuthenticationConfig(self.auth_id)
-            QtCore.QSettings().remove("eodh/hub_auth")
-            self.auth_id = ""
-        self.sign_out.hide()
+        self.clear_saved_credentials()
+        self.header.hide()
+        self.workspace_label.hide()
+        self.status.hide()
+        self.login.set_loading(False)
+        self.login.set_error("")
         self.stack.setCurrentIndex(0)
         self.workspace_label.setText("Earth Observation Data Hub")
         self.status.setText("Signed out. Saved credentials cleared.")
         self.progress.hide()
 
+    def clear_saved_credentials(self):
+        if self.auth_id:
+            QgsApplication.authManager().removeAuthenticationConfig(self.auth_id)
+            QtCore.QSettings().remove("eodh/hub_auth")
+            self.auth_id = ""
+
     def submit(self, title, work, done, failed=None, with_task=False):
         epoch = self.epoch
         self.status.setText(title)
         self.progress.setRange(0, 0)
-        self.progress.show()
+        self.progress.setVisible(self.client is not None)
 
         def finish(result, error):
             if task in self.tasks:
                 self.tasks.remove(task)
-            self.progress.setVisible(bool(self.tasks))
+            self.progress.setVisible(bool(self.tasks) and self.client is not None)
             if epoch != self.epoch:
                 return
             if error is not None:
@@ -264,6 +258,7 @@ class HubDock(QtWidgets.QDockWidget):
                 if isinstance(error, HubError) and error.status == 401 and self.client:
                     self.disconnect()
                     self.status.setText(str(error))
+                    self.login.set_error(str(error))
             else:
                 self.status.setText("Ready")
                 done(result)

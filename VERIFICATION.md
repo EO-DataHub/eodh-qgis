@@ -32,6 +32,14 @@ tests; they are no longer reachable through the plugin's menu or toolbar.
   invalidation, stale asynchronous quote responses, AOI changes and workspace
   loading gates.
 - Ran nine pure-Python contract tests in `tests/test_hub_contract.py`.
+- Updated the login against ArcGIS `LoginView.xaml`: single centered logo,
+  Segoe UI typography, matching orbital paths and dots, stacked fields, exact
+  copy and both documentation links/icons. Production is fixed; credentials are
+  remembered automatically. The login has no header or usage-guide button.
+- Visually checked the updated login in QGIS 4 and QGIS 3 LTR, including a narrow
+  QGIS 4 dock. Ran `tests/qgis_login_check.py` on both runtimes: Production routing,
+  empty-key validation, automatic save/restore, expired-key cleanup and sign-out.
+  Persistence and API calls in this test use isolated fakes, not live credentials.
 - Repository Ruff lint and format checks pass. Pyright reports zero errors;
   warnings concern unavailable QGIS/optional package type information in the
   standalone checking environment. `validate-pyproject` passes.
