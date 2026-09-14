@@ -471,13 +471,12 @@ class Timeline(QtWidgets.QWidget):
 
     def set_thumbnail(self, index, pixmap):
         if index in self.images:
+            scaled = pixmap.scaled(
+                56,
+                42,
+                QtCore.Qt.AspectRatioMode.KeepAspectRatioByExpanding,
+                QtCore.Qt.TransformationMode.SmoothTransformation,
+            )
             self.images[index].setIcon(
-                QtGui.QIcon(
-                    pixmap.scaled(
-                        56,
-                        42,
-                        QtCore.Qt.AspectRatioMode.KeepAspectRatioByExpanding,
-                        QtCore.Qt.TransformationMode.SmoothTransformation,
-                    )
-                )
+                QtGui.QIcon(scaled.copy((scaled.width() - 56) // 2, (scaled.height() - 42) // 2, 56, 42))
             )

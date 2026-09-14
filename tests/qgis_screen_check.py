@@ -12,7 +12,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from qgis.core import Qgis, QgsApplication, QgsFeature, QgsGeometry, QgsProject, QgsVectorFileWriter, QgsVectorLayer
 from qgis.gui import QgsMapCanvas
-from qgis.PyQt import QtCore, QtWidgets
+from qgis.PyQt import QtCore, QtGui, QtWidgets
 
 from eodh_qgis.gui.hub_dock import HubDock
 
@@ -94,6 +94,10 @@ assert date_label.height() >= 12
 assert date_label.isVisible(), str(
     (date_label.geometry(), date_label.parentWidget().geometry(), date_label.parentWidget().isVisible())
 )
+portrait = QtGui.QPixmap(30, 90)
+portrait.fill(QtGui.QColor("blue"))
+dock.timeline.set_thumbnail(0, portrait)
+assert date_label.icon().actualSize(QtCore.QSize(56, 42)) == QtCore.QSize(56, 42)
 assert card.height() >= card.layout().minimumSize().height()
 
 # Forward/back navigation keeps the original total even if the next page omits it.
