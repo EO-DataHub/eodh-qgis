@@ -21,6 +21,9 @@ jobs:
       - name: Code quality
         run: make check
 
+      - name: Hub transport and commercial contract tests
+        run: uv run python -m unittest discover -s tests -v
+
   test:
     runs-on: ubuntu-latest
 
