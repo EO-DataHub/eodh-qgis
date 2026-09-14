@@ -313,6 +313,9 @@ class HubClient:
                     items = self.request(items_url)
                     for item in items.get("features", []):
                         item["_provider"] = label
+                        item["_collection_label"] = (
+                            collection.get("title") or collection.get("description") or collection["id"]
+                        )
                         records.append(item)
                     items_url = href(items, "next", items_url)
             url = href(page, "next", url)
