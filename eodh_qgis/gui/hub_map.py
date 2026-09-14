@@ -78,9 +78,11 @@ class Overlays:
     def band(self, geom, selected=False, aoi=False):
         band = QgsRubberBand(self.canvas, QgsWkbTypes.GeometryType.PolygonGeometry)
         band.setToGeometry(geom, WGS84)
-        band.setStrokeColor(QColor("#d88a26" if aoi else "#4c72ba"))
-        band.setFillColor(QColor(76, 114, 186, 65 if selected else 18))
-        band.setWidth(3 if selected else 1)
+        band.setStrokeColor(
+            QColor(0, 90, 200) if aoi else QColor(255, 190, 0) if selected else QColor(40, 130, 210, 160)
+        )
+        band.setFillColor(QColor(0, 120, 255, 13) if aoi else QColor(40, 130, 210, 0))
+        band.setWidth(4 if aoi else 2 if selected else 1)
         return band
 
     def footprints(self, items, selected=-1, visible=True):

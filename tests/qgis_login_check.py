@@ -64,6 +64,7 @@ with (
     patch("eodh_qgis.gui.hub_dock.HubClient", return_value=client) as client_type,
     patch.object(HubDock, "submit", submit),
     patch.object(HubDock, "discover"),
+    patch.object(HubDock, "refresh_records"),
 ):
     application.authManager.return_value = manager
     dock = HubDock(iface)

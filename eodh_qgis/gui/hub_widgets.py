@@ -1,7 +1,5 @@
 """Qt5/Qt6 widgets for the ArcGIS-aligned EODH experience."""
 
-from datetime import datetime
-
 from qgis.PyQt import QtCore, QtGui, QtWidgets
 
 from eodh_qgis.api.hub import OPTICAL_BUNDLES, OPTICAL_LICENCES, SAR_LICENCES, PurchaseContext, href, provider
@@ -22,107 +20,101 @@ def button(text, callback, primary=False):
     return widget
 
 
-class Timeline(QtWidgets.QWidget):
-    selected = QtCore.pyqtSignal(int)
+class CommercialPanel(QtWidgets.QFrame):
+    changed = QtCore.pyqtSignal()
 
-    def __init__(self):
-        super().__init__()
-        self.items, self.points, self.index = [], [], -1
-        self.setMinimumHeight(90)
-        self.setMouseTracking(True)
-
-    def set_items(self, items):
-        self.items = items
-        self.index = -1
-        self.update()
-
-    def paintEvent(self, event):
-        painter = QtGui.QPainter(self)
-        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
-        painter.setPen(self.palette().text().color())
-        painter.drawText(10, 17, "Acquisition timeline")
-        self.points = []
-        dates = []
-        for index, item in enumerate(self.items):
-            raw = (item.get("properties") or {}).get("datetime")
-            if not isinstance(raw, str):
-                continue
-            try:
-                dates.append((index, datetime.fromisoformat(raw.replace("Z", "+00:00")).timestamp(), raw[:10]))
-            except (TypeError, ValueError, AttributeError):
-                pass
-        if not dates:
-            painter.drawText(10, 53, "No dated results")
-            return
-        low, high = min(x[1] for x in dates), max(x[1] for x in dates)
-        painter.drawLine(15, 47, self.width() - 15, 47)
-        for index, timestamp, text in dates:
-            x = 15 + (timestamp - low) / (high - low or 1) * (self.width() - 30)
-            y = 43 - (index % 3) * 8
-            self.points.append((index, x, y, text))
-            painter.setBrush(QtGui.QColor("#d88a26" if index == self.index else "#4c72ba"))
-            painter.drawEllipse(QtCore.QPointF(x, y), 5 if index == self.index else 3, 5 if index == self.index else 3)
-        painter.drawText(10, 75, min(dates, key=lambda x: x[1])[2])
-        painter.drawText(max(10, self.width() - 85), 75, max(dates, key=lambda x: x[1])[2])
-
-    def mousePressEvent(self, event):
-        if self.points:
-            point = min(self.points, key=lambda p: (p[1] - event.pos().x()) ** 2 + (p[2] - event.pos().y()) ** 2)
-            self.selected.emit(point[0])
-
-    def mouseMoveEvent(self, event):
-        if self.points:
-            point = min(self.points, key=lambda p: abs(p[1] - event.pos().x()))
-            self.setToolTip(point[3] + "\n" + self.items[point[0]].get("id", ""))
-
-
-class CommercialPanel(QtWidgets.QGroupBox):
     def __init__(self, dock):
-        super().__init__("Commercial quote and order")
+        super().__init__()
+        self.setObjectName("purchasePanel")
+        self.setStyleSheet(
+            "QFrame#purchasePanel {background:rgba(255,215,0,16);border-radius:3px;} QFrame#purchasePanel QWidget {font-size:10px;}"
+        )
         self.dock, self.item, self.quote_context, self.quote = dock, {}, None, None
         self.busy = False
         self.revision = 0
         self.request_id = 0
-        self.form = QtWidgets.QFormLayout(self)
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(8, 6, 8, 6)
+        layout.setSpacing(4)
         self.provider_label = label("")
-        self.form.addRow(self.provider_label)
+        self.provider_label.setStyleSheet("color:#b8860b;")
+        font = self.provider_label.font()
+        font.setWeight(QtGui.QFont.Weight.DemiBold)
+        self.provider_label.setFont(font)
+        layout.addWidget(self.provider_label)
         self.fields = {}
+        self.field_rows = {}
         for key, title in (
-            ("licence", "Licence"),
-            ("bundle", "Product bundle"),
-            ("country", "End-user country"),
-            ("orbit", "Orbit"),
-            ("resolution", "Resolution"),
-            ("projection", "Projection"),
+            ("licence", "Licence:"),
+            ("bundle", "Bundle:"),
+            ("country", "Country:"),
+            ("orbit", "Orbit:"),
+            ("resolution", "Resolution:"),
+            ("projection", "Projection:"),
         ):
+            group = QtWidgets.QWidget()
+            row = QtWidgets.QHBoxLayout(group)
+            row.setContentsMargins(0, 0, 0, 0)
+            row.setSpacing(4)
+            row.addWidget(label(title))
             widget = QtWidgets.QLineEdit() if key == "country" else QtWidgets.QComboBox()
             self.fields[key] = widget
-            self.form.addRow(title, widget)
+            widget.setMinimumWidth(40 if key == "country" else 120 if key in ("licence", "bundle") else 100)
+            if key == "country":
+                widget.setMaximumWidth(50)
+                widget.setMaxLength(3)
+            row.addWidget(widget)
+            row.addStretch()
+            self.field_rows[key] = group
+            layout.addWidget(group)
             (widget.textChanged if key == "country" else widget.currentTextChanged).connect(self.invalidate)
-        self.fields["country"].setPlaceholderText("e.g. United Kingdom")
+        quote_row = QtWidgets.QHBoxLayout()
+        self.quote_button = button("Get Quote", self.get_quote)
+        quote_row.addWidget(self.quote_button)
+        self.progress = QtWidgets.QProgressBar()
+        self.progress.setRange(0, 0)
+        self.progress.setFixedSize(60, 2)
+        self.progress.hide()
+        quote_row.addWidget(self.progress)
+        self.quote_text = label("")
+        quote_row.addWidget(self.quote_text)
+        quote_row.addStretch()
+        layout.addLayout(quote_row)
+        self.message = label("")
+        self.message.setStyleSheet("color:#666;")
+        layout.addWidget(self.message)
+        self.order_group = QtWidgets.QWidget()
+        order_layout = QtWidgets.QVBoxLayout(self.order_group)
+        order_layout.setContentsMargins(0, 0, 0, 0)
+        order_layout.setSpacing(4)
         self.help = label("")
         self.help.setTextFormat(QtCore.Qt.TextFormat.RichText)
         self.help.setText(
-            '<a href="https://docs.eodatahub.org.uk/Analysts/commercial/ordering-commercial-data/#understanding-the-ordering-options">Commercial bundles and licences</a>'
+            '<a href="https://docs.eodatahub.org.uk/Getting-Started/workspaces/linked-accounts/" style="color:#006a8a;text-decoration:none;">Provider account and licensing guidance</a>'
         )
         self.help.setOpenExternalLinks(True)
-        self.form.addRow(self.help)
-        self.quote_button = button("Get Quote", self.get_quote)
-        self.form.addRow(self.quote_button)
-        self.message = label("Get a quote to review the price.")
-        self.form.addRow(self.message)
-        self.accept = QtWidgets.QCheckBox("I accept the applicable licensing terms")
-        self.accept.toggled.connect(self.update_enabled)
-        self.form.addRow(self.accept)
-        self.order_button = button("Place Order", self.place_order, True)
-        self.form.addRow(self.order_button)
+        order_layout.addWidget(self.help)
+        self.order_button = button("Purchase", self.place_order)
+        order_layout.addWidget(self.order_button, 0, QtCore.Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.order_group)
+        self.purchase_status = label("")
+        self.purchase_status.setStyleSheet("color:green;")
+        layout.addWidget(self.purchase_status)
+        self.purchase_error = label("")
+        self.purchase_error.setStyleSheet("color:red;")
+        layout.addWidget(self.purchase_error)
+        self.update_enabled()
 
     def set_item(self, item):
         self.request_id += 1
         self.busy = False
         self.item = item or {}
         p = provider(self.item)
-        self.provider_label.setText(p)
+        self.provider_label.setText(
+            "Commercial ("
+            + {"Airbus Optical": "AirbusOptical", "Airbus SAR": "AirbusSar", "Open Cosmos": "OpenCosmos"}.get(p, p)
+            + ")"
+        )
         choices = {
             "licence": SAR_LICENCES if p == "Airbus SAR" else OPTICAL_LICENCES,
             "bundle": ("SSC", "MGD", "GEC", "EEC") if p == "Airbus SAR" else OPTICAL_BUNDLES,
@@ -136,7 +128,7 @@ class CommercialPanel(QtWidgets.QGroupBox):
                 widget.clear()
                 widget.addItems(choices[key])
             else:
-                widget.clear()
+                widget.setText("GB" if p == "Airbus Optical" else "")
             widget.blockSignals(False)
         self.invalidate()
 
@@ -164,8 +156,8 @@ class CommercialPanel(QtWidgets.QGroupBox):
     def invalidate(self, *args):
         self.revision += 1
         self.quote_context, self.quote = None, None
-        self.accept.setChecked(False)
-        self.message.setText("Get a new quote after changing any ordering option.")
+        self.message.clear()
+        self.purchase_status.clear()
         p = provider(self.item)
         bundle = self.fields["bundle"].currentText()
         visible = {
@@ -176,9 +168,8 @@ class CommercialPanel(QtWidgets.QGroupBox):
             "resolution": p == "Airbus SAR" and bundle != "SSC",
             "projection": p == "Airbus SAR" and bundle not in ("SSC", "MGD"),
         }
-        for key, widget in self.fields.items():
-            widget.setVisible(visible[key])
-            self.form.labelForField(widget).setVisible(visible[key])
+        for key in self.fields:
+            self.field_rows[key].setVisible(visible[key])
         self.update_enabled()
 
     def update_enabled(self, *args):
@@ -190,12 +181,14 @@ class CommercialPanel(QtWidgets.QGroupBox):
             valid = False
         self.quote_button.setEnabled(valid and not self.busy)
         self.order_button.setEnabled(
-            valid
-            and not self.busy
-            and self.quote is not None
-            and self.quote_context == self.context()
-            and self.accept.isChecked()
+            valid and not self.busy and self.quote is not None and self.quote_context == self.context()
         )
+        self.order_group.setVisible(self.quote is not None)
+        self.quote_text.setText(f"{self.quote['value']:,.2f} {self.quote['units']}" if self.quote else "")
+        self.progress.setVisible(self.busy)
+        for widget in (self.message, self.purchase_status, self.purchase_error):
+            widget.setVisible(bool(widget.text()))
+        self.changed.emit()
 
     def get_quote(self):
         if self.busy or not self.dock.client:
@@ -204,9 +197,10 @@ class CommercialPanel(QtWidgets.QGroupBox):
         try:
             payload, _ = context.requests()
         except ValueError as error:
-            self.message.setText(str(error))
+            self.purchase_error.setText(str(error))
             return
         self.invalidate()
+        self.purchase_error.clear()
         self.busy = True
         self.request_id += 1
         request_id, revision = self.request_id, self.revision
@@ -219,10 +213,10 @@ class CommercialPanel(QtWidgets.QGroupBox):
             self.busy = False
             if revision == self.revision and context == self.context():
                 if not isinstance(result.get("value"), (float, int)) or not result.get("units"):
-                    self.message.setText("EODH returned an invalid quote. Retry.")
+                    self.purchase_error.setText("EODH returned an invalid quote. Retry.")
                 else:
                     self.quote_context, self.quote = context, result
-                    self.message.setText(f"{result['value']} {result['units']}\n{result.get('message') or ''}")
+                    self.message.setText(result.get("message") or "")
             self.update_enabled()
 
         def failed(error):
@@ -230,13 +224,15 @@ class CommercialPanel(QtWidgets.QGroupBox):
                 return
             self.busy = False
             self.invalidate()
-            self.message.setText(str(error))
+            self.purchase_error.setText(str(error))
+            self.update_enabled()
 
         self.dock.submit(
             "Getting quote…",
             lambda: client.request(context.item_url.rstrip("/") + "/quote", "POST", payload),
             done,
             failed,
+            quiet=True,
         )
 
     def place_order(self):
@@ -248,7 +244,8 @@ class CommercialPanel(QtWidgets.QGroupBox):
         answer = QtWidgets.QMessageBox.warning(
             self,
             "EODH — Confirm Order",
-            f"Order {self.item.get('id')} for {current_quote['value']} {current_quote['units']}?\n\nThis purchase is irreversible.",
+            f"You are about to order this item for {current_quote['value']:,.2f} {current_quote['units']}.\n\n"
+            "This action is irreversible. Do you want to proceed?",
             QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
             QtWidgets.QMessageBox.StandardButton.No,
         )
@@ -266,18 +263,21 @@ class CommercialPanel(QtWidgets.QGroupBox):
                 return
             self.busy = False
             self.invalidate()
-            self.message.setText("Ordered — check Workspace for delivery status.")
+            self.purchase_status.setText("Ordered — check workspace for delivery status")
+            self.update_enabled()
 
         def failed(error):
             if request_id != self.request_id:
                 return
             self.busy = False
             self.invalidate()
-            self.message.setText(str(error) + "\nCheck Workspace before attempting another order.")
+            self.purchase_error.setText(str(error))
+            self.update_enabled()
 
         self.dock.submit(
             "Placing order…",
             lambda: client.request(context.item_url.rstrip("/") + "/order", "POST", payload, raw=True),
             done,
             failed,
+            quiet=True,
         )

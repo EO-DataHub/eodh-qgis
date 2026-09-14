@@ -52,17 +52,17 @@ app.processEvents()
 assert len(dock.overlays.bands) == 1
 assert len(QgsProject.instance().mapLayers()) == 0
 assert dock.results.currentRow() == dock.timeline.index == 0
-panel = dock.commercial
-panel.fields["country"].setText("United Kingdom")
+panel = dock.result_cards[0].commercial
+panel.fields["country"].setText("GB")
 assert panel.quote_button.isEnabled()
 panel.quote_context, panel.quote = panel.context(), {"value": 10, "units": "GBP"}
-panel.accept.setChecked(True)
+panel.update_enabled()
 assert panel.order_button.isEnabled()
 panel.fields["bundle"].setCurrentText("Analytic")
 assert panel.quote is None
 assert not panel.order_button.isEnabled()
 panel.quote_context, panel.quote = panel.context(), {"value": 10, "units": "GBP"}
-panel.accept.setChecked(True)
+panel.update_enabled()
 dock.set_bbox([0, 0, 2, 2])
 assert panel.quote is None
 assert not panel.order_button.isEnabled()
@@ -71,10 +71,10 @@ assert not panel.order_button.isEnabled()
 callbacks = []
 original_submit = dock.submit
 dock.client = object()
-dock.submit = lambda title, work, done, failed=None: callbacks.append(done)
+dock.submit = lambda title, work, done, failed=None, **kwargs: callbacks.append(done)
 panel.get_quote()
-panel.fields["country"].setText("France")
-panel.fields["country"].setText("United Kingdom")
+panel.fields["country"].setText("FR")
+panel.fields["country"].setText("GB")
 callbacks.pop()({"value": 12, "units": "GBP"})
 assert panel.quote is None
 assert not panel.order_button.isEnabled()
@@ -95,7 +95,7 @@ for status, enabled in (("pending", False), ("failed", False), ("completed", Tru
     record = dict(item, _provider="Airbus", properties={"order:status": status})
     dock.records = [record]
     dock.filter_records()
-    assert dock.load_order.isEnabled() == enabled
+    assert dock.record_cards[0].load_button.isEnabled() == enabled
 dock.shutdown()
 print(
     "PASS",
