@@ -168,3 +168,5 @@ playground/*
 .pre-commit-config.yaml
 
 .pi/
+.local/
+.qgis-settings/

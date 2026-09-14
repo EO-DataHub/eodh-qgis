@@ -2,17 +2,21 @@
 
 [![codecov](https://codecov.io/github/EO-DataHub/eodh-qgis/graph/badge.svg?token=N2VQBHVZN8)](https://codecov.io/github/EO-DataHub/eodh-qgis)
 
-A QGIS plugin to integrate with the Earth Observation Data Hub (EODH)
-This plugin demonstrates the EO Application Package and workflow capabilities of the EODH.
+A QGIS plugin for Earth Observation Data Hub (EODH) catalogue search, imagery loading,
+commercial quotes and orders, and workspace commercial records. Its dockable Search,
+Results and Workspace interface follows the EODH ArcGIS Pro add-in.
+
+See the [usage guide](USAGE_GUIDE.md) for installation, qpip dependencies, signing in,
+search filters, footprints, asset loading and commercial ordering.
 
 ## Installation
 
 ### From QGIS repository
 
 1. Go to menu Plugins -> All
-2. Search for `EODH Workflows`
+2. Search for `Access and run workflows on the EODH`
 3. Click Install Plugin
-4. We're using [QPIP plugin](https://github.com/opengisch/qpip) to install python dependencies using pip. Click OK to install them.
+4. Review the [qpip dependency explanation](USAGE_GUIDE.md#what-is-qpip) before agreeing to install the listed packages.
 
 ### Manual
 
@@ -22,29 +26,24 @@ This plugin demonstrates the EO Application Package and workflow capabilities of
 4. Select `Install from ZIP...`
 5. Select the downloaded archive
 6. Click `Install Plugin`
-7. We're using [QPIP plugin](https://github.com/opengisch/qpip) to install python dependencies using pip. Click OK to install them.
+7. Review qpip's package prompt; the [usage guide](USAGE_GUIDE.md#what-is-qpip) explains the packages and their purposes.
 
 ### Version compatibility
 
-This plugin requires Python 3.9+ in the QGIS environment.
-
-The recommended QGIS version is always the latest LTR.
-
-On Windows, this plugin is compatible with QGIS version 3.34+. It is possible to install the plugin on older versions by first fixing the missing SSL libraries following this https://stackoverflow.com/a/71226425 (requires administrator priviledges). Without it, QPIP (another plugin we use to manage python dependencies) will fail to install anything from PyPI.
-
-On MacOS the plugin usually bundles it's own Python distribution which should be 3.9 or newer.
-
-If you encounter installation issues, please first try upgrading QGIS to the latest LTR.
-
-Please note that we can't test all possible combinations of operating systems and their versions, QGIS versions and various packaging and versions of python.
+The supported baseline is QGIS 3.44 LTR and QGIS 4, using their bundled Python and
+`qgis.PyQt` bindings. No separately installed PyQt wheel or resource compiler is
+needed to build the current dock UI. See [verification notes](VERIFICATION.md) for
+the versions and behaviors actually checked.
 
 ## Usage
 
 When opening the plugin for the first time, you need to configure authentication credentials to access EODH APIs.
 
-1. Click on settings button
-2. Enter your EODH username and API key (can be generated in your account settings on EODH website).
-3. Click back to Workflows or Jobs and your list will load normally.
+1. Choose the environment and enter your workspace name and Workspace API key.
+2. Select Connect, then choose a Public or Commercial collection on Search.
+3. Browse Results or open Workspace to review commercial orders.
+
+The legacy workflow execution navigation is removed from the active plugin.
 
 ## Development
 
@@ -78,3 +77,8 @@ To setup language server support in VSCode if you've installed QGIS from Flatpak
 1. `make check` will run code formatting and linting checks.
 
 2. `make test` will run tests against a running QGIS instance in a docker container.
+
+3. `python -m unittest discover -s tests -v` runs the transport/contract regressions without QGIS.
+
+4. Run `tests/qgis_runtime_check.py` with each QGIS installation's Python launcher
+   to check actual Qt widgets, map overlays, quote invalidation and workspace asset gates.
