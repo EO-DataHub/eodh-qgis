@@ -5,9 +5,11 @@ from pathlib import Path
 from urllib.parse import quote, urljoin
 
 from qgis.core import (
+    Qgis,
     QgsApplication,
     QgsAuthMethodConfig,
     QgsCoordinateTransform,
+    QgsMessageLog,
     QgsProject,
     QgsProviderRegistry,
     QgsRasterLayer,
@@ -849,7 +851,14 @@ class HubDock(QtWidgets.QDockWidget):
                         data = client.request(urljoin(href(item, "self") or client.base, asset["href"]), raw=True)
                         task.thumbnail_ready.emit(index, data)
                     except Exception:
-                        pass
+                        # Thumbnails are optional. Keep loading the remaining results,
+                        # but record failures without exposing signed URLs or credentials.
+                        QgsMessageLog.logMessage(
+                            f"Could not load thumbnail for result {index + 1}. The result remains available.",
+                            "EODH",
+                            Qgis.MessageLevel.Warning,
+                            notifyUser=False,
+                        )
 
         def ready(index, data):
             if generation != self.selection_id or epoch != self.epoch:

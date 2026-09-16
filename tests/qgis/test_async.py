@@ -2,7 +2,8 @@ from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 import pytest
-from qgis.PyQt import QtWidgets
+from qgis.core import Qgis
+from qgis.PyQt import QtCore, QtGui, QtWidgets
 
 from eodh_qgis.api.hub import HubError
 
@@ -219,3 +220,35 @@ def test_session_expiry(dock, task_queue):
     done.assert_not_called()
     failed.assert_called_once()
     complete(outstanding)
+
+
+@pytest.mark.parametrize("error_type", [HubError, RuntimeError])
+def test_thumbnail_failure_is_logged_without_secrets_and_remaining_images_load(
+    dock, task_queue, scene, monkeypatch, qgis_app, error_type
+):
+    log = Mock()
+    monkeypatch.setattr("eodh_qgis.gui.hub_dock.QgsMessageLog.logMessage", log)
+    image = QtGui.QImage(8, 8, QtGui.QImage.Format.Format_RGB32)
+    image.fill(QtGui.QColor("blue"))
+    buffer = QtCore.QBuffer()
+    buffer.open(QtCore.QIODevice.OpenModeFlag.WriteOnly)
+    assert image.save(buffer, "PNG")
+    task_queue.client.request.side_effect = [
+        error_type("https://example.test/thumbnail?token=private-secret"),
+        bytes(buffer.data()),
+    ]
+    dock.display_page({"features": [scene, dict(scene, id="second")]})
+    task_queue.complete()
+    qgis_app.processEvents()
+    assert len(dock.result_cards) == 2
+    assert task_queue.client.request.call_count == 2
+    assert not dock.result_cards[1].thumbnail.pixmap().isNull()
+    assert not dock.timeline.images[1].icon().isNull()
+    assert not dock.tasks
+    log.assert_called_once_with(
+        "Could not load thumbnail for result 1. The result remains available.",
+        "EODH",
+        Qgis.MessageLevel.Warning,
+        notifyUser=False,
+    )
+    assert "private-secret" not in str(log.call_args)
