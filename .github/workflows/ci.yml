@@ -25,7 +25,7 @@ jobs:
         run: make check
 
       - name: Hub transport and commercial contract tests
-        run: uv run python -m unittest discover -s tests -v
+        run: uv run pytest tests/unit
 
   qgis-compatibility:
     name: QGIS ${{ matrix.qgis }} / Qt ${{ matrix.qt }}
@@ -54,7 +54,7 @@ jobs:
       - name: Install native test dependencies
         run: |
           apt-get update
-          apt-get install -y --no-install-recommends python3-gdal python3-numpy python3-coverage
+          apt-get install -y --no-install-recommends python3-gdal python3-numpy python3-coverage python3-pytest
       - name: Verify QGIS and Qt versions
         run: |
           python3 - <<'PY'

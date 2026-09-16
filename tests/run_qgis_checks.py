@@ -26,7 +26,7 @@ def main():
     prefix = ["-m", "coverage", "run", "--parallel-mode"] if args.coverage else []
     if args.coverage:
         run(["-m", "coverage", "erase"])
-    run([*prefix, "-m", "unittest", "discover", "-s", "tests", "-v"])
+    run([*prefix, "-m", "pytest", "tests/unit"])
     for check in CHECKS:
         print(f"Running QGIS {check} checks", flush=True)
         run([*prefix, str(ROOT / "tests" / f"qgis_{check}_check.py")])

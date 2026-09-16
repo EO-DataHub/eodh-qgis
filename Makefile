@@ -27,7 +27,7 @@ typecheck:
 
 .PHONY: test
 test:
-	${uv-run} python -m unittest discover -s tests -v
+	${uv-run} pytest tests/unit
 	QGIS_IMAGE=${qgis-image} docker compose run --rm --build qgis
 
 .git/hooks/pre-commit:

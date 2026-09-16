@@ -2,7 +2,7 @@ ARG QGIS_IMAGE=qgis/qgis:4.2-trixie
 FROM ${QGIS_IMAGE}
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3-gdal python3-numpy python3-coverage && \
+    apt-get install -y --no-install-recommends python3-gdal python3-numpy python3-coverage python3-pytest && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /workspace
