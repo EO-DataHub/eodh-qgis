@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 from collections import deque
 from dataclasses import dataclass
 from urllib.error import HTTPError, URLError
@@ -170,6 +171,24 @@ def record_status(item):
     return property_value(item, "order:status", "order_status", "order:state", "status", default="unknown").lower()
 
 
+def requires_auth(base, workspace, url):
+    """Authorize the API origin and the selected production workspace storage."""
+    target, origin = urlsplit(url), urlsplit(base)
+    if target.scheme != "https" or target.username or target.password or origin.scheme != "https":
+        return False
+    if (target.hostname, target.port or 443) == (origin.hostname, origin.port or 443):
+        return True
+    # Workspace asset links returned by EODH use this documented separate origin.
+    # Match the exact workspace, never every subdomain or another workspace.
+    return bool(
+        origin.hostname == "eodatahub.org.uk"
+        and (origin.port or 443) == 443
+        and re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?", workspace)
+        and target.hostname == f"{workspace}.eodatahub-workspaces.org.uk"
+        and (target.port or 443) == 443
+    )
+
+
 class SafeRedirect(HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         result = super().redirect_request(req, fp, code, msg, headers, newurl)
@@ -190,7 +209,7 @@ class HubClient:
         if parsed.scheme != "https" or parsed.username or parsed.password:
             raise HubError("EODH links must use HTTPS without embedded credentials.")
         headers = {"Accept": "application/json"}
-        if parsed.netloc == urlsplit(self.base).netloc:
+        if requires_auth(self.base, self.workspace, url):
             headers["Authorization"] = "Bearer " + self.token
         if probe_range:
             headers["Range"] = "bytes=0-0"

@@ -12,6 +12,7 @@ from eodh_qgis.api.hub import (
     coordinates,
     provider,
     record_status,
+    requires_auth,
     search_body,
 )
 
@@ -32,6 +33,32 @@ class ContractTests(unittest.TestCase):
                 self.assertEqual(request.get_header("Authorization"), "Bearer secret")
                 response.read.assert_not_called()
                 response.__exit__.assert_called_once()
+
+    def test_workspace_asset_authentication(self):
+        client = HubClient("https://eodatahub.org.uk", "samples-airbus-optical", "secret")
+        workspace = "https://samples-airbus-optical.eodatahub-workspaces.org.uk/files/data.tif"
+        for url, authorized in (
+            (workspace, True),
+            (workspace.replace(".org.uk/", ".org.uk:443/"), True),
+            (workspace.replace("samples-airbus-optical", "another-workspace"), False),
+            (workspace.replace(".org.uk/", ".org.uk.evil.test/"), False),
+            (workspace.replace(".org.uk/", ".org.uk:444/"), False),
+            ("https://dap.ceda.ac.uk/public.tif", False),
+        ):
+            with self.subTest(url=url), patch("eodh_qgis.api.hub.build_opener") as opener:
+                response = MagicMock(status=206)
+                response.headers = {"Content-Range": "bytes 0-0/100"}
+                response.__enter__.return_value = response
+                opener.return_value.open.return_value = response
+                client.request(url, probe_range=True)
+                request = opener.return_value.open.call_args.args[0]
+                self.assertEqual(request.get_header("Authorization"), "Bearer secret" if authorized else None)
+        self.assertFalse(requires_auth(client.base, client.workspace, workspace.replace("https:", "http:")))
+        self.assertFalse(requires_auth("https://staging.eodatahub.org.uk", client.workspace, workspace))
+        self.assertFalse(requires_auth(client.base, "other.samples-airbus-optical", workspace))
+        req = Request(workspace, headers={"Authorization": "Bearer secret"})
+        redirected = SafeRedirect().redirect_request(req, None, 302, "", {}, "https://external.test/file")
+        self.assertIsNone(redirected.get_header("Authorization"))
 
     def test_cloud_default_and_date_validation(self):
         body = search_body("s2", "2026-01-01", "2026-02-01")

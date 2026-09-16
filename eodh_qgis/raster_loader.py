@@ -7,7 +7,7 @@ from urllib.parse import quote, urlsplit
 from osgeo import gdal
 from qgis.core import QgsRasterLayer
 
-from eodh_qgis.api.hub import HubError, asset_type
+from eodh_qgis.api.hub import HubError, asset_type, requires_auth
 
 # GDAL render workers need these options after the loading task has finished.
 # They are scoped to each exact source, never to the whole QGIS process.
@@ -31,7 +31,7 @@ def streaming_source(client, url):
         "GDAL_HTTP_MULTIPLEX": "YES",
         "CPL_VSIL_CURL_AUTHORIZATION_HEADER_ALLOWED_IF_REDIRECT": "SAME_HOST",
     }
-    if parsed.netloc == urlsplit(client.base).netloc:
+    if requires_auth(client.base, client.workspace, url):
         options["GDAL_HTTP_HEADERS"] = "Authorization: Bearer " + client.token
         _authenticated_sources.add(source)
     for key, value in options.items():

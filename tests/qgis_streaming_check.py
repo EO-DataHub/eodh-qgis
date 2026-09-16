@@ -19,7 +19,7 @@ from qgis.core import Qgis, QgsApplication, QgsRectangle
 from qgis.PyQt.QtWidgets import QMainWindow
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from eodh_qgis.api.hub import HubError
+from eodh_qgis.api.hub import HubClient, HubError
 from eodh_qgis.main import EodhQgis
 from eodh_qgis.raster_loader import StreamingUnavailable, clear_stream_credentials, load_asset, streaming_source
 
@@ -104,7 +104,10 @@ with tempfile.TemporaryDirectory() as directory:
     client = LocalClient()
     asset = {"type": "image/tiff", "eo:bands": [{"common_name": c} for c in ("blue", "green", "red")]}
     # Only the local fixture permits plain HTTP. Production rejects it below.
-    with patch("eodh_qgis.raster_loader.urlsplit", lambda url: urlsplit(url)._replace(scheme="https")):
+    with (
+        patch("eodh_qgis.raster_loader.urlsplit", lambda url: urlsplit(url)._replace(scheme="https")),
+        patch("eodh_qgis.api.hub.urlsplit", lambda url: urlsplit(url)._replace(scheme="https")),
+    ):
         layers, streamed = load_asset(client, base + "/fixture.tif", asset, "fixture")
         layer = layers[0]
         assert streamed
@@ -155,6 +158,18 @@ with tempfile.TemporaryDirectory() as directory:
             except HubError as error:
                 fallback = isinstance(error, StreamingUnavailable)
             assert fallback == (status not in (401, 403))
+    workspace_client = HubClient("https://eodatahub.org.uk", "my-workspace", "workspace-secret")
+    workspace_source = streaming_source(
+        workspace_client, "https://my-workspace.eodatahub-workspaces.org.uk/files/a.tif"
+    )
+    assert (
+        gdal.GetPathSpecificOption(workspace_source, "GDAL_HTTP_HEADERS", "")
+        == "Authorization: Bearer workspace-secret"
+    )
+    other_source = streaming_source(workspace_client, "https://other.eodatahub-workspaces.org.uk/files/a.tif")
+    assert not gdal.GetPathSpecificOption(other_source, "GDAL_HTTP_HEADERS", "")
+    clear_stream_credentials()
+    assert not gdal.GetPathSpecificOption(workspace_source, "GDAL_HTTP_HEADERS", "")
     server.shutdown()
     server.server_close()
     thread.join()

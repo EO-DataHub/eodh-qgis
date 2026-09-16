@@ -133,6 +133,25 @@ tests; they are no longer reachable through the plugin's menu or toolbar.
   locally on QGIS 3.44.14 and 4.2.2. Docker is unavailable on this VM, so the Linux
   container jobs have not been executed here or on GitHub yet.
 
+## Workspace asset authentication (2026-09-16, version 0.2.9)
+
+- Reproduced the reported Airbus SPOT `INT_SAMPLE12` `cog_rgb` 401 response.
+  Its EODH-returned asset URL uses the workspace storage domain, while the old
+  transport authenticated only the main API host.
+- HTTP probes/downloads and GDAL streaming now share an exact-origin policy for
+  the API and the selected production workspace's storage host. Other workspace
+  hosts, lookalike domains and nonstandard ports receive no key. Cross-host
+  redirects still strip authorization; no key is persisted in raster URLs.
+- The live Airbus asset now supports authenticated range reads, opens as a valid
+  streamed five-band raster and reads a 128-pixel overview on both QGIS 4.2.2 and
+  3.44.14 (5,242,880 bytes transferred for each overview check).
+- Windows computer use verified loading the same selected `cog_rgb` through the
+  QGIS 4 Workspace card and the rendered RGB imagery, without the access error.
+- Fourteen transport/presentation tests and both native streaming checks pass,
+  including workspace header scoping and clearing. Ruff checks pass.
+- Installed and byte-verified all 65 package files in both normal default profiles;
+  existing user sessions were left open and require a restart to use 0.2.9.
+
 ## Boundaries
 
 No commercial quote or purchase was submitted to the live service. Commercial
