@@ -4,7 +4,7 @@ Search, filter, preview, and load datasets from the [UK EO Data Hub](https://eod
 
 ## Requirements
 
-- QGIS 3.44 LTR or QGIS 4 on a supported desktop system
+- QGIS 3.0.0 or newer; QGIS 3.44 LTR and QGIS 4 are the actively tested versions
 - An EODH workspace and a current Workspace API key
 - An internet connection for catalogue search and remote imagery
 

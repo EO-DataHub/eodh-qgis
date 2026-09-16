@@ -36,7 +36,7 @@ This plugin requires Python 3.9+ in the QGIS environment.
 
 The recommended QGIS version is always the latest LTR or QGIS 4.
 
-On Windows, this plugin is compatible with QGIS version 3.44+.
+Installation is allowed on QGIS 3.0.0 and newer. We actively test QGIS 3.44 LTR and QGIS 4; older versions are not actively supported.
 
 On MacOS the plugin usually bundles it's own Python distribution which should be 3.9 or newer.
 

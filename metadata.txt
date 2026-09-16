@@ -4,7 +4,7 @@
 
 [general]
 name=EODH
-qgisMinimumVersion=3.44
+qgisMinimumVersion=3.0.0
 qgisMaximumVersion=4.99
 description=Search, filter, preview, and load datasets from the UK EO Data Hub
 version=0.3.0
