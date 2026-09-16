@@ -356,6 +356,7 @@ class HubDock(QtWidgets.QDockWidget):
         layout.addWidget(text_label("Collection", 12, True))
         self.collection = QtWidgets.QComboBox()
         self.collection.setEditable(True)
+        self.collection.setMaxVisibleItems(20)
         self.collection.setInsertPolicy(QtWidgets.QComboBox.InsertPolicy.NoInsert)
         self.collection.currentIndexChanged.connect(self.collection_changed)
         layout.addWidget(self.collection)

@@ -36,6 +36,25 @@ window.addDockWidget(QtCore.Qt.DockWidgetArea.RightDockWidgetArea, dock)
 dock.stack.setCurrentWidget(dock.tabs)
 window.show()
 app.processEvents()
+
+
+# Controls must never appear as native top-level windows during asynchronous
+# result/workspace population (even briefly before a layout adopts them).
+class UnexpectedWindows(QtCore.QObject):
+    def __init__(self):
+        super().__init__()
+        self.shown = []
+
+    def eventFilter(self, obj, event):
+        if event.type() == QtCore.QEvent.Type.Show and isinstance(obj, QtWidgets.QWidget) and obj.isWindow():
+            self.shown.append(type(obj).__name__)
+        return False
+
+
+window_watch = UnexpectedWindows()
+app.installEventFilter(window_watch)
+assert dock.collection.maxVisibleItems() == 20
+
 entry = {
     "collection": {
         "id": "sentinel2_ard",
@@ -188,6 +207,9 @@ with tempfile.TemporaryDirectory() as directory:
     assert result[0] == QgsVectorFileWriter.WriterError.NoError
     dock.import_aoi_path(path)
     assert all(abs(a - b) < 0.00001 for a, b in zip(dock.bbox, [0, 0, 3, 3]))
+
+assert not window_watch.shown, window_watch.shown
+app.removeEventFilter(window_watch)
 
 dock.submit = original_submit
 dock.shutdown()
