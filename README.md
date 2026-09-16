@@ -1,10 +1,12 @@
-# eodh-qgis Plugin
+# EODH Plugin for QGIS
 
 [![codecov](https://codecov.io/github/EO-DataHub/eodh-qgis/graph/badge.svg?token=N2VQBHVZN8)](https://codecov.io/github/EO-DataHub/eodh-qgis)
 
-A QGIS plugin for Earth Observation Data Hub (EODH) catalogue search, imagery loading,
-commercial quotes and orders, and workspace commercial records. Its dockable Search,
-Results and Workspace interface follows the EODH ArcGIS Pro add-in.
+Search, filter, preview, and load datasets from the UK EO Data Hub.
+
+EODH for QGIS supports catalogue search, imagery loading, commercial quotes and
+orders, and workspace commercial records. Its dockable Search, Results and Workspace
+interface follows the EODH ArcGIS Pro add-in.
 
 See the [usage guide](USAGE_GUIDE.md) for installation, qpip dependencies, signing in,
 search filters, thumbnail timeline, Quick view, asset loading and commercial ordering.
@@ -14,7 +16,7 @@ search filters, thumbnail timeline, Quick view, asset loading and commercial ord
 ### From QGIS repository
 
 1. Go to menu Plugins -> All
-2. Search for `Access and run workflows on the EODH`
+2. Search for `EODH`
 3. Click Install Plugin
 4. Review the [qpip dependency explanation](USAGE_GUIDE.md#what-is-qpip) before agreeing to install the listed packages.
 

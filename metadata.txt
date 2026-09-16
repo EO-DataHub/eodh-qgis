@@ -3,15 +3,15 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=Access and run workflows on the EODH
+name=EODH
 qgisMinimumVersion=3.44
 qgisMaximumVersion=4.99
-description=Access and run workflows on the EODH
+description=Search, filter, preview, and load datasets from the UK EO Data Hub
 version=0.3.0
 author=Oxidian
 email=daniel@oxidian.com
 
-about=Access and run workflows on the EODH. The EODH is a climate and Earth Observation Hub and processing platform.
+about=Search, filter, preview, and load datasets from the UK EO Data Hub
 
 tracker=https://github.com/EO-DataHub/eodh-qgis/issues
 repository=https://github.com/EO-DataHub/eodh-qgis

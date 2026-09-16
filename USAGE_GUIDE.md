@@ -1,6 +1,6 @@
 # EODH Plugin for QGIS — Usage Guide
 
-The EODH plugin brings the [Earth Observation Data Hub](https://eodatahub.org.uk) into QGIS. It supports curated dataset search, temporary result footprints, loading supported assets, commercial quotes and orders, and commercial order records for one authenticated workspace.
+Search, filter, preview, and load datasets from the [UK EO Data Hub](https://eodatahub.org.uk). The EODH plugin brings this functionality into QGIS. It supports curated dataset search, temporary result footprints, loading supported assets, commercial quotes and orders, and commercial order records for one authenticated workspace.
 
 ## Requirements
 
@@ -14,7 +14,7 @@ Workspace API keys expire after at most 30 days. The plugin does not renew them 
 
 1. Download the plugin ZIP from [GitHub Releases](https://github.com/EO-DataHub/eodh-qgis/releases).
 2. In QGIS, open **Plugins → Manage and Install Plugins… → Install from ZIP**.
-3. Select the ZIP and choose **Install Plugin**. The plugin is listed as **Access and run workflows on the EODH**.
+3. Select the ZIP and choose **Install Plugin**. The plugin is listed as **EODH**.
 4. Review and install the dependencies requested by qpip, as explained below. Restart QGIS if prompted.
 
 You can also install the published plugin from the **All** tab in the plugin manager. Open the plugin using its toolbar button or **Web → EODH → Earth Observation Data Hub**.

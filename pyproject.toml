@@ -1,7 +1,7 @@
 [project]
 name = "eodh-qgis"
 version = "0.0.2"
-description = "QGIS plugin for EODH"
+description = "Search, filter, preview, and load datasets from the UK EO Data Hub"
 authors = [{ name = "Dusan Figala", email = "dusan@oxidian.com" }]
 license = { text = "BSD-3-Clause" }
 readme = "README.md"
