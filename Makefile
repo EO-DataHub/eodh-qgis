@@ -1,4 +1,5 @@
 uv-run ?= uv run --no-sync
+qgis-image ?= qgis/qgis:4.2-trixie
 
 .PHONY: install
 install:
@@ -27,10 +28,7 @@ typecheck:
 .PHONY: test
 test:
 	${uv-run} python -m unittest discover -s tests -v
-	.docker/stop.sh
-	.docker/start.sh
-	sleep 5
-	.docker/exec.sh
+	QGIS_IMAGE=${qgis-image} docker compose run --rm --build qgis
 
 .git/hooks/pre-commit:
 	${uv-run} pre-commit install

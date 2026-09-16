@@ -5,6 +5,9 @@ import os
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import sys
 from pathlib import Path
+from unittest.mock import patch
+
+from qgis_test_support import finish
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from qgis.core import Qgis, QgsApplication, QgsProject
@@ -27,7 +30,8 @@ class Interface:
         return canvas
 
 
-dock = HubDock(Interface())
+with patch.object(HubDock, "load_credentials", lambda self: None):
+    dock = HubDock(Interface())
 window.show()
 dock.show()
 app.processEvents()
@@ -105,5 +109,4 @@ print(
     "tabs, catalogue roots, geometry overlays, timeline, quote invalidation, workspace loading gates",
 )
 # Native QGIS owns globals until interpreter exit; avoid teardown ordering issues.
-sys.stdout.flush()
-os._exit(0)
+finish()

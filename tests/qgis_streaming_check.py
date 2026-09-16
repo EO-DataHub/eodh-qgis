@@ -17,6 +17,7 @@ import numpy as np
 from osgeo import gdal, osr
 from qgis.core import Qgis, QgsApplication, QgsRectangle
 from qgis.PyQt.QtWidgets import QMainWindow
+from qgis_test_support import finish
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from eodh_qgis.api.hub import HubClient, HubError
@@ -184,5 +185,4 @@ print(
     length,
     "bytes; scoped auth, redirects, fallback",
 )
-sys.stdout.flush()
-os._exit(0)
+finish()

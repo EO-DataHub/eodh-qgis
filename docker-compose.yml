@@ -2,13 +2,7 @@ services:
   qgis:
     build:
       context: .
-      dockerfile: Dockerfile
+      args:
+        QGIS_IMAGE: ${QGIS_IMAGE:-qgis/qgis:4.2-trixie}
     volumes:
-      - ./dist/eodh_qgis:/tests_directory
-    environment:
-      CI: "true"
-      DISPLAY: ":99"
-    working_dir: /tests_directory
-    entrypoint: /entrypoint.sh
-    command: tail -f /dev/null
-    tty: true
+      - .:/workspace

@@ -7,6 +7,8 @@ import sys
 from pathlib import Path
 from unittest.mock import Mock, patch
 
+from qgis_test_support import finish
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from qgis.core import Qgis, QgsApplication
 from qgis.gui import QgsMapCanvas
@@ -139,5 +141,4 @@ print(
     QtCore.QT_VERSION_STR,
     "login validation, Production, save, restore, expiry, sign-out",
 )
-sys.stdout.flush()
-os._exit(0)
+finish()

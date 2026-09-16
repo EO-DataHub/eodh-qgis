@@ -9,6 +9,8 @@ from copy import deepcopy
 from pathlib import Path
 from unittest.mock import Mock, patch
 
+from qgis_test_support import finish
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from qgis.core import Qgis, QgsApplication, QgsFeature, QgsGeometry, QgsProject, QgsVectorFileWriter, QgsVectorLayer
 from qgis.gui import QgsMapCanvas
@@ -248,5 +250,4 @@ print(
     Qgis.QGIS_VERSION,
     "screen defaults, AOI gates/import, inline cards, timeline dates, paging failure/cache, independent quotes, purchase cancellation, workspace state",
 )
-sys.stdout.flush()
-os._exit(0)
+finish()

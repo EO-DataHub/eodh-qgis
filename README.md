@@ -79,12 +79,10 @@ To setup language server support in VSCode if you've installed QGIS from Flatpak
 
 1. `make check` will run code formatting and linting checks.
 
-2. `make test` runs the Python transport/contract unit tests, then tests against a running QGIS instance in a docker container.
+2. `make test` runs the Python unit tests, then tests the current plugin in a QGIS 4 Docker container. The native checks cover the plugin lifecycle, login, catalogue and workspace screens, map interaction, streaming/fallback, and NetCDF loading, and produce `coverage.xml`.
+3. Use `make test qgis-image=qgis/qgis:3.44-trixie` to run the same checks on QGIS 3 LTR. CI runs both versions.
 
-3. Run `tests/qgis_runtime_check.py` with each QGIS installation's Python launcher
-   to check actual Qt widgets, map overlays, quote invalidation and workspace asset gates.
+To run native checks without Docker, use your QGIS Python interpreter with `tests/run_qgis_checks.py` (add `--coverage` if the interpreter has the `coverage` package installed).
 
-4. Run `tests/qgis_login_check.py` and `tests/qgis_screen_check.py` with the same
-   launchers for login state, collection defaults, projected AOI import, inline
-   cards, timeline dates, page caching/errors, purchase cancellation and workspace
-   selection persistence. These checks use local fixtures and do not place orders.
+
+These checks exercise real Qt widgets with local fixtures and mocked service responses. They do not require EODH credentials or place commercial orders.

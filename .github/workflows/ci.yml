@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   code-quality:
     runs-on: ubuntu-latest
@@ -23,38 +26,6 @@ jobs:
 
       - name: Hub transport and commercial contract tests
         run: uv run python -m unittest discover -s tests -v
-
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
-          
-      - name: Setup environment
-        run: |
-          pip install pyqt5
-
-      - name: Start container
-        run: |
-          .docker/start.sh
-          sleep 10
-
-      - name: Run Tests
-        run: |
-          .docker/exec.sh
-
-      - name: Retrieve coverage report
-        run: |
-          docker compose cp qgis:/tests_directory/coverage.xml ./
-
-      - name: Codecov Upload
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
 
   qgis-compatibility:
     name: QGIS ${{ matrix.qgis }} / Qt ${{ matrix.qt }}
@@ -83,7 +54,7 @@ jobs:
       - name: Install native test dependencies
         run: |
           apt-get update
-          apt-get install -y --no-install-recommends python3-gdal python3-numpy python3-defusedxml
+          apt-get install -y --no-install-recommends python3-gdal python3-numpy python3-coverage
       - name: Verify QGIS and Qt versions
         run: |
           python3 - <<'PY'
@@ -94,11 +65,11 @@ jobs:
           assert Qgis.QGIS_VERSION.startswith(os.environ["EXPECTED_QGIS"] + ".")
           assert QT_VERSION_STR.startswith(os.environ["EXPECTED_QT"] + ".")
           PY
-      - name: Run transport contracts
-        run: python3 -m unittest discover -s tests -v
-      - name: Run native plugin checks
-        run: |
-          set -eu
-          for check in runtime login screen streaming; do
-            python3 "tests/qgis_${check}_check.py"
-          done
+      - name: Test current plugin and collect coverage
+        run: python3 tests/run_qgis_checks.py --coverage
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          flags: qgis-${{ matrix.qgis }}
