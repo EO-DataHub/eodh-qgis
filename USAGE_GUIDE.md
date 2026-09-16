@@ -12,12 +12,23 @@ Workspace API keys expire after at most 30 days. The plugin does not renew them 
 
 ## Installation
 
-1. Download the plugin ZIP from [GitHub Releases](https://github.com/EO-DataHub/eodh-qgis/releases).
-2. In QGIS, open **Plugins → Manage and Install Plugins… → Install from ZIP**.
-3. Select the ZIP and choose **Install Plugin**. The plugin is listed as **EODH**.
+### QGIS plugin manager (recommended)
+
+1. In QGIS, open **Plugins → Manage and Install Plugins…**.
+2. Select the **All** tab and search for **EODH**.
+3. Select **EODH** and choose **Install Plugin**.
 4. Review and install the dependencies requested by qpip, as explained below. Restart QGIS if prompted.
 
-You can also install the published plugin from the **All** tab in the plugin manager. Open the plugin using its toolbar button or **Web → EODH → Earth Observation Data Hub**.
+### Manual installation from GitHub
+
+As an alternative, install a plugin ZIP from GitHub Releases:
+
+1. Download the plugin ZIP from [GitHub Releases](https://github.com/EO-DataHub/eodh-qgis/releases).
+2. In QGIS, open **Plugins → Manage and Install Plugins… → Install from ZIP**.
+3. Select the ZIP and choose **Install Plugin**.
+4. Review and install the dependencies requested by qpip, as explained below. Restart QGIS if prompted.
+
+Open the plugin using its toolbar button or **Web → EODH → Earth Observation Data Hub**.
 
 ![EODH entry in the QGIS Web menu](Images/menu.png)
 

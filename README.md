@@ -46,13 +46,7 @@ Please note that we can't test all possible combinations of operating systems an
 
 ## Usage
 
-When opening the plugin for the first time, you need to configure authentication credentials to access EODH APIs.
-
-1. Enter your workspace name and Workspace API key. The plugin connects to Production and remembers credentials securely.
-2. Select Connect, then choose a Public or Commercial collection on Search.
-3. Browse Results or open Workspace to review commercial orders.
-
-The legacy workflow execution navigation is removed from the active plugin.
+See the [usage guide](USAGE_GUIDE.md) for installation, signing in, searching for data, loading imagery, and commercial orders.
 
 ## Development
 
