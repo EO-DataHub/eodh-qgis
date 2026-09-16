@@ -54,7 +54,7 @@ jobs:
       - name: Install native test dependencies
         run: |
           apt-get update
-          apt-get install -y --no-install-recommends python3-gdal python3-numpy python3-coverage python3-pytest
+          apt-get install -y --no-install-recommends python3-gdal python3-numpy python3-pytest python3-pytest-cov
       - name: Verify QGIS and Qt versions
         run: |
           python3 - <<'PY'
@@ -66,7 +66,13 @@ jobs:
           assert QT_VERSION_STR.startswith(os.environ["EXPECTED_QT"] + ".")
           PY
       - name: Test current plugin and collect coverage
-        run: python3 tests/run_qgis_checks.py --coverage
+        run: python3 -m pytest tests --cov=eodh_qgis --cov-report=term-missing --cov-report=xml --junitxml=test-results.xml
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-qgis-${{ matrix.qgis }}
+          path: test-results.xml
       - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:

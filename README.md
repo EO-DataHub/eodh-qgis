@@ -77,12 +77,20 @@ To setup language server support in VSCode if you've installed QGIS from Flatpak
 
 ### Testing
 
-1. `make check` will run code formatting and linting checks.
+Run `make install` to install the development dependencies, then `make check` for linting, formatting, and type checks.
 
-2. `make test` runs the Python unit tests, then tests the current plugin in a QGIS 4 Docker container. The native checks cover the plugin lifecycle, login, catalogue and workspace screens, map interaction, streaming/fallback, and NetCDF loading, and produce `coverage.xml`.
-3. Use `make test qgis-image=qgis/qgis:3.44-trixie` to run the same checks on QGIS 3 LTR. CI runs both versions.
+All tests use pytest, with plain assertions, parameterized cases, and shared fixtures:
 
-To run native checks without Docker, use your QGIS Python interpreter with `tests/run_qgis_checks.py` (add `--coverage` if the interpreter has the `coverage` package installed).
+- `uv run pytest` runs the fast unit tests in `tests/unit` without QGIS.
+- `make test` runs those unit tests, then the complete suite in a QGIS 4 Docker container.
+- `make test qgis-image=qgis/qgis:3.44-trixie` runs the same suite on QGIS 3 LTR. CI tests both versions and uploads coverage to Codecov and JUnit test results as artifacts.
 
+To run the complete suite without Docker, use the Python interpreter supplied with QGIS, with `pytest` and `pytest-cov` installed:
 
-These checks exercise real Qt widgets with local fixtures and mocked service responses. They do not require EODH credentials or place commercial orders.
+```sh
+python -m pytest tests --cov=eodh_qgis --cov-report=term-missing --cov-report=xml --junitxml=test-results.xml
+```
+
+Use `-k streaming` to select matching tests, or a node ID such as `tests/qgis/test_login.py::test_sign_out_clears_credentials` to run one test (list available IDs with `--collect-only -q`). Reports are written to `coverage.xml` and `test-results.xml`.
+
+The integration tests in `tests/qgis` exercise the current plugin's real Qt widgets, plugin lifecycle, login, catalogue and workspace screens, map interaction, streaming and automatic fallback, and NetCDF loading. Fixtures create an isolated QGIS profile, clean up widgets and map layers after each test, and shut down QGIS normally. Service responses are mocked; COG range reads use a local HTTP server. Tests do not require EODH credentials or place commercial orders.

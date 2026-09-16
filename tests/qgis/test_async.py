@@ -1,52 +1,37 @@
-"""Exercise real task callbacks and UI recovery with a deterministic task queue."""
-
-import os
-
-os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
-import sys
-from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from qgis.core import QgsApplication
-from qgis.gui import QgsMapCanvas
-from qgis.PyQt import QtCore, QtWidgets
-from qgis_test_support import finish
+import pytest
+from qgis.PyQt import QtWidgets
 
 from eodh_qgis.api.hub import HubError
-from eodh_qgis.gui.hub_dock import HubDock
-
-app = QgsApplication([], False)
-app.initQgis()
-window = QtWidgets.QMainWindow()
-canvas = QgsMapCanvas(window)
-iface = Mock()
-iface.mainWindow.return_value = window
-iface.mapCanvas.return_value = canvas
-with patch.object(HubDock, "load_credentials", lambda self: None):
-    dock = HubDock(iface)
-window.addDockWidget(QtCore.Qt.DockWidgetArea.RightDockWidgetArea, dock)
-dock.stack.setCurrentWidget(dock.tabs)
-window.show()
-app.processEvents()
-client = Mock()
-dock.client = client
-queued = []
-manager = Mock()
-manager.addTask.side_effect = queued.append
 
 
-def complete(task=None):
-    task = queued.pop(0) if task is None else task
-    success = task.run()
-    task.finished(success)
-    assert task.work is None
-    assert task.finish_callback is None
-    return task
+@pytest.fixture
+def task_queue(dock, monkeypatch):
+    queued = []
+    client = Mock()
+    dock.client = client
+    manager = Mock()
+    manager.addTask.side_effect = queued.append
+    monkeypatch.setattr("eodh_qgis.gui.hub_dock.QgsApplication.taskManager", lambda: manager)
+
+    def complete(task=None):
+        task = queued.pop(0) if task is None else task
+        success = task.run()
+        task.finished(success)
+        assert task.work is None
+        assert task.finish_callback is None
+        return task
+
+    yield SimpleNamespace(queued=queued, client=client, complete=complete)
+    for task in list(queued):
+        task.cancel()
+        complete()
 
 
-# Keep the real HubTask and submit/finish logic; only control when tasks run.
-with patch("eodh_qgis.gui.hub_dock.QgsApplication.taskManager", return_value=manager):
+def test_download_progress(dock, task_queue):
+    queued, _client, complete = task_queue.queued, task_queue.client, task_queue.complete
     done, failed = Mock(), Mock()
     dock.submit("Download", lambda task: "loaded", done, failed, with_task=True)
     task = queued[0]
@@ -65,6 +50,9 @@ with patch("eodh_qgis.gui.hub_dock.QgsApplication.taskManager", return_value=man
     assert dock.status.text() == "Ready"
     assert dock.progress.isHidden()
 
+
+def test_cancelled_work(dock, task_queue):
+    queued, _client, complete = task_queue.queued, task_queue.client, task_queue.complete
     # Cancellation never invokes the work, and returns a recoverable error.
     work, done, failed = Mock(), Mock(), Mock()
     dock.submit("Cancel me", work, done, failed)
@@ -75,6 +63,9 @@ with patch("eodh_qgis.gui.hub_dock.QgsApplication.taskManager", return_value=man
     assert str(failed.call_args.args[0]) == "Operation cancelled."
     assert dock.progress.isHidden()
 
+
+def test_stale_session_callbacks(dock, task_queue):
+    queued, _client, complete = task_queue.queued, task_queue.client, task_queue.complete
     # Responses and progress from a previous session cannot mutate the current UI.
     done = Mock()
     dock.submit("Old request", lambda task: "old", done, with_task=True)
@@ -87,6 +78,9 @@ with patch("eodh_qgis.gui.hub_dock.QgsApplication.taskManager", return_value=man
     assert dock.status_detail.text() == "Current session"
     assert not dock.tasks
 
+
+def test_workspace_retry_and_filters(dock, task_queue):
+    _queued, client, complete = task_queue.queued, task_queue.client, task_queue.complete
     # Refresh errors expose Retry; successful refresh populates both filters.
     dock.tabs.setCurrentIndex(2)
     client.records.side_effect = HubError("Service temporarily unavailable", 503)
@@ -120,6 +114,10 @@ with patch("eodh_qgis.gui.hub_dock.QgsApplication.taskManager", return_value=man
     dock.provider_filter.setCurrentText("All")
     assert [card.item["id"] for card in dock.record_cards] == ["delivered"]
 
+
+def test_workspace_ignores_stale_refresh_error(dock, task_queue):
+    queued, client, complete = task_queue.queued, task_queue.client, task_queue.complete
+    client.records.return_value = [{"id": "one", "_provider": "Airbus"}, {"id": "two", "_provider": "Planet"}]
     # Only the latest refresh may populate records, including after an older error.
     dock.refresh_records()
     old = queued.pop()
@@ -131,6 +129,10 @@ with patch("eodh_qgis.gui.hub_dock.QgsApplication.taskManager", return_value=man
     assert len(dock.records) == 2
     client.records.side_effect = None
 
+
+@pytest.fixture
+def commercial_panel(dock, task_queue):
+    queued, _client, complete = task_queue.queued, task_queue.client, task_queue.complete
     # Commercial controls use asynchronous responses and enforce a fresh quote.
     item_url = "https://eodatahub.org.uk/catalogs/commercial/catalogs/airbus/items/scene"
     item = {"id": "scene", "collection": "airbus-optical", "links": [{"rel": "self", "href": item_url}]}
@@ -138,6 +140,13 @@ with patch("eodh_qgis.gui.hub_dock.QgsApplication.taskManager", return_value=man
     while queued:
         complete()
     panel = dock.result_cards[0].commercial
+    return panel
+
+
+def test_successful_quote_and_order(commercial_panel, task_queue):
+    panel = commercial_panel
+    client, complete = task_queue.client, task_queue.complete
+    item_url = "https://eodatahub.org.uk/catalogs/commercial/catalogs/airbus/items/scene"
     client.request.return_value = {"value": 12.5, "units": "GBP"}
     panel.quote_button.click()
     assert panel.busy
@@ -157,16 +166,30 @@ with patch("eodh_qgis.gui.hub_dock.QgsApplication.taskManager", return_value=man
     assert panel.purchase_status.text() == "Ordered — check workspace for delivery status"
     assert not panel.order_button.isEnabled()
 
+
+def test_invalid_quote_disables_order(commercial_panel, task_queue):
+    panel = commercial_panel
+    client, complete = task_queue.client, task_queue.complete
     client.request.return_value = {"value": "invalid", "units": "GBP"}
     panel.quote_button.click()
     complete()
     assert panel.purchase_error.text() == "EODH returned an invalid quote. Retry."
     assert not panel.order_button.isEnabled()
+
+
+def test_quote_failure_allows_retry(commercial_panel, task_queue):
+    panel = commercial_panel
+    client, complete = task_queue.client, task_queue.complete
     client.request.side_effect = HubError("Provider unavailable", 503)
     panel.quote_button.click()
     complete()
     assert panel.purchase_error.text() == "Provider unavailable"
     assert panel.quote_button.isEnabled()
+
+
+def test_order_failure_requires_fresh_quote(commercial_panel, task_queue):
+    panel = commercial_panel
+    client, complete = task_queue.client, task_queue.complete
     client.request.side_effect = None
     client.request.return_value = {"value": 12.5, "units": "GBP"}
     panel.quote_button.click()
@@ -179,6 +202,9 @@ with patch("eodh_qgis.gui.hub_dock.QgsApplication.taskManager", return_value=man
     assert not panel.order_button.isEnabled()
     assert panel.quote_button.isEnabled()
 
+
+def test_session_expiry(dock, task_queue):
+    queued, _client, complete = task_queue.queued, task_queue.client, task_queue.complete
     # Authentication expiry returns to login and cancels other outstanding work.
     done, failed = Mock(), Mock()
     dock.submit("Outstanding", lambda: None, Mock())
@@ -193,9 +219,3 @@ with patch("eodh_qgis.gui.hub_dock.QgsApplication.taskManager", return_value=man
     done.assert_not_called()
     failed.assert_called_once()
     complete(outstanding)
-
-dock.shutdown()
-print(
-    "PASS task progress/cancellation/session isolation, workspace refresh/filter/retry, quote/order responses and authentication expiry"
-)
-finish()

@@ -58,8 +58,6 @@ select = [
     "PT",   # pytest
 ]
 ignore = [
-    "PT009",  # native unittest tests are migrated in the next commit
-    "PT027",
     "E501",    # line too long
     "SIM108",  # ternary operator
     "SIM103",  # return bool directly

@@ -1,45 +1,28 @@
-"""Real GDAL/QGIS range reads against a local COG, with no external service."""
+"""Integration tests for actual GDAL HTTP range reads against a local COG."""
 
-import os
-
-os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import re
-import sys
-import tempfile
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
 import numpy as np
+import pytest
 from osgeo import gdal, osr
-from qgis.core import Qgis, QgsApplication, QgsRectangle
-from qgis.PyQt.QtWidgets import QMainWindow
-from qgis_test_support import finish
+from qgis.core import QgsRectangle
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from eodh_qgis.api.hub import HubClient, HubError
 from eodh_qgis.main import EodhQgis
 from eodh_qgis.raster_loader import StreamingUnavailable, clear_stream_credentials, load_asset, streaming_source
 
-app = QgsApplication([], False)
-app.initQgis()
-# Exercise actual plugin startup: legacy process-wide extension filters broke
-# encoded vsicurl URLs even when the loader passed standalone tests.
-window = QMainWindow()
-iface = Mock()
-iface.mainWindow.return_value = window
-plugin = EodhQgis(iface)
-original_filter = gdal.GetConfigOption("CPL_VSIL_CURL_ALLOWED_EXTENSIONS")
-plugin.initGui()
-assert gdal.GetConfigOption("CPL_VSIL_CURL_ALLOWED_EXTENSIONS") == original_filter
-gdal.UseExceptions()
-requests = []
 
-with tempfile.TemporaryDirectory() as directory:
-    path = str(Path(directory) / "fixture.tif")
+@pytest.fixture
+def local_cog(tmp_path):
+    requests = []
+    path = str(tmp_path / "fixture.tif")
     data = gdal.GetDriverByName("MEM").Create("", 4096, 4096, 3, gdal.GDT_Byte)
     srs = osr.SpatialReference()
     srs.ImportFromEPSG(3857)
@@ -48,8 +31,8 @@ with tempfile.TemporaryDirectory() as directory:
     rng = np.random.default_rng(7)
     for i in range(1, 4):
         data.GetRasterBand(i).WriteArray(rng.integers(0, 256, (4096, 4096), dtype=np.uint8))
-    cog = gdal.Translate(path, data, format="COG", creationOptions=["COMPRESS=DEFLATE", "BLOCKSIZE=256"])
-    cog = data = None
+    gdal.Translate(path, data, format="COG", creationOptions=["COMPRESS=DEFLATE", "BLOCKSIZE=256"])
+    data = None
     length = Path(path).stat().st_size
 
     class Handler(BaseHTTPRequestHandler):
@@ -104,6 +87,34 @@ with tempfile.TemporaryDirectory() as directory:
 
     client = LocalClient()
     asset = {"type": "image/tiff", "eo:bands": [{"common_name": c} for c in ("blue", "green", "red")]}
+    try:
+        yield SimpleNamespace(client=client, base=base, requests=requests, length=length, asset=asset)
+    finally:
+        clear_stream_credentials()
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+        assert not thread.is_alive()
+
+
+def test_startup_preserves_gdal_extension_configuration(iface):
+    plugin = EodhQgis(iface)
+    original = gdal.GetConfigOption("CPL_VSIL_CURL_ALLOWED_EXTENSIONS")
+    plugin.initGui()
+    try:
+        assert gdal.GetConfigOption("CPL_VSIL_CURL_ALLOWED_EXTENSIONS") == original
+    finally:
+        plugin.unload()
+
+
+def test_cog_overviews_detail_authentication_and_redirects(local_cog):
+    client, base, requests, length, asset = (
+        local_cog.client,
+        local_cog.base,
+        local_cog.requests,
+        local_cog.length,
+        local_cog.asset,
+    )
     # Only the local fixture permits plain HTTP. Production rejects it below.
     with (
         patch("eodh_qgis.raster_loader.urlsplit", lambda url: urlsplit(url)._replace(scheme="https")),
@@ -139,26 +150,32 @@ with tempfile.TemporaryDirectory() as directory:
         remote = None
         clear_stream_credentials()
         assert gdal.GetPathSpecificOption(layer.source(), "GDAL_HTTP_HEADERS", "missing") == ""
-    try:
-        streaming_source(client, base + "/fixture.tif")
-        raise AssertionError("HTTP must not be accepted outside the local test")
-    except HubError:
-        pass
-    with patch.object(client, "request", return_value=False) as request:
-        try:
-            load_asset(client, "https://example.test/no-range.tif", asset, "no ranges")
-            raise AssertionError("Must signal that the loading task should use its download fallback")
-        except StreamingUnavailable:
-            pass
-        assert request.call_count == 1
-    for status in (416, 503, 401, 403):
-        with patch.object(client, "request", side_effect=HubError("Probe failed", status)):
-            try:
-                load_asset(client, "https://example.test/probe.tif", asset, "probe failure")
-                raise AssertionError("Probe failure must be reported")
-            except HubError as error:
-                fallback = isinstance(error, StreamingUnavailable)
-            assert fallback == (status not in (401, 403))
+
+
+def test_streaming_rejects_insecure_urls():
+    client = HubClient("https://eodatahub.org.uk", "test", "secret")
+    with pytest.raises(HubError, match="HTTPS"):
+        streaming_source(client, "http://example.test/data.tif")
+
+
+def test_no_range_support_requests_download_fallback():
+    client = Mock()
+    client.request.return_value = False
+    with pytest.raises(StreamingUnavailable):
+        load_asset(client, "https://example.test/no-range.tif", {"type": "image/tiff"}, "no ranges")
+    client.request.assert_called_once()
+
+
+@pytest.mark.parametrize(("status", "fallback"), [(416, True), (503, True), (401, False), (403, False)])
+def test_probe_failure_preserves_authentication_errors(status, fallback):
+    client = Mock()
+    client.request.side_effect = HubError("Probe failed", status)
+    with pytest.raises(HubError) as raised:
+        load_asset(client, "https://example.test/probe.tif", {"type": "image/tiff"}, "probe failure")
+    assert isinstance(raised.value, StreamingUnavailable) == fallback
+
+
+def test_workspace_stream_credentials_are_scoped_and_cleared():
     workspace_client = HubClient("https://eodatahub.org.uk", "my-workspace", "workspace-secret")
     workspace_source = streaming_source(
         workspace_client, "https://my-workspace.eodatahub-workspaces.org.uk/files/a.tif"
@@ -171,18 +188,3 @@ with tempfile.TemporaryDirectory() as directory:
     assert not gdal.GetPathSpecificOption(other_source, "GDAL_HTTP_HEADERS", "")
     clear_stream_credentials()
     assert not gdal.GetPathSpecificOption(workspace_source, "GDAL_HTTP_HEADERS", "")
-    server.shutdown()
-    server.server_close()
-    thread.join()
-    layer = layers = block = None
-
-print(
-    "PASS",
-    Qgis.QGIS_VERSION,
-    "COG overview/detail range reads",
-    fetched,
-    "of",
-    length,
-    "bytes; scoped auth, redirects, fallback",
-)
-finish()
