@@ -88,6 +88,31 @@ tests; they are no longer reachable through the plugin's menu or toolbar.
 - Built `dist/eodh_qgis.zip` and checked that its contents do not contain the
   supplied API key. Development profiles, installers and credentials are excluded.
 
+## Loading and streaming follow-up (2026-09-16, version 0.2.7)
+
+- Reviewed the supplied recording and traced transient native windows to result
+  and workspace buttons shown before they had a parent. Both card types now
+  assign parents first; the screen regression watches top-level show events.
+- Collection menus now show up to 20 rows instead of 10. Visually checked the
+  taller menu and live collection/search loading with Windows computer use.
+- Compared ArcGIS LayerService's remote-first raster loading with QGIS. GeoTIFF
+  and COG assets now use GDAL `/vsicurl` range reads, with STAC RGB band mapping.
+  Servers without streaming support require explicit consent for a full download.
+- A live Sentinel-2 ARD COG at CEDA was 2,034,369,365 bytes with nine overviews.
+  Opening it transferred 32,768 bytes. Visually verified native QGIS map rendering
+  and zooming; the QGIS 4 overview/detail session transferred 82,132,992 bytes,
+  rather than the entire file. Both QGIS 4.2.2 and 3.44.14 opened and rendered it.
+  This VM reports a missing preferred EPSG:27700-to-3857 transform; native
+  EPSG:27700 rendering was also checked independently of that installation warning.
+- `qgis_streaming_check.py` passes on both installed QGIS versions, including real
+  plugin startup, overview and finer-detail reads (917,809 of 64,409,758 fixture
+  bytes), scoped authorization, cross-host redirects, credential clearing and
+  refusing an automatic full download. Thirteen pure contract tests pass, as do
+  both native screen suites and Ruff lint/format checks.
+- Built the credential-scanned ZIP and byte-verified all 65 installed files in
+  both normal default profiles. Reloaded both running plugins without closing
+  the user's projects. QGIS 4 reconnected automatically; LTR requires its key again.
+
 ## Boundaries
 
 No commercial quote or purchase was submitted to the live service. Commercial
@@ -102,7 +127,8 @@ legacy-suite run, not a full pass. Legacy test packaging still includes the old
 compiled UI resources. New contract tests are wired into CI, and the current
 dock is tested directly against both installed QGIS versions.
 
-Asset downloads are local temporary files, retained so the created layers remain
-usable in the current session. Copy imagery to durable storage for long-lived
-projects. AOI overlap uses a planar WGS84 approximation. Antimeridian-crossing
+Explicit full-file downloads and NetCDF downloads are local temporary files,
+retained so created layers remain usable in the current session. Copy downloaded
+imagery to durable storage for long-lived projects. Streamed COG/GeoTIFF projects
+keep remote URLs; protected layers require reconnecting to the same workspace. AOI overlap uses a planar WGS84 approximation. Antimeridian-crossing
 AOIs must be split into separate searches.
