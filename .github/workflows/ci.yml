@@ -55,3 +55,50 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
+
+  qgis-compatibility:
+    name: QGIS ${{ matrix.qgis }} / Qt ${{ matrix.qt }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - qgis: "3.44"
+            qt: "5"
+            image: qgis/qgis:3.44-trixie
+          - qgis: "4.2"
+            qt: "6"
+            image: qgis/qgis:4.2-trixie
+    container:
+      image: ${{ matrix.image }}
+    env:
+      QT_QPA_PLATFORM: offscreen
+      QGIS_PREFIX_PATH: /usr
+      PYTHONPATH: /usr/share/qgis/python:/usr/share/qgis/python/plugins
+      EXPECTED_QGIS: ${{ matrix.qgis }}
+      EXPECTED_QT: ${{ matrix.qt }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install native test dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3-gdal python3-numpy python3-defusedxml
+      - name: Verify QGIS and Qt versions
+        run: |
+          python3 - <<'PY'
+          import os
+          from qgis.core import Qgis
+          from qgis.PyQt.QtCore import QT_VERSION_STR
+          print("QGIS", Qgis.QGIS_VERSION, "Qt", QT_VERSION_STR)
+          assert Qgis.QGIS_VERSION.startswith(os.environ["EXPECTED_QGIS"] + ".")
+          assert QT_VERSION_STR.startswith(os.environ["EXPECTED_QT"] + ".")
+          PY
+      - name: Run transport contracts
+        run: python3 -m unittest discover -s tests -v
+      - name: Run native plugin checks
+        run: |
+          set -eu
+          for check in runtime login screen streaming; do
+            python3 "tests/qgis_${check}_check.py"
+          done

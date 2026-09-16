@@ -122,6 +122,17 @@ tests; they are no longer reachable through the plugin's menu or toolbar.
   authentication failures still report access denied.
 - Installed the updated package into both normal default profiles.
 
+## QGIS CI matrix (2026-09-16)
+
+- Added native compatibility jobs using official `qgis/qgis:3.44-trixie` (Qt 5)
+  and `qgis/qgis:4.2-trixie` (Qt 6) images; both tags were verified as published.
+- Each job checks the actual QGIS/Qt version and runs the transport contracts,
+  runtime, login, screen and streaming checks. The existing legacy coverage job
+  remains separate.
+- GitHub Actions syntax passes actionlint 1.7.12. All four native checks pass
+  locally on QGIS 3.44.14 and 4.2.2. Docker is unavailable on this VM, so the Linux
+  container jobs have not been executed here or on GitHub yet.
+
 ## Boundaries
 
 No commercial quote or purchase was submitted to the live service. Commercial
