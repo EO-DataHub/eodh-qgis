@@ -32,10 +32,17 @@ search filters, thumbnail timeline, Quick view, asset loading and commercial ord
 
 ### Version compatibility
 
-The supported baseline is QGIS 3.44 LTR and QGIS 4, using their bundled Python and
-`qgis.PyQt` bindings. No separately installed PyQt wheel or resource compiler is
-needed to build the current dock UI. CI runs native compatibility checks on
-QGIS 3.44 / Qt 5 and QGIS 4.2 / Qt 6.
+This plugin requires Python 3.9+ in the QGIS environment.
+
+The recommended QGIS version is always the latest LTR or QGIS 4.
+
+On Windows, this plugin is compatible with QGIS version 3.34+. It is possible to install the plugin on older versions by first fixing the missing SSL libraries following this https://stackoverflow.com/a/71226425 (requires administrator priviledges). Without it, QPIP (another plugin we use to manage python dependencies) will fail to install anything from PyPI.
+
+On MacOS the plugin usually bundles it's own Python distribution which should be 3.9 or newer.
+
+If you encounter installation issues, please first try upgrading QGIS to the latest LTR or QGIS 4.
+
+Please note that we can't test all possible combinations of operating systems and their versions, QGIS versions and various packaging and versions of python.
 
 ## Usage
 
