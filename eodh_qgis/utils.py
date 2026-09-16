@@ -1,11 +1,8 @@
-"""Utility functions for the EODH QGIS plugin."""
+"""NetCDF metadata and georeferencing helpers."""
 
 from __future__ import annotations
 
-import urllib.request
 from dataclasses import dataclass
-from typing import Callable
-from urllib.parse import urlparse
 
 from osgeo import gdal
 
@@ -16,76 +13,6 @@ from eodh_qgis.definitions.constants import (
     X_COORDINATE_NAMES,
     Y_COORDINATE_NAMES,
 )
-
-_ALLOWED_URL_SCHEMES = ("http", "https")
-
-
-def validate_http_url(url: str) -> None:
-    """Raise ValueError if url is not http(s).
-
-    Defends urllib.request.urlopen / urlretrieve against file://, ftp://,
-    and custom schemes (bandit B310).
-    """
-    scheme = urlparse(url).scheme.lower()
-    if scheme not in _ALLOWED_URL_SCHEMES:
-        raise ValueError(f"URL scheme {scheme!r} not permitted; expected http or https")
-
-
-def _build_safe_opener() -> urllib.request.OpenerDirector:
-    """OpenerDirector that handles only http(s) — no file://, ftp://, data://.
-
-    Without FileHandler/FTPHandler/etc. registered, urllib has no machinery
-    to follow non-http(s) URLs even if scheme validation were bypassed; the
-    redirect handler also rejects redirects to schemes it has no opener for.
-    """
-    opener = urllib.request.OpenerDirector()
-    for handler_cls in (
-        urllib.request.HTTPHandler,
-        urllib.request.HTTPSHandler,
-        urllib.request.HTTPDefaultErrorHandler,
-        urllib.request.HTTPRedirectHandler,
-        urllib.request.HTTPErrorProcessor,
-    ):
-        opener.add_handler(handler_cls())
-    return opener
-
-
-_SAFE_OPENER = _build_safe_opener()
-
-
-def safe_urlopen(url: str, *, timeout: float):
-    """http(s)-only replacement for urllib.request.urlopen."""
-    validate_http_url(url)
-    return _SAFE_OPENER.open(url, timeout=timeout)  # nosec B310 - scheme restricted by validate_http_url + opener handler list
-
-
-def safe_urlretrieve(
-    url: str,
-    dest_path: str,
-    *,
-    reporthook: Callable[[int, int, int], None] | None = None,
-    chunk_size: int = 64 * 1024,
-) -> None:
-    """Stream `url` to `dest_path`. http(s) only.
-
-    Reimplements the bits of urllib.request.urlretrieve that callers use,
-    but routes I/O through the restricted opener so non-http(s) schemes
-    (and redirects to them) cannot be followed.
-    """
-    validate_http_url(url)
-    with _SAFE_OPENER.open(url) as resp, open(dest_path, "wb") as out:  # nosec B310
-        total_size = int(resp.headers.get("Content-Length") or 0)
-        block_num = 0
-        if reporthook is not None:
-            reporthook(block_num, chunk_size, total_size)
-        while True:
-            chunk = resp.read(chunk_size)
-            if not chunk:
-                break
-            out.write(chunk)
-            block_num += 1
-            if reporthook is not None:
-                reporthook(block_num, chunk_size, total_size)
 
 
 @dataclass
@@ -123,8 +50,7 @@ def compute_geotransform(xc_data, yc_data) -> tuple[float, ...] | None:
 def get_netcdf_metadata(file_path: str) -> NetCDFMetadata:
     """Extract all metadata from a NetCDF file with minimal file opens.
 
-    Consolidates get_netcdf_data_variables, get_netcdf_geotransform, and
-    extract_epsg_from_netcdf into just 2 file opens (instead of 4).
+    Reads subdataset names and multidimensional metadata in two file opens.
 
     Args:
         file_path: Path to NetCDF file
@@ -221,51 +147,6 @@ def get_netcdf_metadata(file_path: str) -> NetCDFMetadata:
         return NetCDFMetadata(data_variables, geotransform, epsg)
 
 
-def extract_epsg_from_netcdf(file_path: str) -> str | None:
-    """Extract EPSG code from NetCDF grid_mapping variable (CF conventions).
-
-    NetCDF files following CF conventions store CRS info in a grid_mapping
-    variable (e.g., 'polar_stereographic') which may contain an 'epsg_code'
-    attribute.
-
-    Args:
-        file_path: Path to NetCDF file (can include NETCDF:"path":var format
-                   or /vsicurl/ prefix for remote files)
-
-    Returns:
-        EPSG code as string, or None if not found
-    """
-    try:
-        # Handle NETCDF:"path":variable format - extract just the file path
-        if file_path.startswith("NETCDF:"):
-            parts = file_path.split(":")
-            # Reconstruct path - everything between first ":" and last ":"
-            if len(parts) >= 3:
-                file_path = ":".join(parts[1:-1]).strip('"')
-
-        # Open with multidim API to access scalar variables
-        ds = gdal.OpenEx(file_path, gdal.OF_MULTIDIM_RASTER)
-        if not ds:
-            return None
-
-        root = ds.GetRootGroup()
-        if not root:
-            return None
-
-        for gm_name in GRID_MAPPING_NAMES:
-            arr = root.OpenMDArray(gm_name)
-            if arr:
-                for attr in arr.GetAttributes():
-                    attr_name = attr.GetName().lower()
-                    if attr_name in EPSG_ATTRIBUTE_NAMES:
-                        return str(int(attr.Read()))
-
-        return None
-
-    except Exception:
-        return None
-
-
 def is_coordinate_variable(arr) -> bool:
     """Check if a GDAL MDArray is a coordinate variable using CF conventions.
 
@@ -296,134 +177,3 @@ def is_coordinate_variable(arr) -> bool:
             return True
 
     return False
-
-
-def get_netcdf_data_variables(file_path: str) -> list[tuple[str, str]]:
-    """Get all data (non-coordinate) subdatasets from a NetCDF file.
-
-    Uses CF convention attributes to identify and exclude coordinate variables.
-    Also excludes bounds variables (ending in _bnds or _bounds).
-
-    Args:
-        file_path: Path to NetCDF file (can include NETCDF:"path":var format
-                   or /vsicurl/ prefix for remote files)
-
-    Returns:
-        List of (subdataset_uri, variable_name) tuples for data variables only
-    """
-    result = []
-
-    try:
-        # Handle NETCDF:"path":variable format - extract just the file path
-        if file_path.startswith("NETCDF:"):
-            parts = file_path.split(":")
-            if len(parts) >= 3:
-                file_path = ":".join(parts[1:-1]).strip('"')
-
-        # Get subdatasets using standard GDAL API
-        ds = gdal.Open(file_path)
-        if not ds:
-            return result
-
-        subdatasets = ds.GetMetadata("SUBDATASETS")
-        if not subdatasets:
-            return result
-
-        # Extract subdataset URIs (keys ending in _NAME)
-        subdataset_uris = []
-        for key, value in subdatasets.items():
-            if key.endswith("_NAME"):
-                subdataset_uris.append(value)
-
-        ds = None  # Close dataset
-
-        # Open with multidim API to check variable attributes
-        md_ds = gdal.OpenEx(file_path, gdal.OF_MULTIDIM_RASTER)
-        if not md_ds:
-            return result
-
-        root = md_ds.GetRootGroup()
-        if not root:
-            return result
-
-        # Check each subdataset
-        for uri in subdataset_uris:
-            # Extract variable name from NETCDF:"path":varname format
-            if ":" in uri:
-                var_name = uri.split(":")[-1]
-            else:
-                continue
-
-            # Skip bounds variables
-            if var_name.endswith("_bnds") or var_name.endswith("_bounds"):
-                continue
-
-            # Check if it's a coordinate variable
-            arr = root.OpenMDArray(var_name)
-            if arr and is_coordinate_variable(arr):
-                continue
-
-            result.append((uri, var_name))
-
-        return result
-
-    except Exception:
-        return result
-
-
-def get_netcdf_geotransform(file_path: str) -> tuple[float, ...] | None:
-    """Extract geotransform from NetCDF coordinate arrays (xc/yc).
-
-    Reads the 1D projection coordinate arrays (xc, yc) and computes
-    the GDAL geotransform. These arrays contain pixel center coordinates
-    in the projected CRS (e.g., meters for polar stereographic).
-
-    Args:
-        file_path: Path to NetCDF file (can include NETCDF:"path":var format)
-
-    Returns:
-        6-element geotransform tuple
-        (origin_x, pixel_width, 0, origin_y, 0, pixel_height),
-        or None if coordinate arrays not found
-    """
-    try:
-        # Handle NETCDF:"path":variable format - extract just the file path
-        if file_path.startswith("NETCDF:"):
-            parts = file_path.split(":")
-            if len(parts) >= 3:
-                file_path = ":".join(parts[1:-1]).strip('"')
-
-        # Open with multidim API to read coordinate arrays
-        ds = gdal.OpenEx(file_path, gdal.OF_MULTIDIM_RASTER)
-        if not ds:
-            return None
-
-        root = ds.GetRootGroup()
-        if not root:
-            return None
-
-        xc_arr = None
-        yc_arr = None
-
-        for name in X_COORDINATE_NAMES:
-            arr = root.OpenMDArray(name)
-            if arr and arr.GetDimensionCount() == 1:
-                xc_arr = arr
-                break
-
-        for name in Y_COORDINATE_NAMES:
-            arr = root.OpenMDArray(name)
-            if arr and arr.GetDimensionCount() == 1:
-                yc_arr = arr
-                break
-
-        if not xc_arr or not yc_arr:
-            return None
-
-        xc_data = xc_arr.ReadAsArray()
-        yc_data = yc_arr.ReadAsArray()
-
-        return compute_geotransform(xc_data, yc_data)
-
-    except Exception:
-        return None

@@ -40,9 +40,7 @@ This plugin requests:
 
 | Package | Purpose |
 |---|---|
-| `defusedxml` | Safer XML parsing for data utilities. |
-| `pyeodh` | The EODH Python client used by the plugin's API/data utility modules. |
-| `truststore` | Uses the operating system's trusted certificate store for HTTPS connections. |
+| `truststore` (Python 3.10+) | Uses the operating system's trusted certificate store for HTTPS connections. |
 
 Review qpip's full package list before agreeing: it can include dependencies of these packages. This agreement installs software; it does not purchase imagery or create an EODH subscription. If you decline, features requiring the missing packages may be unavailable. QGIS supplies Qt, GDAL and its Python bindings; do not install a separate PyQt wheel into QGIS.
 

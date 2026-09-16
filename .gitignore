@@ -170,3 +170,6 @@ playground/*
 .pi/
 .local/
 .qgis-settings/
+
+# GDAL cache generated when exercising NetCDF fixtures
+tests/data/*.aux.xml

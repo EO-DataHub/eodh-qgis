@@ -8,11 +8,7 @@ try:
 except ImportError:
     from qgis.PyQt.QtWidgets import QAction
 
-# Import the code for the dialog
 from .gui.hub_dock import HubDock
-
-# Initialize Qt resources from file resources.py
-# Branding is shipped as ordinary image files, avoiding Qt-version-specific rcc output.
 
 MENU_NAME = "&EODH"
 
@@ -156,12 +152,6 @@ class EodhQgis:
         if dlg is not None:
             dlg.shutdown()
             self.iface.removeDockWidget(dlg)
-            search_widget = getattr(dlg, "search_widget", None)
-            if search_widget is not None:
-                try:
-                    search_widget.cleanup_polygon_tool()
-                except RuntimeError:
-                    pass
 
         for action in self.actions:
             self.iface.removePluginWebMenu(self.menu, action)

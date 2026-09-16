@@ -18,10 +18,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Install dependencies
-        run: |
-          pip install pyqt5
-
       - name: Set plugin version from tag
         run: sed -i "s/^version=.*/version=${{ github.ref_name }}/" metadata.txt
 
@@ -29,7 +25,6 @@ jobs:
         run: |
           python deploy.py --dist dist/eodh_qgis
           cd dist
-          find . -name "__pycache__" -type d | xargs rm -rf
           zip -r eodh_qgis_${{ github.ref_name }}.zip eodh_qgis
 
       - name: Create release
