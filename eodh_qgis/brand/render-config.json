@@ -1,0 +1,5099 @@
+{
+  "sentinel2_ard": {
+    "renders": {
+      "Natural Color": {
+        "title": "Natural Color",
+        "assets": ["cog"],
+        "bidx": [3, 2, 1],
+        "color_formula": "Gamma RGB 6 Saturation 0.8 Sigmoidal RGB 25 0.35",
+        "nodata": 0
+      },
+      "True Color (RGB)": {
+        "title": "True Color (RGB)",
+        "assets": ["cog"],
+        "bidx": [3, 2, 1],
+        "rescale": [
+          [0, 200],
+          [0, 200],
+          [0, 200]
+        ]
+      },
+      "Color infrared": {
+        "title": "Color infrared",
+        "assets": ["cog"],
+        "bidx": [7, 3, 2],
+        "rescale": [
+          [0, 200],
+          [0, 200],
+          [0, 200]
+        ]
+      },
+      "Shortwave infrared": {
+        "title": "Shortwave infrared",
+        "assets": ["cog"],
+        "bidx": [10, 8, 3],
+        "rescale": [
+          [0, 200],
+          [0, 200],
+          [0, 200]
+        ]
+      },
+      "NDVI": {
+        "title": "Normalized difference vegetation index (NDVI)",
+        "assets": ["cog"],
+        "bidx": [7, 3],
+        "colormap_name": "rdylgn",
+        "expression": "(cog_b7-cog_b3)/(cog_b7+cog_b3)",
+        "nodata": 0,
+        "rescale": [[-1, 1]]
+      }
+    }
+  },
+  "sentinel-2-c1-l2a": {
+    "renders": {
+      "True Color": {
+        "title": "True Color",
+        "assets": ["visual"]
+      },
+      "Natural Color": {
+        "title": "Natural Color",
+        "assets": ["red", "green", "blue"],
+        "rescale": [
+          [1000, 4000],
+          [1000, 4000],
+          [1000, 4000]
+        ],
+        "nodata": 0
+      },
+      "Color infrared": {
+        "title": "Color infrared",
+        "assets": ["nir", "red", "green"],
+        "rescale": [
+          [1000, 4000],
+          [1000, 4000],
+          [1000, 4000]
+        ],
+        "nodata": 0
+      },
+      "Shortwave infrared": {
+        "title": "Shortwave infrared",
+        "assets": ["swir22", "nir", "red"],
+        "rescale": [
+          [1000, 4000],
+          [1000, 4000],
+          [1000, 4000]
+        ],
+        "nodata": 0
+      }
+    }
+  },
+  "sentinel1": {
+    "renders": {
+      "preview": {
+        "title": "Single-Look Complex (SLC) Preview (approximate location)",
+        "assets": ["thumbnail"]
+      }
+    }
+  },
+  "sentinel1_ard": {
+    "renders": {
+      "VV": {
+        "title": "Backscatter VV (Vertical-Vertical)",
+        "assets": ["data"],
+        "bidx": [1],
+        "rescale": [[-24, -9]]
+      },
+      "VH": {
+        "title": "Backscatter VH (Vertical-Horizontal)",
+        "assets": ["data"],
+        "bidx": [2],
+        "rescale": [[-40, -24]]
+      }
+    }
+  },
+  "ukcp": {
+    "eodhrc:time-variable-items": true,
+    "eodhrc:render-key-properties": ["var_id"],
+    "renders": {
+      "pr": {
+        "title": "Precipitation (mm/day)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "reference": true,
+        "colormap_name": "viridis",
+        "rescale": [0, 10]
+      },
+      "prsn": {
+        "title": "Snowfall Flux (mm/day)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "reference": true,
+        "colormap_name": "viridis",
+        "rescale": [0, 10]
+      },
+      "tas": {
+        "title": "Mean Air Temperature (°C)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "reference": true,
+        "colormap_name": "coolwarm",
+        "rescale": [-5, 20]
+      }
+    }
+  },
+  "PSScene": {
+    "thumbnail_auth": false,
+    "thumbnail_asset": "thumbnail",
+    "renders": {
+      "preview": {
+        "title": "Preview (approximate location)",
+        "assets": ["thumbnail"],
+        "quicklook_georeference": "bbox-squared"
+      }
+    }
+  },
+  "SkySatCollect": {
+    "renders": {
+      "preview": {
+        "title": "Preview (approximate location)",
+        "assets": ["thumbnail"],
+        "quicklook_georeference": "bbox-squared"
+      }
+    }
+  },
+  "my-SkySatCollect": {
+    "renders": {
+      "preview": {
+        "title": "Preview",
+        "assets": ["primaryAsset"],
+        "bidx": [1, 2, 3],
+        "nodata": 0,
+        "auth": true,
+        "rescale": [
+          [200, 7000],
+          [200, 6000],
+          [200, 5000]
+        ],
+        "color_formula": "sigmoidal r 4 0.6, saturation 1.1"
+      }
+    },
+    "thumbnail_auth": true
+  },
+  "my-PSScene": {
+    "renders": {
+      "preview": {
+        "title": "Preview",
+        "assets": ["primaryAsset_2"],
+        "bidx": [6, 4, 2],
+        "nodata": 0,
+        "auth": true,
+        "rescale": [1000, 8000]
+      }
+    },
+    "thumbnail_auth": true,
+    "thumbnail_asset": "thumbnail"
+  },
+  "my-platero-l1c-cogs": {
+    "renders": {
+      "preview": {
+        "title": "True Color (RGB)",
+        "assets": ["TCI"],
+        "bidx": [1, 2, 3],
+        "nodata": 0,
+        "auth": true
+      }
+    },
+    "thumbnail_auth": true
+  },
+  "my-mantis-l1d-cogs": {
+    "renders": {
+      "preview": {
+        "title": "True Color (RGB)",
+        "assets": ["TCI"],
+        "bidx": [1, 2, 3],
+        "nodata": 0,
+        "auth": true
+      }
+    },
+    "thumbnail_auth": true
+  },
+  "my-hammer-l1c-cogs": {
+    "renders": {
+      "preview": {
+        "title": "True Color (RGB)",
+        "assets": ["TCI"],
+        "bidx": [1, 2, 3],
+        "nodata": 0,
+        "auth": true
+      }
+    },
+    "thumbnail_auth": true
+  },
+  "my-menut-l1b-cogs": {
+    "renders": {
+      "preview": {
+        "title": "True Color (RGB)",
+        "assets": ["TCI"],
+        "bidx": [1, 2, 3],
+        "nodata": 0,
+        "auth": true
+      }
+    },
+    "thumbnail_auth": true
+  },
+  "my-menut-l1c-cogs": {
+    "renders": {
+      "preview": {
+        "title": "True Color (RGB)",
+        "assets": ["TCI"],
+        "bidx": [1, 2, 3],
+        "nodata": 0,
+        "auth": true
+      }
+    },
+    "thumbnail_auth": true
+  },
+  "my-nexos-iow-and-hants-rgbih_pm-10cm-1": {
+    "renders": {
+      "preview": {
+        "title": "True Color (RGB)",
+        "assets": ["image"],
+        "bidx": [1, 2, 3],
+        "auth": true
+      }
+    },
+    "thumbnail_auth": true
+  },
+  "SkySatScene": {
+    "renders": {
+      "preview": {
+        "title": "Preview (approximate location)",
+        "assets": ["thumbnail"],
+        "quicklook_georeference": "bbox-squared"
+      }
+    }
+  },
+  "REScene": {
+    "renders": {
+      "preview": {
+        "title": "Preview (approximate location)",
+        "assets": ["thumbnail"],
+        "quicklook_georeference": "bbox-squared"
+      }
+    }
+  },
+  "REOrthoTile": {
+    "renders": {
+      "preview": {
+        "title": "Preview (approximate location)",
+        "assets": ["thumbnail"],
+        "quicklook_georeference": "bbox-squared"
+      }
+    }
+  },
+  "land_cover": {
+    "renders": {
+      "Land Cover Map": {
+        "title": "Land Cover Map",
+        "assets": ["GeoTIFF"],
+        "colormap": {
+          "0": "#000000",
+          "10": "#ffff64",
+          "11": "#ffff64",
+          "12": "#ffff00",
+          "20": "#aaf0f0",
+          "30": "#dbf064",
+          "40": "#c8c864",
+          "50": "#006400",
+          "60": "#00a000",
+          "61": "#00a000",
+          "62": "#aac800",
+          "70": "#003c00",
+          "71": "#003c00",
+          "72": "#005000",
+          "80": "#400500",
+          "81": "#400500",
+          "82": "#400640",
+          "90": "#788200",
+          "100": "#1400a0",
+          "110": "#be9500",
+          "120": "#150064",
+          "121": "#784c00",
+          "122": "#150064",
+          "130": "#ffb432",
+          "140": "#ffdcd2",
+          "150": "#ffebaf",
+          "151": "#ffc964",
+          "152": "#ffd278",
+          "153": "#ffebaf",
+          "160": "#00785a",
+          "170": "#009678",
+          "180": "#00dc80",
+          "190": "#c31300",
+          "200": "#fff5d7",
+          "201": "#dcdcdc",
+          "202": "#fff5d7",
+          "210": "#0046c8",
+          "220": "#ffffff"
+        }
+      }
+    }
+  },
+  "airbus_sar_data": {
+    "renders": {
+      "preview": {
+        "title": "Preview (approximate location)",
+        "assets": ["thumbnail"],
+        "nodata": 0
+      }
+    }
+  },
+  "airbus_phr_data": {
+    "renders": {
+      "preview": {
+        "title": "Preview (approximate location)",
+        "assets": ["quicklook"],
+        "quicklook_georeference": "geometry"
+      }
+    }
+  },
+  "my-airbus_phr_data": {
+    "renders": {
+      "cog_rgb": {
+        "title": "Cloud-Optimized GeoTIFF image",
+        "assets": ["cog_rgb"],
+        "bidx": [3, 2, 1],
+        "nodata": 0
+      }
+    },
+    "thumbnail_auth": true
+  },
+  "airbus_pneo_data": {
+    "renders": {
+      "preview": {
+        "title": "Preview (approximate location)",
+        "assets": ["external_quicklook"],
+        "quicklook_georeference": "geometry",
+        "auth": false
+      }
+    },
+    "thumbnail_auth": false,
+    "thumbnail_asset": "external_thumbnail"
+  },
+  "my-airbus_pneo_data": {
+    "renders": {
+      "cog_rgb": {
+        "title": "Cloud-Optimized GeoTIFF image",
+        "assets": ["cog_rgb"],
+        "bidx": [1, 2, 3],
+        "nodata": 0,
+        "rescale": [0, 1000]
+      },
+      "cog_pan": {
+        "title": "Cloud-Optimized GeoTIFF panchromatic image",
+        "assets": ["cog_pan"],
+        "bidx": [1],
+        "nodata": 0
+      }
+    },
+    "thumbnail_auth": true,
+    "thumbnail_asset": "quicklook"
+  },
+  "airbus_spot_data": {
+    "renders": {
+      "preview": {
+        "title": "Preview (approximate location)",
+        "assets": ["quicklook"],
+        "quicklook_georeference": "geometry"
+      }
+    }
+  },
+  "my-airbus_spot_data": {
+    "renders": {
+      "cog_rgb": {
+        "title": "Cloud-Optimized GeoTIFF image",
+        "assets": ["cog_rgb"],
+        "bidx": [1, 2, 3],
+        "nodata": 0,
+        "rescale": [0, 1000]
+      }
+    },
+    "thumbnail_auth": true
+  },
+  "eocis-sst-cdrv3-climatology": {
+    "renders": {
+      "analysed_sst": {
+        "title": "Analysed sea surface temperature (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "turbo",
+        "variable": "analysed_sst",
+        "reference": true,
+        "rescale": [[271, 305]]
+      },
+      "sea_ice_fraction": {
+        "title": "Sea ice area fraction",
+        "assets": ["reference_file"],
+        "colormap_name": "blues_r",
+        "variable": "sea_ice_fraction",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "analysed_sst_max": {
+        "title": "Maximum Analysed sea surface temperature (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "turbo",
+        "variable": "analysed_sst_max",
+        "reference": true,
+        "rescale": [[271, 307]]
+      },
+      "sea_ice_fraction_max": {
+        "title": "Maximum Sea ice area fraction",
+        "assets": ["reference_file"],
+        "colormap_name": "blues_r",
+        "variable": "sea_ice_fraction_max",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "analysed_sst_min": {
+        "title": "Minimum Analysed sea surface temperature (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "turbo",
+        "variable": "analysed_sst_min",
+        "reference": true,
+        "rescale": [[271, 305]]
+      },
+      "sea_ice_fraction_min": {
+        "title": "Minimum Sea ice area fraction",
+        "assets": ["reference_file"],
+        "colormap_name": "blues_r",
+        "variable": "sea_ice_fraction_min",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "mask": {
+        "title": "Sea/land/lake/ice field composite mask",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "mask",
+        "reference": true,
+        "rescale": [[1, 9]]
+      },
+      "analysed_sst_std": {
+        "title": "Std.dev. of Analysed sea surface temperature (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "analysed_sst_std",
+        "reference": true,
+        "rescale": [[0, 4]]
+      },
+      "sea_ice_fraction_std": {
+        "title": "Std.dev. of Sea ice area fraction",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "sea_ice_fraction_std",
+        "reference": true,
+        "rescale": [[0, 1]]
+      }
+    }
+  },
+  "eocis-sst-cdrv3": {
+    "renders": {
+      "analysed_sst": {
+        "title": "Analysed sea surface temperature (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "turbo",
+        "variable": "analysed_sst",
+        "reference": true,
+        "rescale": [[271, 306]]
+      },
+      "sea_ice_fraction": {
+        "title": "Sea ice area fraction",
+        "assets": ["reference_file"],
+        "colormap_name": "blues_r",
+        "variable": "sea_ice_fraction",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "analysed_sst_uncertainty": {
+        "title": "Estimated error standard deviation of analysed_sst (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "analysed_sst_uncertainty",
+        "reference": true,
+        "rescale": [[0, 4]]
+      },
+      "mask": {
+        "title": "Sea/land/lake/ice field composite mask",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "mask",
+        "reference": true,
+        "rescale": [[1, 9]]
+      }
+    }
+  },
+  "eocis-lst-s3b-night": {
+    "renders": {
+      "lst": {
+        "title": "Land surface temperature (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "turbo",
+        "variable": "lst",
+        "reference": true,
+        "rescale": [[190, 323]]
+      },
+      "t2m": {
+        "title": "2m air temperature (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "t2m",
+        "reference": true,
+        "rescale": [[190, 349]]
+      },
+      "ndvi": {
+        "title": "Normalized difference vegetation index",
+        "assets": ["reference_file"],
+        "colormap_name": "rdylgn",
+        "variable": "ndvi",
+        "reference": true,
+        "rescale": [[-1, 1]]
+      },
+      "lcc": {
+        "title": "Land cover class",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "lcc",
+        "reference": true,
+        "rescale": [[11.0, 230.0]]
+      },
+      "lst_uncertainty": {
+        "title": "Land surface temperature total uncertainty (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_uncertainty",
+        "reference": true,
+        "rescale": [[0, 10]]
+      },
+      "n": {
+        "title": "Number of clear-sky pixels",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "n",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "ncld": {
+        "title": "Number of cloudy pixels",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "ncld",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "qual_flag": {
+        "title": "Quality flags",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "qual_flag",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "sataz": {
+        "title": "Satellite azimuth angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "sataz",
+        "reference": true,
+        "rescale": [[-180, 180]]
+      },
+      "satze": {
+        "title": "Satellite zenith angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "satze",
+        "reference": true,
+        "rescale": [[6, 59]]
+      },
+      "solaz": {
+        "title": "Solar azimuth angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "solaz",
+        "reference": true,
+        "rescale": [[-180, 180]]
+      },
+      "solze": {
+        "title": "Solar zenith angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "solze",
+        "reference": true,
+        "rescale": [[90, 158]]
+      },
+      "emis": {
+        "title": "Surface emissivity",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "emis",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "lst_unc_sys": {
+        "title": "Uncertainty from large-scale systematic errors (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_sys",
+        "reference": true,
+        "rescale": [[0, 10]]
+      },
+      "lst_unc_loc_atm": {
+        "title": "Uncertainty from locally correlated errors on atmospheric scales (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_loc_atm",
+        "reference": true,
+        "rescale": [[0, 9]]
+      },
+      "lst_unc_loc_sfc": {
+        "title": "Uncertainty from locally correlated errors on surface scales (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_loc_sfc",
+        "reference": true,
+        "rescale": [[0, 9]]
+      },
+      "lst_unc_ran": {
+        "title": "Uncertainty from uncorrelated errors (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_ran",
+        "reference": true,
+        "rescale": [[0, 10]]
+      }
+    }
+  },
+  "eocis-lst-s3b-day": {
+    "renders": {
+      "lst": {
+        "title": "Land surface temperature (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "turbo",
+        "variable": "lst",
+        "reference": true,
+        "rescale": [[190, 334]]
+      },
+      "t2m": {
+        "title": "2m air temperature (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "t2m",
+        "reference": true,
+        "rescale": [[190, 313]]
+      },
+      "ndvi": {
+        "title": "Normalized difference vegetation index",
+        "assets": ["reference_file"],
+        "colormap_name": "rdylgn",
+        "variable": "ndvi",
+        "reference": true,
+        "rescale": [[-1, 1]]
+      },
+      "lcc": {
+        "title": "Land cover class",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "lcc",
+        "reference": true
+      },
+      "lst_uncertainty": {
+        "title": "Land surface temperature total uncertainty (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_uncertainty",
+        "reference": true,
+        "rescale": [[0, 10]]
+      },
+      "n": {
+        "title": "Number of clear-sky pixels",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "n",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "ncld": {
+        "title": "Number of cloudy pixels",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "ncld",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "qual_flag": {
+        "title": "Quality flags",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "qual_flag",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "sataz": {
+        "title": "Satellite azimuth angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "sataz",
+        "reference": true,
+        "rescale": [[-180, 180]]
+      },
+      "satze": {
+        "title": "Satellite zenith angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "satze",
+        "reference": true,
+        "rescale": [[6, 59]]
+      },
+      "solaz": {
+        "title": "Solar azimuth angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "solaz",
+        "reference": true,
+        "rescale": [[-180, 180]]
+      },
+      "solze": {
+        "title": "Solar zenith angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "solze",
+        "reference": true,
+        "rescale": [[27, 90]]
+      },
+      "emis": {
+        "title": "Surface emissivity",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "emis",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "lst_unc_sys": {
+        "title": "Uncertainty from large-scale systematic errors (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_sys",
+        "reference": true,
+        "rescale": [[0, 10]]
+      },
+      "lst_unc_loc_atm": {
+        "title": "Uncertainty from locally correlated errors on atmospheric scales (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_loc_atm",
+        "reference": true,
+        "rescale": [[0, 10]]
+      },
+      "lst_unc_loc_sfc": {
+        "title": "Uncertainty from locally correlated errors on surface scales (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_loc_sfc",
+        "reference": true,
+        "rescale": [[0, 10]]
+      },
+      "lst_unc_ran": {
+        "title": "Uncertainty from uncorrelated errors (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_ran",
+        "reference": true,
+        "rescale": [[0, 10]]
+      }
+    }
+  },
+  "eocis-lst-s3a-night": {
+    "renders": {
+      "lst": {
+        "title": "Land surface temperature (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "turbo",
+        "variable": "lst",
+        "reference": true,
+        "rescale": [[190, 321]]
+      },
+      "t2m": {
+        "title": "2m air temperature (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "t2m",
+        "reference": true,
+        "rescale": [[190, 260]]
+      },
+      "ndvi": {
+        "title": "Normalized difference vegetation index",
+        "assets": ["reference_file"],
+        "colormap_name": "rdylgn",
+        "variable": "ndvi",
+        "reference": true,
+        "rescale": [[-1, 1]]
+      },
+      "lcc": {
+        "title": "Land cover class",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "lcc",
+        "reference": true
+      },
+      "lst_uncertainty": {
+        "title": "Land surface temperature total uncertainty (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_uncertainty",
+        "reference": true,
+        "rescale": [[0, 10]]
+      },
+      "n": {
+        "title": "Number of clear-sky pixels",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "n",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "ncld": {
+        "title": "Number of cloudy pixels",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "ncld",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "qual_flag": {
+        "title": "Quality flags",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "qual_flag",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "sataz": {
+        "title": "Satellite azimuth angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "sataz",
+        "reference": true,
+        "rescale": [[-180, 180]]
+      },
+      "satze": {
+        "title": "Satellite zenith angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "satze",
+        "reference": true,
+        "rescale": [[6, 59]]
+      },
+      "solaz": {
+        "title": "Solar azimuth angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "solaz",
+        "reference": true,
+        "rescale": [[-180, 180]]
+      },
+      "solze": {
+        "title": "Solar zenith angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "solze",
+        "reference": true,
+        "rescale": [[90, 158]]
+      },
+      "emis": {
+        "title": "Surface emissivity",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "emis",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "lst_unc_sys": {
+        "title": "Uncertainty from large-scale systematic errors (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_sys",
+        "reference": true,
+        "rescale": [[0, 10]]
+      },
+      "lst_unc_loc_atm": {
+        "title": "Uncertainty from locally correlated errors on atmospheric scales (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_loc_atm",
+        "reference": true,
+        "rescale": [[0, 10]]
+      },
+      "lst_unc_loc_sfc": {
+        "title": "Uncertainty from locally correlated errors on surface scales (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_loc_sfc",
+        "reference": true,
+        "rescale": [[0, 10]]
+      },
+      "lst_unc_ran": {
+        "title": "Uncertainty from uncorrelated errors (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_ran",
+        "reference": true,
+        "rescale": [[0, 10]]
+      }
+    }
+  },
+  "eocis-lst-s3a-day": {
+    "renders": {
+      "lst": {
+        "title": "Land surface temperature (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "turbo",
+        "variable": "lst",
+        "reference": true,
+        "rescale": [[190, 338]]
+      },
+      "t2m": {
+        "title": "2m air temperature (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "t2m",
+        "reference": true,
+        "rescale": [[190, 345]]
+      },
+      "ndvi": {
+        "title": "Normalized difference vegetation index",
+        "assets": ["reference_file"],
+        "colormap_name": "rdylgn",
+        "variable": "ndvi",
+        "reference": true,
+        "rescale": [[-1, 1]]
+      },
+      "lcc": {
+        "title": "Land cover class",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "lcc",
+        "reference": true,
+        "rescale": [[11.0, 230.0]]
+      },
+      "lst_uncertainty": {
+        "title": "Land surface temperature total uncertainty (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_uncertainty",
+        "reference": true,
+        "rescale": [[0, 10]]
+      },
+      "n": {
+        "title": "Number of clear-sky pixels",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "n",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "ncld": {
+        "title": "Number of cloudy pixels",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "ncld",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "qual_flag": {
+        "title": "Quality flags",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "qual_flag",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "sataz": {
+        "title": "Satellite azimuth angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "sataz",
+        "reference": true,
+        "rescale": [[-179, 175]]
+      },
+      "satze": {
+        "title": "Satellite zenith angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "satze",
+        "reference": true,
+        "rescale": [[6, 60]]
+      },
+      "solaz": {
+        "title": "Solar azimuth angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "solaz",
+        "reference": true,
+        "rescale": [[-180, 180]]
+      },
+      "solze": {
+        "title": "Solar zenith angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "solze",
+        "reference": true,
+        "rescale": [[27, 90]]
+      },
+      "emis": {
+        "title": "Surface emissivity",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "emis",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "lst_unc_sys": {
+        "title": "Uncertainty from large-scale systematic errors (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_sys",
+        "reference": true,
+        "rescale": [[0, 9]]
+      },
+      "lst_unc_loc_atm": {
+        "title": "Uncertainty from locally correlated errors on atmospheric scales (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_loc_atm",
+        "reference": true,
+        "rescale": [[0, 9]]
+      },
+      "lst_unc_loc_sfc": {
+        "title": "Uncertainty from locally correlated errors on surface scales (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_loc_sfc",
+        "reference": true,
+        "rescale": [[0, 9]]
+      },
+      "lst_unc_ran": {
+        "title": "Uncertainty from uncorrelated errors (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_ran",
+        "reference": true,
+        "rescale": [[0, 10]]
+      }
+    }
+  },
+  "eocis-lst-day": {
+    "renders": {
+      "lst": {
+        "title": "Land surface temperature (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "turbo",
+        "variable": "lst",
+        "reference": true,
+        "rescale": [[190, 336]]
+      },
+      "t2m": {
+        "title": "2m air temperature (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "t2m",
+        "reference": true,
+        "rescale": [[190, 313]]
+      },
+      "ndvi": {
+        "title": "Normalized difference vegetation index",
+        "assets": ["reference_file"],
+        "colormap_name": "rdylgn",
+        "variable": "ndvi",
+        "reference": true,
+        "rescale": [[-1, 1]]
+      },
+      "lcc": {
+        "title": "Land cover class",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "lcc",
+        "reference": true,
+        "rescale": [[11.0, 230.0]]
+      },
+      "lst_uncertainty": {
+        "title": "Land surface temperature total uncertainty (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_uncertainty",
+        "reference": true,
+        "rescale": [[0, 10]]
+      },
+      "n": {
+        "title": "Number of clear-sky pixels",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "n",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "ncld": {
+        "title": "Number of cloudy pixels",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "ncld",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "qual_flag": {
+        "title": "Quality flags",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "qual_flag",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "sataz": {
+        "title": "Satellite azimuth angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "sataz",
+        "reference": true,
+        "rescale": [[-178, 180]]
+      },
+      "satze": {
+        "title": "Satellite zenith angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "satze",
+        "reference": true,
+        "rescale": [[6, 59]]
+      },
+      "solaz": {
+        "title": "Solar azimuth angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "solaz",
+        "reference": true,
+        "rescale": [[-180, 180]]
+      },
+      "solze": {
+        "title": "Solar zenith angle (degrees)",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "solze",
+        "reference": true,
+        "rescale": [[26, 90]]
+      },
+      "emis": {
+        "title": "Surface emissivity",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "emis",
+        "reference": true,
+        "rescale": [[0, 1]]
+      },
+      "lst_unc_sys": {
+        "title": "Uncertainty from large-scale systematic errors (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_sys",
+        "reference": true,
+        "rescale": [[0, 9]]
+      },
+      "lst_unc_loc_atm": {
+        "title": "Uncertainty from locally correlated errors on atmospheric scales (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_loc_atm",
+        "reference": true,
+        "rescale": [[0, 9]]
+      },
+      "lst_unc_loc_sfc": {
+        "title": "Uncertainty from locally correlated errors on surface scales (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_loc_sfc",
+        "reference": true,
+        "rescale": [[0, 10]]
+      },
+      "lst_unc_ran": {
+        "title": "Uncertainty from uncorrelated errors (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "lst_unc_ran",
+        "reference": true,
+        "rescale": [[0, 10]]
+      }
+    }
+  },
+  "eocis-aerosol-slstr-monthly-s3b": {
+    "renders": {
+      "AAOD550_mean": {
+        "title": "Absorbing AOD at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AAOD550_mean",
+        "reference": true,
+        "rescale": [[0.0011401924421079457, 0.019460527971386924]]
+      },
+      "AOD550_mean": {
+        "title": "Aerosol optical thickness at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AOD550_mean",
+        "reference": true,
+        "rescale": [[0.06667282357811928, 0.34701185226440445]]
+      },
+      "AOD670_mean": {
+        "title": "Aerosol optical thickness at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AOD670_mean",
+        "reference": true,
+        "rescale": [[0.05470720939338207, 0.27353436350822463]]
+      },
+      "AOD870_mean": {
+        "title": "Aerosol optical thickness at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AOD870_mean",
+        "reference": true,
+        "rescale": [[0.040324481949210164, 0.19432629793882375]]
+      },
+      "AOD1600_mean": {
+        "title": "Aerosol optical thickness at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AOD1600_mean",
+        "reference": true,
+        "rescale": [[0.023442509956657885, 0.13462695926427842]]
+      },
+      "ANG550_870_mean": {
+        "title": "Angstrom exponent computed on aod550nm and aod870nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "ANG550_870_mean",
+        "reference": true,
+        "rescale": [[0.6309065222740173, 1.7503405213356023]]
+      },
+      "FM_AOD550_mean": {
+        "title": "Fine mode aod",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "FM_AOD550_mean",
+        "reference": true,
+        "rescale": [[0.037457697093486786, 0.2782644629478455]]
+      },
+      "AOD1600_uncertainty_max": {
+        "title": "Maximum l2 uncertainty on aot at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty_max",
+        "reference": true,
+        "rescale": [[0.0085431307554245, 0.2914588481187821]]
+      },
+      "AOD550_uncertainty_max": {
+        "title": "Maximum l2 uncertainty on aot at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty_max",
+        "reference": true,
+        "rescale": [[0.017736820317804814, 0.5690772533416749]]
+      },
+      "AOD670_uncertainty_max": {
+        "title": "Maximum l2 uncertainty on aot at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty_max",
+        "reference": true,
+        "rescale": [[0.01469099586829543, 0.48188243210315723]]
+      },
+      "AOD870_uncertainty_max": {
+        "title": "Maximum l2 uncertainty on aot at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty_max",
+        "reference": true,
+        "rescale": [[0.01136869601905346, 0.381738063693047]]
+      },
+      "AOD1600_uncertainty_mean": {
+        "title": "Mean of l2 uncertainty on aot at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty_mean",
+        "reference": true,
+        "rescale": [[0.006521863816305995, 0.08974050432443621]]
+      },
+      "AOD550_uncertainty_mean": {
+        "title": "Mean of l2 uncertainty on aot at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty_mean",
+        "reference": true,
+        "rescale": [[0.014339868538081646, 0.20209172368049622]]
+      },
+      "AOD670_uncertainty_mean": {
+        "title": "Mean of l2 uncertainty on aot at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty_mean",
+        "reference": true,
+        "rescale": [[0.011906547378748656, 0.16323258578777333]]
+      },
+      "AOD870_uncertainty_mean": {
+        "title": "Mean of l2 uncertainty on aot at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty_mean",
+        "reference": true,
+        "rescale": [[0.009238971211016179, 0.12106503248214727]]
+      },
+      "AOD550_uncertainty_min": {
+        "title": "Minimum l2 uncertainty on aot at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty_min",
+        "reference": true,
+        "rescale": [[0.011590012069791555, 0.08952163681387905]]
+      },
+      "AOD670_uncertainty_min": {
+        "title": "Minimum l2 uncertainty on aot at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty_min",
+        "reference": true,
+        "rescale": [[0.009800253808498383, 0.07281477674841884]]
+      },
+      "AOD870_uncertainty_min": {
+        "title": "Minimum l2 uncertainty on aot at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty_min",
+        "reference": true,
+        "rescale": [[0.0076550722122192385, 0.0544158224016428]]
+      },
+      "AOD1600_uncertainty_min": {
+        "title": "Minimum l2 uncertainty on aot at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty_min",
+        "reference": true,
+        "rescale": [[0.004606354609131813, 0.04015413969755173]]
+      },
+      "D_AOD550_mean": {
+        "title": "Non-spherical dust aod",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "D_AOD550_mean",
+        "reference": true,
+        "rescale": [[0.0008073561592027545, 0.054337064176797886]]
+      },
+      "pixel_count": {
+        "title": "Number of retrieval pixels in grid cell",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "pixel_count",
+        "reference": true,
+        "rescale": [[2.0, 17.0]]
+      },
+      "AOD550_uncertainty": {
+        "title": "Propagated l2 uncertainty in aerosol optical thickness at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty",
+        "reference": true,
+        "rescale": [[0.028283639624714852, 0.22702676951885223]]
+      },
+      "AOD670_uncertainty": {
+        "title": "Propagated l2 uncertainty in aerosol optical thickness at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty",
+        "reference": true,
+        "rescale": [[0.02305544577538967, 0.18288162499666222]]
+      },
+      "AOD870_uncertainty": {
+        "title": "Propagated l2 uncertainty in aerosol optical thickness at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty",
+        "reference": true,
+        "rescale": [[0.0171392235904932, 0.14003580659627973]]
+      },
+      "AOD1600_uncertainty": {
+        "title": "Propagated l2 uncertainty in aerosol optical thickness at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty",
+        "reference": true,
+        "rescale": [[0.011635697912424803, 0.11329475566744811]]
+      },
+      "SSA550_mean": {
+        "title": "Single scattering albedo at 550nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "SSA550_mean",
+        "reference": true,
+        "rescale": [[0.935894763469696, 0.9875847041606903]]
+      },
+      "AAOD550_sdev": {
+        "title": "Standard deviation absorbing aod",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AAOD550_sdev",
+        "reference": true,
+        "rescale": [[0.0001796914599253796, 0.0046383279375731955]]
+      },
+      "AOD550_sdev": {
+        "title": "Standard deviation aerosol optical thickness at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AOD550_sdev",
+        "reference": true,
+        "rescale": [[0.01097007691860199, 0.08440261334180835]]
+      },
+      "AOD670_sdev": {
+        "title": "Standard deviation aerosol optical thickness at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AOD670_sdev",
+        "reference": true,
+        "rescale": [[0.00900350846350193, 0.06774435713887215]]
+      },
+      "AOD870_sdev": {
+        "title": "Standard deviation aerosol optical thickness at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AOD870_sdev",
+        "reference": true,
+        "rescale": [[0.006713887955993414, 0.05175289399921896]]
+      },
+      "ANG550_870_sdev": {
+        "title": "Standard deviation angstrom exponent computed on aod550nm and aod870nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "ANG550_870_sdev",
+        "reference": true,
+        "rescale": [[0.03175650835037231, 0.15320987105369568]]
+      },
+      "AOD1600_sdev": {
+        "title": "Standard deviation aerosol optical thickness at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AOD1600_sdev",
+        "reference": true,
+        "rescale": [[0.0043472378514707085, 0.0437100447714329]]
+      },
+      "FM_AOD550_sdev": {
+        "title": "Standard deviation fine mode aod",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "FM_AOD550_sdev",
+        "reference": true,
+        "rescale": [[0.006776414997875691, 0.06436292976140977]]
+      },
+      "D_AOD550_sdev": {
+        "title": "Standard deviation non-spherical dust aod",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "D_AOD550_sdev",
+        "reference": true,
+        "rescale": [[0.00011090765328845008, 0.020249763131141678]]
+      },
+      "AOD1600_uncertainty_sdev": {
+        "title": "Standard deviation of l2 uncertainty on aot at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty_sdev",
+        "reference": true,
+        "rescale": [[0.00040112658170983196, 0.039346781000495004]]
+      },
+      "AOD550_uncertainty_sdev": {
+        "title": "Standard deviation of l2 uncertainty on aot at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty_sdev",
+        "reference": true,
+        "rescale": [[0.0005143617221619934, 0.07474085688591003]]
+      },
+      "AOD670_uncertainty_sdev": {
+        "title": "Standard deviation of l2 uncertainty on aot at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty_sdev",
+        "reference": true,
+        "rescale": [[0.0003678607114125043, 0.06276366114616397]]
+      },
+      "AOD870_uncertainty_sdev": {
+        "title": "Standard deviation of l2 uncertainty on aot at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty_sdev",
+        "reference": true,
+        "rescale": [[0.00028546297980938104, 0.05018976181745546]]
+      },
+      "SSA550_sdev": {
+        "title": "Standard deviation of ssa",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "SSA550_sdev",
+        "reference": true,
+        "rescale": [[0.00019111239380436017, 0.0019010017276741564]]
+      }
+    }
+  },
+  "eocis-aerosol-slstr-monthly-s3a": {
+    "renders": {
+      "AAOD550_mean": {
+        "title": "Absorbing AOD at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AAOD550_mean",
+        "reference": true,
+        "rescale": [[0.0010189136723056436, 0.019242185354232753]]
+      },
+      "AOD550_mean": {
+        "title": "Aerosol optical thickness at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AOD550_mean",
+        "reference": true,
+        "rescale": [[0.06106320023536682, 0.3399542629718776]]
+      },
+      "AOD670_mean": {
+        "title": "Aerosol optical thickness at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AOD670_mean",
+        "reference": true,
+        "rescale": [[0.05021360218524933, 0.26601391434669447]]
+      },
+      "AOD870_mean": {
+        "title": "Aerosol optical thickness at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AOD870_mean",
+        "reference": true,
+        "rescale": [[0.037468183785676956, 0.18797016739845268]]
+      },
+      "AOD1600_mean": {
+        "title": "Aerosol optical thickness at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AOD1600_mean",
+        "reference": true,
+        "rescale": [[0.022700222209095955, 0.12487093210220326]]
+      },
+      "ANG550_870_mean": {
+        "title": "Angstrom exponent computed on aod550nm and aod870nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "ANG550_870_mean",
+        "reference": true,
+        "rescale": [[0.6204084396362305, 1.7324242591857895]]
+      },
+      "FM_AOD550_mean": {
+        "title": "Fine mode aod",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "FM_AOD550_mean",
+        "reference": true,
+        "rescale": [[0.03417957052588463, 0.271835577487945]]
+      },
+      "AOD1600_uncertainty_max": {
+        "title": "Maximum l2 uncertainty on aot at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty_max",
+        "reference": true,
+        "rescale": [[0.008373408205807209, 0.2860517978668199]]
+      },
+      "AOD550_uncertainty_max": {
+        "title": "Maximum l2 uncertainty on aot at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty_max",
+        "reference": true,
+        "rescale": [[0.017270679771900176, 0.5593284368514999]]
+      },
+      "AOD670_uncertainty_max": {
+        "title": "Maximum l2 uncertainty on aot at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty_max",
+        "reference": true,
+        "rescale": [[0.014259191043674947, 0.4678858876228312]]
+      },
+      "AOD870_uncertainty_max": {
+        "title": "Maximum l2 uncertainty on aot at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty_max",
+        "reference": true,
+        "rescale": [[0.01103883758187294, 0.3706345975399008]]
+      },
+      "AOD550_uncertainty_mean": {
+        "title": "Mean of l2 uncertainty on aot at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty_mean",
+        "reference": true,
+        "rescale": [[0.01416925135999918, 0.20156852304935455]]
+      },
+      "AOD670_uncertainty_mean": {
+        "title": "Mean of l2 uncertainty on aot at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty_mean",
+        "reference": true,
+        "rescale": [[0.011832882463932038, 0.16336991786956678]]
+      },
+      "AOD870_uncertainty_mean": {
+        "title": "Mean of l2 uncertainty on aot at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty_mean",
+        "reference": true,
+        "rescale": [[0.00915562491863966, 0.12108646333217615]]
+      },
+      "AOD1600_uncertainty_mean": {
+        "title": "Mean of l2 uncertainty on aot at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty_mean",
+        "reference": true,
+        "rescale": [[0.006428090576082468, 0.08975437283515927]]
+      },
+      "AOD550_uncertainty_min": {
+        "title": "Minimum l2 uncertainty on aot at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty_min",
+        "reference": true,
+        "rescale": [[0.011839151009917259, 0.09020593315362928]]
+      },
+      "AOD670_uncertainty_min": {
+        "title": "Minimum l2 uncertainty on aot at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty_min",
+        "reference": true,
+        "rescale": [[0.009958704933524132, 0.07329947948455805]]
+      },
+      "AOD870_uncertainty_min": {
+        "title": "Minimum l2 uncertainty on aot at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty_min",
+        "reference": true,
+        "rescale": [[0.007703660521656275, 0.054652378708124144]]
+      },
+      "AOD1600_uncertainty_min": {
+        "title": "Minimum l2 uncertainty on aot at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty_min",
+        "reference": true,
+        "rescale": [[0.0046034083701670175, 0.04077806919813149]]
+      },
+      "D_AOD550_mean": {
+        "title": "Non-spherical dust aod",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "D_AOD550_mean",
+        "reference": true,
+        "rescale": [[0.0007495455443859101, 0.05494986176490777]]
+      },
+      "pixel_count": {
+        "title": "Number of retrieval pixels in grid cell",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "pixel_count",
+        "reference": true,
+        "rescale": [[2.0, 17.0]]
+      },
+      "AOD870_uncertainty": {
+        "title": "Propagated l2 uncertainty aerosol optical thickness at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty",
+        "reference": true,
+        "rescale": [[0.015498191863298417, 0.14011414647102344]]
+      },
+      "AOD1600_uncertainty": {
+        "title": "Propagated l2 uncertainty in aerosol optical thickness at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty",
+        "reference": true,
+        "rescale": [[0.010712405294179918, 0.10979467928409575]]
+      },
+      "AOD550_uncertainty": {
+        "title": "Propagated l2 uncertainty in aerosol optical thickness at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty",
+        "reference": true,
+        "rescale": [[0.026019171997904777, 0.22708072960376646]]
+      },
+      "AOD670_uncertainty": {
+        "title": "Propagated l2 uncertainty in aerosol optical thickness at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty",
+        "reference": true,
+        "rescale": [[0.021132485941052437, 0.18520732820033944]]
+      },
+      "SSA550_mean": {
+        "title": "Single scattering albedo at 550nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "SSA550_mean",
+        "reference": true,
+        "rescale": [[0.9363942742347717, 0.987698209285736]]
+      },
+      "AAOD550_sdev": {
+        "title": "Standard deviation absorbing aod",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AAOD550_sdev",
+        "reference": true,
+        "rescale": [[0.00015236216131597757, 0.0045150803402066175]]
+      },
+      "AOD1600_sdev": {
+        "title": "Standard deviation aerosol optical thickness at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AOD1600_sdev",
+        "reference": true,
+        "rescale": [[0.0038773680571466684, 0.041419643908739055]]
+      },
+      "AOD550_sdev": {
+        "title": "Standard deviation aerosol optical thickness at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AOD550_sdev",
+        "reference": true,
+        "rescale": [[0.009449298121035099, 0.08318772614002226]]
+      },
+      "AOD670_sdev": {
+        "title": "Standard deviation aerosol optical thickness at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AOD670_sdev",
+        "reference": true,
+        "rescale": [[0.007782355975359678, 0.06676384508609765]]
+      },
+      "AOD870_sdev": {
+        "title": "Standard deviation aerosol optical thickness at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AOD870_sdev",
+        "reference": true,
+        "rescale": [[0.0058490031398832805, 0.05069750919938081]]
+      },
+      "ANG550_870_sdev": {
+        "title": "Standard deviation angstrom exponent computed on aod550nm and aod870nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "ANG550_870_sdev",
+        "reference": true,
+        "rescale": [[0.028811392560601234, 0.1394165277481079]]
+      },
+      "FM_AOD550_sdev": {
+        "title": "Standard deviation fine mode aod",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "FM_AOD550_sdev",
+        "reference": true,
+        "rescale": [[0.005786395072937012, 0.06337082684040056]]
+      },
+      "D_AOD550_sdev": {
+        "title": "Standard deviation non-spherical dust aod",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "D_AOD550_sdev",
+        "reference": true,
+        "rescale": [[9.162299247691409e-5, 0.01974155232310291]]
+      },
+      "AOD1600_uncertainty_sdev": {
+        "title": "Standard deviation of l2 uncertainty on aot at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty_sdev",
+        "reference": true,
+        "rescale": [[0.00033484189189039173, 0.038760397583245815]]
+      },
+      "AOD550_uncertainty_sdev": {
+        "title": "Standard deviation of l2 uncertainty on aot at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty_sdev",
+        "reference": true,
+        "rescale": [[0.00040239267400465906, 0.07343541234731674]]
+      },
+      "AOD670_uncertainty_sdev": {
+        "title": "Standard deviation of l2 uncertainty on aot at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty_sdev",
+        "reference": true,
+        "rescale": [[0.00028803067980334165, 0.06228685528039926]]
+      },
+      "AOD870_uncertainty_sdev": {
+        "title": "Standard deviation of l2 uncertainty on aot at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty_sdev",
+        "reference": true,
+        "rescale": [[0.00023275991843547673, 0.0495034448802471]]
+      },
+      "SSA550_sdev": {
+        "title": "Standard deviation of ssa",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "SSA550_sdev",
+        "reference": true,
+        "rescale": [[0.00018278175266459585, 0.0017075912328436964]]
+      }
+    }
+  },
+  "eocis-aerosol-slstr-daily-s3b": {
+    "renders": {
+      "AAOD550_mean": {
+        "title": "Absorbing AOD at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AAOD550_mean",
+        "reference": true,
+        "rescale": [[0.0007253863092046231, 0.023145229183137366]]
+      },
+      "AOD550_mean": {
+        "title": "Aerosol optical thickness at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AOD550_mean",
+        "reference": true,
+        "rescale": [[0.0391631055623293, 0.4111390590667718]]
+      },
+      "AOD670_mean": {
+        "title": "Aerosol optical thickness at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AOD670_mean",
+        "reference": true,
+        "rescale": [[0.03284773118793965, 0.3261867851018902]]
+      },
+      "AOD870_mean": {
+        "title": "Aerosol optical thickness at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AOD870_mean",
+        "reference": true,
+        "rescale": [[0.0256302772089839, 0.23422280699014653]]
+      },
+      "AOD1600_mean": {
+        "title": "Aerosol optical thickness at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AOD1600_mean",
+        "reference": true,
+        "rescale": [[0.01689490918070078, 0.163108904659748]]
+      },
+      "ANG550_870_mean": {
+        "title": "Angstrom exponent computed on aod550nm and aod870nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "ANG550_870_mean",
+        "reference": true,
+        "rescale": [[0.5166163384914398, 1.7575316667556757]]
+      },
+      "FM_AOD550_mean": {
+        "title": "Fine mode aod",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "FM_AOD550_mean",
+        "reference": true,
+        "rescale": [[0.02044536527246237, 0.3245397657155987]]
+      },
+      "AOD550_uncertainty_max": {
+        "title": "Maximum l2 uncertainty on aot at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty_max",
+        "reference": true,
+        "rescale": [[0.014524844102561475, 0.3676943689584716]]
+      },
+      "AOD670_uncertainty_max": {
+        "title": "Maximum l2 uncertainty on aot at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty_max",
+        "reference": true,
+        "rescale": [[0.011857959069311618, 0.31108196377754077]]
+      },
+      "AOD870_uncertainty_max": {
+        "title": "Maximum l2 uncertainty on aot at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty_max",
+        "reference": true,
+        "rescale": [[0.00852805832400918, 0.23902585208415966]]
+      },
+      "AOD1600_uncertainty_max": {
+        "title": "Maximum l2 uncertainty on aot at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty_max",
+        "reference": true,
+        "rescale": [[0.005788571015000344, 0.17328188717365214]]
+      },
+      "AOD550_uncertainty_mean": {
+        "title": "Mean of l2 uncertainty on aot at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty_mean",
+        "reference": true,
+        "rescale": [[0.012845272663980722, 0.17753258943557734]]
+      },
+      "AOD670_uncertainty_mean": {
+        "title": "Mean of l2 uncertainty on aot at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty_mean",
+        "reference": true,
+        "rescale": [[0.010649252869188787, 0.1407275035977363]]
+      },
+      "AOD870_uncertainty_mean": {
+        "title": "Mean of l2 uncertainty on aot at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty_mean",
+        "reference": true,
+        "rescale": [[0.007932685874402523, 0.0992696262896057]]
+      },
+      "AOD1600_uncertainty_mean": {
+        "title": "Mean of l2 uncertainty on aot at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty_mean",
+        "reference": true,
+        "rescale": [[0.004612636240199208, 0.06913754343986499]]
+      },
+      "AOD1600_uncertainty_min": {
+        "title": "Minimum l2 uncertainty on aot at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty_min",
+        "reference": true,
+        "rescale": [[0.0032839516177773477, 0.031104999594390365]]
+      },
+      "AOD550_uncertainty_min": {
+        "title": "Minimum l2 uncertainty on aot at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty_min",
+        "reference": true,
+        "rescale": [[0.009788142237812282, 0.08062114194035515]]
+      },
+      "AOD670_uncertainty_min": {
+        "title": "Minimum l2 uncertainty on aot at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty_min",
+        "reference": true,
+        "rescale": [[0.00848508719354868, 0.06422159671783441]]
+      },
+      "AOD870_uncertainty_min": {
+        "title": "Minimum l2 uncertainty on aot at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty_min",
+        "reference": true,
+        "rescale": [[0.006746731186285615, 0.04744792468845841]]
+      },
+      "D_AOD550_mean": {
+        "title": "Non-spherical dust aod",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "D_AOD550_mean",
+        "reference": true,
+        "rescale": [[0.0008005824231076986, 0.05085464715957641]]
+      },
+      "pixel_count": {
+        "title": "Number of retrieval pixels in grid cell",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "pixel_count",
+        "reference": true,
+        "rescale": [[3.0, 468.0]]
+      },
+      "AOD870_uncertainty": {
+        "title": "Propagated l2 uncertainty aerosol optical thickness at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty",
+        "reference": true,
+        "rescale": [[0.011282115895301105, 0.12112501263618465]]
+      },
+      "AOD1600_uncertainty": {
+        "title": "Propagated l2 uncertainty in aerosol optical thickness at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty",
+        "reference": true,
+        "rescale": [[0.007370121218264103, 0.09984255880117407]]
+      },
+      "AOD550_uncertainty": {
+        "title": "Propagated l2 uncertainty in aerosol optical thickness at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty",
+        "reference": true,
+        "rescale": [[0.0181367764249444, 0.2000144049525255]]
+      },
+      "AOD670_uncertainty": {
+        "title": "Propagated l2 uncertainty in aerosol optical thickness at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty",
+        "reference": true,
+        "rescale": [[0.015001949947327377, 0.16144855767488409]]
+      },
+      "SSA550_mean": {
+        "title": "Single scattering albedo at 550nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "SSA550_mean",
+        "reference": true,
+        "rescale": [[0.9336745917797089, 0.9875956118106842]]
+      },
+      "AAOD550_sdev": {
+        "title": "Standard deviation absorbing aod",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AAOD550_sdev",
+        "reference": true,
+        "rescale": [[9.08668647753075e-5, 0.004549881070852273]]
+      },
+      "AOD1600_sdev": {
+        "title": "Standard deviation aerosol optical thickness at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AOD1600_sdev",
+        "reference": true,
+        "rescale": [[0.0021534070605412126, 0.05761722102761264]]
+      },
+      "AOD550_sdev": {
+        "title": "Standard deviation aerosol optical thickness at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AOD550_sdev",
+        "reference": true,
+        "rescale": [[0.005013515613973141, 0.0924848921597002]]
+      },
+      "AOD670_sdev": {
+        "title": "Standard deviation aerosol optical thickness at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AOD670_sdev",
+        "reference": true,
+        "rescale": [[0.0041724648792296655, 0.07832961454987517]]
+      },
+      "AOD870_sdev": {
+        "title": "Standard deviation aerosol optical thickness at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AOD870_sdev",
+        "reference": true,
+        "rescale": [[0.0032012026291340593, 0.06294794380664825]]
+      },
+      "ANG550_870_sdev": {
+        "title": "Standard deviation angstrom exponent computed on aod550nm and aod870nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "ANG550_870_sdev",
+        "reference": true,
+        "rescale": [[0.012981803063303233, 0.2082359686493873]]
+      },
+      "FM_AOD550_sdev": {
+        "title": "Standard deviation fine mode aod",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "FM_AOD550_sdev",
+        "reference": true,
+        "rescale": [[0.0028132839361205714, 0.061043179035186614]]
+      },
+      "D_AOD550_sdev": {
+        "title": "Standard deviation non-spherical dust aod",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "D_AOD550_sdev",
+        "reference": true,
+        "rescale": [[8.234676424763168e-5, 0.02046908326447008]]
+      },
+      "AOD1600_uncertainty_sdev": {
+        "title": "Standard deviation of l2 uncertainty on aot at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty_sdev",
+        "reference": true,
+        "rescale": [[0.0001175256576971151, 0.022685503959655746]]
+      },
+      "AOD550_uncertainty_sdev": {
+        "title": "Standard deviation of l2 uncertainty on aot at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty_sdev",
+        "reference": true,
+        "rescale": [[0.00018822388810804116, 0.0493045218288898]]
+      },
+      "AOD670_uncertainty_sdev": {
+        "title": "Standard deviation of l2 uncertainty on aot at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty_sdev",
+        "reference": true,
+        "rescale": [[0.00011732688508345749, 0.04109577164053915]]
+      },
+      "AOD870_uncertainty_sdev": {
+        "title": "Standard deviation of l2 uncertainty on aot at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty_sdev",
+        "reference": true,
+        "rescale": [[6.066228124836926e-5, 0.032521966844797134]]
+      },
+      "SSA550_sdev": {
+        "title": "Standard deviation of ssa",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "SSA550_sdev",
+        "reference": true,
+        "rescale": [[9.586620071786458e-5, 0.002462957310490305]]
+      }
+    }
+  },
+  "eocis-aerosol-slstr-daily-s3a": {
+    "renders": {
+      "AAOD550_mean": {
+        "title": "Absorbing AOD at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AAOD550_mean",
+        "reference": true,
+        "rescale": [[0.0006450454442529008, 0.0209471839480102]]
+      },
+      "AOD550_mean": {
+        "title": "Aerosol optical thickness at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AOD550_mean",
+        "reference": true,
+        "rescale": [[0.03538413383066654, 0.37589157968759535]]
+      },
+      "AOD670_mean": {
+        "title": "Aerosol optical thickness at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AOD670_mean",
+        "reference": true,
+        "rescale": [[0.029758050758391618, 0.2947259962558746]]
+      },
+      "AOD870_mean": {
+        "title": "Aerosol optical thickness at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AOD870_mean",
+        "reference": true,
+        "rescale": [[0.02348718224093318, 0.20554180964827531]]
+      },
+      "AOD1600_mean": {
+        "title": "Aerosol optical thickness at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "AOD1600_mean",
+        "reference": true,
+        "rescale": [[0.015668782219290734, 0.13810752257704734]]
+      },
+      "ANG550_870_mean": {
+        "title": "Angstrom exponent computed on aod550nm and aod870nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "ANG550_870_mean",
+        "reference": true,
+        "rescale": [[0.5691560208797455, 1.7646674871444703]]
+      },
+      "FM_AOD550_mean": {
+        "title": "Fine mode AOD at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "FM_AOD550_mean",
+        "reference": true,
+        "rescale": [[0.019116390962153673, 0.30721401572227475]]
+      },
+      "AOD1600_uncertainty_max": {
+        "title": "Maximum l2 uncertainty on aot at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty_max",
+        "reference": true,
+        "rescale": [[0.0055827489122748375, 0.15067154690623244]]
+      },
+      "AOD550_uncertainty_max": {
+        "title": "Maximum l2 uncertainty on aot at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty_max",
+        "reference": true,
+        "rescale": [[0.014632801758125424, 0.34050483405590026]]
+      },
+      "AOD670_uncertainty_max": {
+        "title": "Maximum l2 uncertainty on aot at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty_max",
+        "reference": true,
+        "rescale": [[0.011731212213635444, 0.2778452292084691]]
+      },
+      "AOD870_uncertainty_max": {
+        "title": "Maximum l2 uncertainty on aot at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty_max",
+        "reference": true,
+        "rescale": [[0.00865636309608817, 0.21274273023009285]]
+      },
+      "AOD1600_uncertainty_mean": {
+        "title": "Mean of l2 uncertainty on aot at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty_mean",
+        "reference": true,
+        "rescale": [[0.004578235908411443, 0.05894985385239122]]
+      },
+      "AOD550_uncertainty_mean": {
+        "title": "Mean of l2 uncertainty on aot at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty_mean",
+        "reference": true,
+        "rescale": [[0.012580346083268523, 0.14505013152956953]]
+      },
+      "AOD670_uncertainty_mean": {
+        "title": "Mean of l2 uncertainty on aot at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty_mean",
+        "reference": true,
+        "rescale": [[0.010384200280532241, 0.11466839835047718]]
+      },
+      "AOD870_uncertainty_mean": {
+        "title": "Mean of l2 uncertainty on aot at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty_mean",
+        "reference": true,
+        "rescale": [[0.007796382997184992, 0.08177156075835228]]
+      },
+      "AOD1600_uncertainty_min": {
+        "title": "Minimum l2 uncertainty on aot at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty_min",
+        "reference": true,
+        "rescale": [[0.003342288068961352, 0.025291931256651867]]
+      },
+      "AOD550_uncertainty_min": {
+        "title": "Minimum l2 uncertainty on aot at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty_min",
+        "reference": true,
+        "rescale": [[0.010078969364985823, 0.06608065329492092]]
+      },
+      "AOD670_uncertainty_min": {
+        "title": "Minimum l2 uncertainty on aot at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty_min",
+        "reference": true,
+        "rescale": [[0.008483523782342673, 0.05320248790085311]]
+      },
+      "AOD870_uncertainty_min": {
+        "title": "Minimum l2 uncertainty on aot at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty_min",
+        "reference": true,
+        "rescale": [[0.006597412307746709, 0.03867604229599232]]
+      },
+      "D_AOD550_mean": {
+        "title": "Non-spherical dust aod",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "D_AOD550_mean",
+        "reference": true,
+        "rescale": [[0.0007042513811029494, 0.046707156300544735]]
+      },
+      "pixel_count": {
+        "title": "Number of retrieval pixels in grid cell",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "pixel_count",
+        "reference": true,
+        "rescale": [[3.0, 464.0]]
+      },
+      "AOD870_uncertainty": {
+        "title": "Propagated l2 uncertainty aerosol optical thickness at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty",
+        "reference": true,
+        "rescale": [[0.010944651206955314, 0.10401755012571809]]
+      },
+      "AOD1600_uncertainty": {
+        "title": "Propagated l2 uncertainty in aerosol optical thickness at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty",
+        "reference": true,
+        "rescale": [[0.007227004528976977, 0.08076746016740795]]
+      },
+      "AOD550_uncertainty": {
+        "title": "Propagated l2 uncertainty in aerosol optical thickness at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty",
+        "reference": true,
+        "rescale": [[0.017510684952139855, 0.17598724961280815]]
+      },
+      "AOD670_uncertainty": {
+        "title": "Propagated l2 uncertainty in aerosol optical thickness at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty",
+        "reference": true,
+        "rescale": [[0.014532448770478368, 0.14222265183925625]]
+      },
+      "SSA550_mean": {
+        "title": "Single scattering albedo at 550nm",
+        "assets": ["reference_file"],
+        "colormap_name": "viridis",
+        "variable": "SSA550_mean",
+        "reference": true,
+        "rescale": [[0.9331152677536011, 0.9873816728591919]]
+      },
+      "AAOD550_sdev": {
+        "title": "Standard deviation absorbing aod",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AAOD550_sdev",
+        "reference": true,
+        "rescale": [[7.506232468585949e-5, 0.004100327542982992]]
+      },
+      "AOD1600_sdev": {
+        "title": "Standard deviation aerosol optical thickness at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AOD1600_sdev",
+        "reference": true,
+        "rescale": [[0.0018997926556039602, 0.0480675384402275]]
+      },
+      "AOD550_sdev": {
+        "title": "Standard deviation aerosol optical thickness at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AOD550_sdev",
+        "reference": true,
+        "rescale": [[0.0041971582453697925, 0.08718373142182827]]
+      },
+      "AOD670_sdev": {
+        "title": "Standard deviation aerosol optical thickness at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AOD670_sdev",
+        "reference": true,
+        "rescale": [[0.0035379309905692936, 0.07045620903372764]]
+      },
+      "AOD870_sdev": {
+        "title": "Standard deviation aerosol optical thickness at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "AOD870_sdev",
+        "reference": true,
+        "rescale": [[0.0027661554398946465, 0.055248378030955766]]
+      },
+      "ANG550_870_sdev": {
+        "title": "Standard deviation angstrom exponent computed on aod550nm and aod870nm",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "ANG550_870_sdev",
+        "reference": true,
+        "rescale": [[0.013204367784783245, 0.17393417209386824]]
+      },
+      "FM_AOD550_sdev": {
+        "title": "Standard deviation fine mode aod",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "FM_AOD550_sdev",
+        "reference": true,
+        "rescale": [[0.0024339963565580547, 0.05931828934699295]]
+      },
+      "D_AOD550_sdev": {
+        "title": "Standard deviation non-spherical dust aod",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "D_AOD550_sdev",
+        "reference": true,
+        "rescale": [[6.37420544080669e-5, 0.01814396260306237]]
+      },
+      "AOD1600_uncertainty_sdev": {
+        "title": "Standard deviation of l2 uncertainty on aot at 1600 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD1600_uncertainty_sdev",
+        "reference": true,
+        "rescale": [[9.906388804665766e-5, 0.019331500772386788]]
+      },
+      "AOD550_uncertainty_sdev": {
+        "title": "Standard deviation of l2 uncertainty on aot at 550 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD550_uncertainty_sdev",
+        "reference": true,
+        "rescale": [[0.0001653480387176387, 0.04350217524915932]]
+      },
+      "AOD670_uncertainty_sdev": {
+        "title": "Standard deviation of l2 uncertainty on aot at 670 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD670_uncertainty_sdev",
+        "reference": true,
+        "rescale": [[0.0001026294325129129, 0.035681666992604714]]
+      },
+      "AOD870_uncertainty_sdev": {
+        "title": "Standard deviation of l2 uncertainty on aot at 870 nm",
+        "assets": ["reference_file"],
+        "colormap_name": "reds",
+        "variable": "AOD870_uncertainty_sdev",
+        "reference": true,
+        "rescale": [[5.180895950616105e-5, 0.027015703916549647]]
+      },
+      "SSA550_sdev": {
+        "title": "Standard deviation of ssa",
+        "assets": ["reference_file"],
+        "colormap_name": "blues",
+        "variable": "SSA550_sdev",
+        "reference": true,
+        "rescale": [[8.84430919541046e-5, 0.0021111176931299267]]
+      }
+    }
+  },
+  "eocis-chuk-land-vegetation-fapar": {
+    "renders": {
+      "data": {
+        "title": "Fraction of Absorbed Photosynthetically Active Radiation",
+        "assets": ["data"],
+        "bidx": [1],
+        "colormap_name": "greens"
+      }
+    }
+  },
+  "eocis-chuk-geospatial-elevation": {
+    "renders": {
+      "data": {
+        "title": "Elevation",
+        "assets": ["data"],
+        "bidx": [1],
+        "colormap_name": "viridis",
+        "rescale": [[0, 1200]]
+      }
+    }
+  },
+  "eocis-chuk-geospatial-landcover": {
+    "renders": {
+      "data": {
+        "title": "Land Cover",
+        "assets": ["data"],
+        "bidx": [1],
+        "colormap": {
+          "-1": "#00FFFFFF",
+          "1": "#FF0000",
+          "2": "#006600",
+          "3": "#732600",
+          "4": "#00FF00",
+          "5": "#7FE57F",
+          "6": "#70A800",
+          "7": "#998100",
+          "8": "#FFFF00",
+          "9": "#801A80",
+          "10": "#E68CA6",
+          "11": "#008073",
+          "12": "#D2D2FF",
+          "13": "#000080",
+          "14": "#0000FF",
+          "15": "#CCB300",
+          "16": "#CCB300",
+          "17": "#FFFF80",
+          "18": "#FFFF80",
+          "19": "#8080FF",
+          "20": "#000000",
+          "21": "#808080"
+        }
+      }
+    }
+  },
+  "eocis-chuk-land-vegetation-lai": {
+    "renders": {
+      "data": {
+        "title": "Leaf Area Index (LAI)",
+        "assets": ["data"],
+        "bidx": [1],
+        "colormap_name": "greens",
+        "rescale": [[0, 50]]
+      }
+    }
+  },
+  "eocis-chuk-lst": {
+    "renders": {
+      "lst": {
+        "title": "Land surface temperature (K)",
+        "assets": ["reference_file"],
+        "colormap_name": "coolwarm",
+        "variable": "lst",
+        "reference": true,
+        "rescale": [[260, 320]]
+      }
+    }
+  },
+  "eocis-chuk-geospatial-builtarea": {
+    "renders": {
+      "urban_area": {
+        "title": "Urban Area",
+        "assets": ["urban_area"],
+        "bidx": [1],
+        "colormap_name": "viridis",
+        "rescale": [[0, 0.1]]
+      },
+      "suburban_area": {
+        "title": "Suburban Area",
+        "assets": ["suburban_area"],
+        "bidx": [1],
+        "colormap_name": "viridis",
+        "rescale": [[0, 0.1]]
+      }
+    }
+  },
+  "cmip6": {
+    "eodhrc:time-variable-items": true,
+    "eodhrc:render-key-properties": ["cmip6:variable_id", "cmip6:frequency", "cmip6:experiment_id"],
+    "renders": {
+      "rsus--mon--ssp585": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[-100.0, 400.0]],
+        "reference": true
+      },
+      "rlus--mon--ssp585": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 700.0]],
+        "reference": true
+      },
+      "tasmin--mon--ssp585": {
+        "title": "Daily Minimum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmin",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "rsds--day--ssp585": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[-200.0, 1000.0]],
+        "reference": true
+      },
+      "tas--day--ssp585": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "psl--day--ssp585": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[96000.0, 106000.0]],
+        "reference": true
+      },
+      "hurs--day--ssp585": {
+        "title": "Near-Surface Relative Humidity (%)",
+        "assets": ["reference_file"],
+        "variable": "hurs",
+        "colormap_name": "viridis",
+        "rescale": [[20.0, 140.0]],
+        "reference": true
+      },
+      "clivi--mon--piControl": {
+        "title": "Ice Water Path (kg m-2)",
+        "assets": ["reference_file"],
+        "variable": "clivi",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.12]],
+        "reference": true
+      },
+      "uas--day--ssp126": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "pr--day--ssp585": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.0004]],
+        "reference": true
+      },
+      "pr--day--ssp126": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[-0.0001, 0.0004]],
+        "reference": true
+      },
+      "tasmin--day--ssp126": {
+        "title": "Daily Minimum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmin",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "tasmax--mon--ssp585": {
+        "title": "Daily Maximum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmax",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 340.0]],
+        "reference": true
+      },
+      "tasmin--mon--ssp126": {
+        "title": "Daily Minimum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmin",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "tasmax--mon--ssp126": {
+        "title": "Daily Maximum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmax",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 340.0]],
+        "reference": true
+      },
+      "prsn--mon--ssp585": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[-9.999999999999999e-6, 3.9999999999999996e-5]],
+        "reference": true
+      },
+      "prsn--mon--ssp126": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[-9.999999999999999e-6, 3.9999999999999996e-5]],
+        "reference": true
+      },
+      "tasmin--day--ssp585": {
+        "title": "Daily Minimum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmin",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "tasmax--day--ssp585": {
+        "title": "Daily Maximum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmax",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 340.0]],
+        "reference": true
+      },
+      "uas--day--ssp585": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "tasmax--day--ssp126": {
+        "title": "Daily Maximum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmax",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "sfcWind--day--ssp585": {
+        "title": "Daily-Mean Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 20.0]],
+        "reference": true
+      },
+      "rlus--day--ssp585": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 600.0]],
+        "reference": true
+      },
+      "rlds--day--ssp585": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 600.0]],
+        "reference": true
+      },
+      "rsus--day--ssp585": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 500.0]],
+        "reference": true
+      },
+      "vas--mon--ssp585": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-7.5, 7.5]],
+        "reference": true
+      },
+      "prsn--day--ssp585": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[-9.999999999999999e-6, 5.9999999999999995e-5]],
+        "reference": true
+      },
+      "uas--mon--ssp585": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "tas--mon--ssp585": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "sfcWind--mon--ssp585": {
+        "title": "Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 15.0]],
+        "reference": true
+      },
+      "rsds--mon--ssp585": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 500.0]],
+        "reference": true
+      },
+      "rlds--mon--ssp585": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 600.0]],
+        "reference": true
+      },
+      "psl--mon--ssp585": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[96000.0, 106000.0]],
+        "reference": true
+      },
+      "pr--mon--ssp585": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[-5e-5, 0.0002]],
+        "reference": true
+      },
+      "huss--mon--ssp585": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[-0.01, 0.05]],
+        "reference": true
+      },
+      "clt--mon--ssp585": {
+        "title": "Total Cloud Cover Percentage (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 100.0]],
+        "reference": true
+      },
+      "hurs--mon--ssp585": {
+        "title": "Near-Surface Relative Humidity (%)",
+        "assets": ["reference_file"],
+        "variable": "hurs",
+        "colormap_name": "viridis",
+        "rescale": [[-500.0, 200.0]],
+        "reference": true
+      },
+      "rsds--3hr--ssp585": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[-200.0, 1000.0]],
+        "reference": true
+      },
+      "rsus--3hr--ssp585": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[-100.0, 500.0]],
+        "reference": true
+      },
+      "vas--day--ssp126": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "tas--day--ssp126": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "snw--day--ssp126": {
+        "title": "Surface Snow Amount (kg m-2)",
+        "assets": ["reference_file"],
+        "variable": "snw",
+        "colormap_name": "viridis",
+        "rescale": [[-2500000.0, 15000000.0]],
+        "reference": true
+      },
+      "sfcWind--day--ssp126": {
+        "title": "Daily-Mean Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 20.0]],
+        "reference": true
+      },
+      "rsds--day--ssp126": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[-200.0, 1000.0]],
+        "reference": true
+      },
+      "rsus--day--ssp126": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 400.0]],
+        "reference": true
+      },
+      "rlds--3hr--ssp585": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "vas--mon--ssp126": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-10.0, 10.0]],
+        "reference": true
+      },
+      "uas--mon--ssp126": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "tas--mon--ssp126": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "sfcWind--mon--ssp126": {
+        "title": "Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 15.0]],
+        "reference": true
+      },
+      "rsus--mon--ssp126": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[-100.0, 400.0]],
+        "reference": true
+      },
+      "rsds--mon--ssp126": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[-100.0, 500.0]],
+        "reference": true
+      },
+      "rlus--day--ssp126": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "rlus--mon--ssp126": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "rlds--mon--ssp126": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "psl--mon--ssp126": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[96000.0, 106000.0]],
+        "reference": true
+      },
+      "psl--day--ssp126": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[96000.0, 106000.0]],
+        "reference": true
+      },
+      "rlds--day--ssp126": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "pr--mon--ssp126": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.0002]],
+        "reference": true
+      },
+      "huss--mon--ssp126": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[-0.005, 0.025]],
+        "reference": true
+      },
+      "prsn--day--ssp126": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[-2e-5, 8e-5]],
+        "reference": true
+      },
+      "clt--mon--ssp126": {
+        "title": "Total Cloud Cover Percentage (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 100.0]],
+        "reference": true
+      },
+      "hurs--mon--ssp126": {
+        "title": "Near-Surface Relative Humidity (%)",
+        "assets": ["reference_file"],
+        "variable": "hurs",
+        "colormap_name": "viridis",
+        "rescale": [[-400.0, 200.0]],
+        "reference": true
+      },
+      "huss--day--ssp126": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.025]],
+        "reference": true
+      },
+      "hurs--day--ssp126": {
+        "title": "Near-Surface Relative Humidity (%)",
+        "assets": ["reference_file"],
+        "variable": "hurs",
+        "colormap_name": "viridis",
+        "rescale": [[20.0, 140.0]],
+        "reference": true
+      },
+      "vas--3hrPt--ssp585": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "uas--3hrPt--ssp585": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 20.0]],
+        "reference": true
+      },
+      "huss--3hrPt--ssp585": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.04]],
+        "reference": true
+      },
+      "huss--day--ssp585": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.05]],
+        "reference": true
+      },
+      "uas--3hrPt--ssp126": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 20.0]],
+        "reference": true
+      },
+      "vas--3hrPt--ssp126": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "tas--3hrPt--ssp585": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "tas--3hrPt--ssp126": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "huss--3hrPt--ssp126": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.025]],
+        "reference": true
+      },
+      "vas--day--ssp585": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "pr--3hr--ssp585": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[-0.0001, 0.0004]],
+        "reference": true
+      },
+      "snw--day--ssp585": {
+        "title": "Surface Snow Amount (kg m-2)",
+        "assets": ["reference_file"],
+        "variable": "snw",
+        "colormap_name": "viridis",
+        "rescale": [[-2500000.0, 15000000.0]],
+        "reference": true
+      },
+      "prsn--3hr--ssp585": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[-2e-5, 8e-5]],
+        "reference": true
+      },
+      "rlus--3hr--ssp585": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 600.0]],
+        "reference": true
+      },
+      "prsn--3hr--ssp126": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[-9.999999999999999e-6, 5.9999999999999995e-5]],
+        "reference": true
+      },
+      "clt--day--ssp245": {
+        "title": "Total Cloud Cover Percentage (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 120.0]],
+        "reference": true
+      },
+      "pr--3hr--ssp126": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[-0.0001, 0.0004]],
+        "reference": true
+      },
+      "rlds--day--ssp245": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "rsus--day--ssp245": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[-100.0, 500.0]],
+        "reference": true
+      },
+      "rsds--3hr--ssp126": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 1000.0]],
+        "reference": true
+      },
+      "tasmax--day--ssp245": {
+        "title": "Daily Maximum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmax",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "tasmin--day--ssp245": {
+        "title": "Daily Minimum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmin",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "sfcWind--day--ssp245": {
+        "title": "Daily-Mean Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 20.0]],
+        "reference": true
+      },
+      "clt--mon--ssp245": {
+        "title": "Total Cloud Cover Percentage (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 100.0]],
+        "reference": true
+      },
+      "tas--day--ssp245": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "hurs--day--ssp245": {
+        "title": "Near-Surface Relative Humidity (%)",
+        "assets": ["reference_file"],
+        "variable": "hurs",
+        "colormap_name": "viridis",
+        "rescale": [[20.0, 140.0]],
+        "reference": true
+      },
+      "vas--day--ssp245": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "vas--mon--ssp245": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-7.5, 7.5]],
+        "reference": true
+      },
+      "uas--mon--ssp245": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "tas--mon--ssp245": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "sfcWind--mon--ssp245": {
+        "title": "Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 15.0]],
+        "reference": true
+      },
+      "rsds--mon--ssp245": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[-100.0, 500.0]],
+        "reference": true
+      },
+      "rsus--mon--ssp245": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[-100.0, 400.0]],
+        "reference": true
+      },
+      "rlus--mon--ssp245": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 600.0]],
+        "reference": true
+      },
+      "rlds--mon--ssp245": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "prsn--mon--ssp245": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[-9.999999999999999e-6, 3.9999999999999996e-5]],
+        "reference": true
+      },
+      "psl--mon--ssp245": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[96000.0, 104000.0]],
+        "reference": true
+      },
+      "pr--mon--ssp245": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.0002]],
+        "reference": true
+      },
+      "hurs--mon--ssp245": {
+        "title": "Near-Surface Relative Humidity (%)",
+        "assets": ["reference_file"],
+        "variable": "hurs",
+        "colormap_name": "viridis",
+        "rescale": [[20.0, 140.0]],
+        "reference": true
+      },
+      "huss--mon--ssp245": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[-0.005, 0.03]],
+        "reference": true
+      },
+      "rsds--day--ssp245": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[-200.0, 1000.0]],
+        "reference": true
+      },
+      "snw--day--ssp245": {
+        "title": "Surface Snow Amount (kg m-2)",
+        "assets": ["reference_file"],
+        "variable": "snw",
+        "colormap_name": "viridis",
+        "rescale": [[-2500000.0, 15000000.0]],
+        "reference": true
+      },
+      "vas--3hr--ssp585": {
+        "title": "Northward Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "uas--3hr--ssp585": {
+        "title": "Eastward Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "tas--3hr--ssp585": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "huss--3hr--ssp585": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.025]],
+        "reference": true
+      },
+      "vas--3hr--ssp245": {
+        "title": "Northward Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "uas--3hr--ssp245": {
+        "title": "Eastward Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "tas--3hr--ssp245": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "vas--3hr--ssp126": {
+        "title": "Northward Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "uas--3hr--ssp126": {
+        "title": "Eastward Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "huss--3hr--ssp126": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.02]],
+        "reference": true
+      },
+      "vas--3hr--ssp119": {
+        "title": "Northward Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "tas--3hr--ssp119": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "uas--3hr--ssp119": {
+        "title": "Eastward Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "huss--3hr--ssp119": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.02]],
+        "reference": true
+      },
+      "psl--3hrPt--ssp585": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[96000.0, 104000.0]],
+        "reference": true
+      },
+      "psl--3hrPt--ssp245": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[96000.0, 104000.0]],
+        "reference": true
+      },
+      "uas--3hrPt--ssp245": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "tas--3hrPt--ssp245": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "huss--3hrPt--ssp245": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.025]],
+        "reference": true
+      },
+      "psl--3hrPt--ssp126": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[97000.0, 104000.0]],
+        "reference": true
+      },
+      "vas--3hrPt--ssp245": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "tas--3hrPt--ssp119": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "huss--3hrPt--ssp119": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.025]],
+        "reference": true
+      },
+      "tasmax--mon--ssp245": {
+        "title": "Daily Maximum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmax",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 340.0]],
+        "reference": true
+      },
+      "tasmin--mon--ssp245": {
+        "title": "Daily Minimum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmin",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "prsn--day--ssp245": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[-2e-5, 8e-5]],
+        "reference": true
+      },
+      "psl--day--ssp245": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[96000.0, 106000.0]],
+        "reference": true
+      },
+      "pr--day--ssp245": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[-5e-5, 0.00030000000000000003]],
+        "reference": true
+      },
+      "uas--day--ssp245": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "huss--day--ssp245": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.03]],
+        "reference": true
+      },
+      "pr--3hr--ssp245": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[-0.0001, 0.0004]],
+        "reference": true
+      },
+      "snw--day--ssp119": {
+        "title": "Surface Snow Amount (kg m-2)",
+        "assets": ["reference_file"],
+        "variable": "snw",
+        "colormap_name": "viridis",
+        "rescale": [[-200000.0, 1000000.0]],
+        "reference": true
+      },
+      "psl--day--ssp119": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[96000.0, 106000.0]],
+        "reference": true
+      },
+      "tasmax--day--ssp119": {
+        "title": "Daily Maximum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmax",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "vas--day--ssp119": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "tas--day--ssp119": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "tasmin--day--ssp119": {
+        "title": "Daily Minimum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmin",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "pr--day--ssp119": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[-5e-5, 0.00030000000000000003]],
+        "reference": true
+      },
+      "sfcWind--day--ssp119": {
+        "title": "Daily-Mean Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 20.0]],
+        "reference": true
+      },
+      "vas--mon--ssp119": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-7.5, 7.5]],
+        "reference": true
+      },
+      "uas--mon--ssp119": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-10.0, 10.0]],
+        "reference": true
+      },
+      "tasmax--mon--ssp119": {
+        "title": "Daily Maximum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmax",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "uas--day--ssp119": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "tasmin--mon--ssp119": {
+        "title": "Daily Minimum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmin",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "tas--mon--ssp119": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "sfcWind--mon--ssp119": {
+        "title": "Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 15.0]],
+        "reference": true
+      },
+      "rsus--mon--ssp119": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[-100.0, 400.0]],
+        "reference": true
+      },
+      "rsds--mon--ssp119": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 500.0]],
+        "reference": true
+      },
+      "huss--day--ssp119": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.025]],
+        "reference": true
+      },
+      "hurs--day--ssp119": {
+        "title": "Near-Surface Relative Humidity (%)",
+        "assets": ["reference_file"],
+        "variable": "hurs",
+        "colormap_name": "viridis",
+        "rescale": [[20.0, 120.0]],
+        "reference": true
+      },
+      "rlds--mon--ssp119": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "rlus--mon--ssp119": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "prsn--mon--ssp119": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[-9.999999999999999e-6, 3.9999999999999996e-5]],
+        "reference": true
+      },
+      "psl--mon--ssp119": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[98000.0, 104000.0]],
+        "reference": true
+      },
+      "pr--mon--ssp119": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.0002]],
+        "reference": true
+      },
+      "huss--mon--ssp119": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.025]],
+        "reference": true
+      },
+      "hurs--mon--ssp119": {
+        "title": "Near-Surface Relative Humidity (%)",
+        "assets": ["reference_file"],
+        "variable": "hurs",
+        "colormap_name": "viridis",
+        "rescale": [[20.0, 140.0]],
+        "reference": true
+      },
+      "clt--mon--ssp119": {
+        "title": "Total Cloud Fraction (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 100.0]],
+        "reference": true
+      },
+      "vas--monC--ssp585": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-6.0, 6.0]],
+        "reference": true
+      },
+      "uas--monC--ssp585": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-10.0, 10.0]],
+        "reference": true
+      },
+      "tasmin--monC--ssp585": {
+        "title": "Daily Minimum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmin",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "tasmax--monC--ssp585": {
+        "title": "Daily Maximum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmax",
+        "colormap_name": "viridis",
+        "rescale": [[240.0, 320.0]],
+        "reference": true
+      },
+      "tas--monC--ssp585": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "sfcWind--monC--ssp585": {
+        "title": "Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 14.0]],
+        "reference": true
+      },
+      "rsus--monC--ssp585": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 400.0]],
+        "reference": true
+      },
+      "rsds--monC--ssp585": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 500.0]],
+        "reference": true
+      },
+      "rlus--monC--ssp585": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 600.0]],
+        "reference": true
+      },
+      "rlds--monC--ssp585": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "psl--monC--ssp585": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[98000.0, 103000.0]],
+        "reference": true
+      },
+      "prsn--monC--ssp585": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 2.9999999999999997e-5]],
+        "reference": true
+      },
+      "pr--monC--ssp585": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.0002]],
+        "reference": true
+      },
+      "huss--monC--ssp585": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.025]],
+        "reference": true
+      },
+      "hurs--monC--ssp585": {
+        "title": "Near-Surface Relative Humidity (%)",
+        "assets": ["reference_file"],
+        "variable": "hurs",
+        "colormap_name": "viridis",
+        "rescale": [[20.0, 120.0]],
+        "reference": true
+      },
+      "clt--monC--ssp585": {
+        "title": "Total Cloud Fraction (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[20.0, 100.0]],
+        "reference": true
+      },
+      "pr--3hr--ssp119": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[-0.0001, 0.0004]],
+        "reference": true
+      },
+      "vas--monC--ssp245": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-6.0, 6.0]],
+        "reference": true
+      },
+      "uas--monC--ssp245": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-10.0, 10.0]],
+        "reference": true
+      },
+      "tasmin--monC--ssp245": {
+        "title": "Daily Minimum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmin",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "tas--monC--ssp245": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "sfcWind--monC--ssp245": {
+        "title": "Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 12.0]],
+        "reference": true
+      },
+      "tasmax--monC--ssp245": {
+        "title": "Daily Maximum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmax",
+        "colormap_name": "viridis",
+        "rescale": [[240.0, 320.0]],
+        "reference": true
+      },
+      "rlus--monC--ssp245": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "rsds--monC--ssp245": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 500.0]],
+        "reference": true
+      },
+      "rsus--monC--ssp245": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 400.0]],
+        "reference": true
+      },
+      "rlds--monC--ssp245": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "prsn--monC--ssp245": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 2.9999999999999997e-5]],
+        "reference": true
+      },
+      "psl--monC--ssp245": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[98000.0, 103000.0]],
+        "reference": true
+      },
+      "pr--monC--ssp245": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.0002]],
+        "reference": true
+      },
+      "huss--monC--ssp245": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.025]],
+        "reference": true
+      },
+      "hurs--monC--ssp245": {
+        "title": "Near-Surface Relative Humidity (%)",
+        "assets": ["reference_file"],
+        "variable": "hurs",
+        "colormap_name": "viridis",
+        "rescale": [[20.0, 120.0]],
+        "reference": true
+      },
+      "clt--monC--ssp245": {
+        "title": "Total Cloud Fraction (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[20.0, 100.0]],
+        "reference": true
+      },
+      "rlus--day--ssp245": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 600.0]],
+        "reference": true
+      },
+      "prsn--day--ssp119": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 8e-5]],
+        "reference": true
+      },
+      "prsn--3hr--ssp119": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 4.9999999999999996e-5]],
+        "reference": true
+      },
+      "sfcWind--3hr--ssp585": {
+        "title": "Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 20.0]],
+        "reference": true
+      },
+      "rsus--3hr--ssp245": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[-100.0, 500.0]],
+        "reference": true
+      },
+      "prsn--3hr--ssp245": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[-9.999999999999999e-6, 5.9999999999999995e-5]],
+        "reference": true
+      },
+      "rlds--3hr--ssp245": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "clt--3hr--ssp245": {
+        "title": "Total Cloud Cover Percentage (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 100.0]],
+        "reference": true
+      },
+      "sfcWind--3hr--ssp245": {
+        "title": "Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 20.0]],
+        "reference": true
+      },
+      "rss--day--ssp245": {
+        "title": "Net Shortwave Surface Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 400.0]],
+        "reference": true
+      },
+      "rsds--3hr--ssp245": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 1000.0]],
+        "reference": true
+      },
+      "clt--day--ssp126": {
+        "title": "Total Cloud Cover Percentage (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 100.0]],
+        "reference": true
+      },
+      "rsds--day--ssp119": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 500.0]],
+        "reference": true
+      },
+      "rlus--day--ssp119": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "rlus--3hr--ssp245": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "clt--day--ssp585": {
+        "title": "Total Cloud Cover Percentage (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 100.0]],
+        "reference": true
+      },
+      "clt--3hr--ssp585": {
+        "title": "Total Cloud Cover Percentage (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 100.0]],
+        "reference": true
+      },
+      "rlus--3hr--ssp126": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "rsus--3hr--ssp126": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 500.0]],
+        "reference": true
+      },
+      "rlds--3hr--ssp126": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "clt--3hr--ssp126": {
+        "title": "Total Cloud Cover Percentage (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 100.0]],
+        "reference": true
+      },
+      "rsus--day--ssp119": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 400.0]],
+        "reference": true
+      },
+      "rlds--day--ssp119": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "clt--day--ssp119": {
+        "title": "Total Cloud Cover Percentage (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 100.0]],
+        "reference": true
+      },
+      "sfcWind--3hr--ssp126": {
+        "title": "Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 17.5]],
+        "reference": true
+      },
+      "rlds--3hr--historical": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 500.0]],
+        "reference": true
+      },
+      "rsus--3hr--historical": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[-100.0, 500.0]],
+        "reference": true
+      },
+      "rsds--3hr--historical": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[-200.0, 1200.0]],
+        "reference": true
+      },
+      "rlus--3hr--historical": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "vas--day--historical": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "pr--3hr--historical": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[-0.0001, 0.0005]],
+        "reference": true
+      },
+      "tas--3hrPt--historical": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "uas--3hrPt--historical": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "clt--3hr--historical": {
+        "title": "Total Cloud Cover Percentage (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 120.0]],
+        "reference": true
+      },
+      "prsn--3hr--historical": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[-2e-5, 8e-5]],
+        "reference": true
+      },
+      "tasmin--day--historical": {
+        "title": "Daily Minimum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmin",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "uas--day--historical": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "tas--day--historical": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "huss--3hrPt--historical": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.025]],
+        "reference": true
+      },
+      "rsds--day--historical": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[-100.0, 500.0]],
+        "reference": true
+      },
+      "sfcWind--day--historical": {
+        "title": "Daily-Mean Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 20.0]],
+        "reference": true
+      },
+      "tasmax--day--historical": {
+        "title": "Daily Maximum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmax",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "psl--day--historical": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[96000.0, 106000.0]],
+        "reference": true
+      },
+      "pr--day--historical": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.0004]],
+        "reference": true
+      },
+      "vas--3hr--historical": {
+        "title": "Northward Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "uas--3hr--historical": {
+        "title": "Eastward Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "huss--3hr--historical": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.02]],
+        "reference": true
+      },
+      "tas--3hr--historical": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "vas--3hrPt--historical": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "snw--day--historical": {
+        "title": "Surface Snow Amount (kg m-2)",
+        "assets": ["reference_file"],
+        "variable": "snw",
+        "colormap_name": "viridis",
+        "rescale": [[-2500000.0, 12500000.0]],
+        "reference": true
+      },
+      "rsus--day--historical": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[-100.0, 500.0]],
+        "reference": true
+      },
+      "clt--day--historical": {
+        "title": "Total Cloud Cover Percentage (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 100.0]],
+        "reference": true
+      },
+      "rlds--day--historical": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 500.0]],
+        "reference": true
+      },
+      "prsn--day--historical": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 8e-5]],
+        "reference": true
+      },
+      "rlus--day--historical": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "hurs--mon--historical": {
+        "title": "Near-Surface Relative Humidity (%)",
+        "assets": ["reference_file"],
+        "variable": "hurs",
+        "colormap_name": "viridis",
+        "rescale": [[-800.0, 200.0]],
+        "reference": true
+      },
+      "tas--mon--historical": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "rlds--mon--historical": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "tasmax--mon--historical": {
+        "title": "Daily Maximum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmax",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "rsds--mon--historical": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[-100.0, 500.0]],
+        "reference": true
+      },
+      "pr--mon--historical": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.0002]],
+        "reference": true
+      },
+      "rlus--mon--historical": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[100.0, 500.0]],
+        "reference": true
+      },
+      "tasmin--mon--historical": {
+        "title": "Daily Minimum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmin",
+        "colormap_name": "viridis",
+        "rescale": [[220.0, 320.0]],
+        "reference": true
+      },
+      "huss--mon--historical": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[-0.005, 0.025]],
+        "reference": true
+      },
+      "clt--mon--historical": {
+        "title": "Total Cloud Cover Percentage (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 100.0]],
+        "reference": true
+      },
+      "rsus--mon--historical": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[-100.0, 400.0]],
+        "reference": true
+      },
+      "vas--mon--historical": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-7.5, 10.0]],
+        "reference": true
+      },
+      "sfcWind--mon--historical": {
+        "title": "Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 12.5]],
+        "reference": true
+      },
+      "uas--mon--historical": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-15.0, 15.0]],
+        "reference": true
+      },
+      "psl--mon--historical": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[96000.0, 104000.0]],
+        "reference": true
+      },
+      "prsn--mon--historical": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[-9.999999999999999e-6, 4.9999999999999996e-5]],
+        "reference": true
+      },
+      "psl--3hrPt--historical": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[96000.0, 106000.0]],
+        "reference": true
+      },
+      "hurs--day--historical": {
+        "title": "Near-Surface Relative Humidity (%)",
+        "assets": ["reference_file"],
+        "variable": "hurs",
+        "colormap_name": "viridis",
+        "rescale": [[20.0, 140.0]],
+        "reference": true
+      },
+      "huss--day--historical": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.02]],
+        "reference": true
+      },
+      "vas--monC--historical": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-6.0, 6.0]],
+        "reference": true
+      },
+      "sfcWind--3hr--historical": {
+        "title": "Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 15.0]],
+        "reference": true
+      },
+      "rss--day--historical": {
+        "title": "Net Shortwave Surface Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 400.0]],
+        "reference": true
+      },
+      "toz--day--historical": {
+        "title": "Total Column Ozone (m)",
+        "assets": ["reference_file"],
+        "variable": "toz",
+        "colormap_name": "viridis",
+        "rescale": [[200.0, 450.0]],
+        "reference": true
+      }
+    }
+  },
+  "cordex": {
+    "eodhrc:time-variable-items": true,
+    "eodhrc:render-key-properties": ["variable_id", "time_frequency", "experiment"],
+    "renders": {
+      "tasmin--day--rcp85": {
+        "title": "Daily Minimum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmin",
+        "colormap_name": "viridis",
+        "rescale": [[250.0, 300.0]],
+        "reference": true
+      },
+      "clt--day--rcp85": {
+        "title": "Total Cloud Fraction (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 100.0]],
+        "reference": true
+      },
+      "snw--day--rcp85": {
+        "title": "Surface Snow Amount (kg m-2)",
+        "assets": ["reference_file"],
+        "variable": "snw",
+        "colormap_name": "viridis",
+        "rescale": [[-25.0, 150.0]],
+        "reference": true
+      },
+      "sfcWind--day--rcp85": {
+        "title": "Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 15.0]],
+        "reference": true
+      },
+      "prsn--day--rcp85": {
+        "title": "Snowfall Flux (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "prsn",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 4.9999999999999996e-5]],
+        "reference": true
+      },
+      "vas--day--rcp85": {
+        "title": "Northward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "vas",
+        "colormap_name": "viridis",
+        "rescale": [[-10.0, 10.0]],
+        "reference": true
+      },
+      "psl--day--rcp85": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[98000.0, 104000.0]],
+        "reference": true
+      },
+      "uas--day--rcp85": {
+        "title": "Eastward Near-Surface Wind (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "uas",
+        "colormap_name": "viridis",
+        "rescale": [[-10.0, 15.0]],
+        "reference": true
+      },
+      "hurs--day--rcp85": {
+        "title": "Near-Surface Relative Humidity (%)",
+        "assets": ["reference_file"],
+        "variable": "hurs",
+        "colormap_name": "viridis",
+        "rescale": [[20.0, 120.0]],
+        "reference": true
+      },
+      "tasmax--day--rcp85": {
+        "title": "Daily Maximum Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tasmax",
+        "colormap_name": "viridis",
+        "rescale": [[260.0, 300.0]],
+        "reference": true
+      },
+      "tas--day--rcp85": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[260.0, 300.0]],
+        "reference": true
+      },
+      "pr--3hr--rcp85": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.0005]],
+        "reference": true
+      },
+      "rlus--3hr--rcp85": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[200.0, 450.0]],
+        "reference": true
+      },
+      "tas--3hr--rcp85": {
+        "title": "Near-Surface Air Temperature (K)",
+        "assets": ["reference_file"],
+        "variable": "tas",
+        "colormap_name": "viridis",
+        "rescale": [[250.0, 300.0]],
+        "reference": true
+      },
+      "huss--3hr--rcp85": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.012]],
+        "reference": true
+      },
+      "hurs--3hr--rcp85": {
+        "title": "Near-Surface Relative Humidity (%)",
+        "assets": ["reference_file"],
+        "variable": "hurs",
+        "colormap_name": "viridis",
+        "rescale": [[20.0, 120.0]],
+        "reference": true
+      },
+      "rsus--day--rcp85": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 80.0]],
+        "reference": true
+      },
+      "rlds--day--rcp85": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[200.0, 400.0]],
+        "reference": true
+      },
+      "psl--3hr--rcp85": {
+        "title": "Sea Level Pressure (Pa)",
+        "assets": ["reference_file"],
+        "variable": "psl",
+        "colormap_name": "viridis",
+        "rescale": [[99000.0, 104000.0]],
+        "reference": true
+      },
+      "rsus--3hr--rcp85": {
+        "title": "Surface Upwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsus",
+        "colormap_name": "viridis",
+        "rescale": [[-1.0, 1.0]],
+        "reference": true
+      },
+      "rlus--day--rcp85": {
+        "title": "Surface Upwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlus",
+        "colormap_name": "viridis",
+        "rescale": [[250.0, 450.0]],
+        "reference": true
+      },
+      "rsds--day--rcp85": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 200.0]],
+        "reference": true
+      },
+      "huss--day--rcp85": {
+        "title": "Near-Surface Specific Humidity (1)",
+        "assets": ["reference_file"],
+        "variable": "huss",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.012]],
+        "reference": true
+      },
+      "rsds--3hr--rcp85": {
+        "title": "Surface Downwelling Shortwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rsds",
+        "colormap_name": "viridis",
+        "rescale": [[-1.0, 1.0]],
+        "reference": true
+      },
+      "rlds--3hr--rcp85": {
+        "title": "Surface Downwelling Longwave Radiation (W m-2)",
+        "assets": ["reference_file"],
+        "variable": "rlds",
+        "colormap_name": "viridis",
+        "rescale": [[200.0, 400.0]],
+        "reference": true
+      },
+      "pr--day--rcp85": {
+        "title": "Precipitation (kg m-2 s-1)",
+        "assets": ["reference_file"],
+        "variable": "pr",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 0.00025]],
+        "reference": true
+      },
+      "sfcWind--3hr--rcp85": {
+        "title": "Near-Surface Wind Speed (m s-1)",
+        "assets": ["reference_file"],
+        "variable": "sfcWind",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 17.5]],
+        "reference": true
+      },
+      "clt--3hr--rcp85": {
+        "title": "Total Cloud Fraction (%)",
+        "assets": ["reference_file"],
+        "variable": "clt",
+        "colormap_name": "viridis",
+        "rescale": [[0.0, 100.0]],
+        "reference": true
+      }
+    }
+  },
+  "menut-l1a-cogs": {
+    "renders": {
+      "preview": {
+        "title": "Preview (approximate location)",
+        "assets": ["thumbnail"],
+        "quicklook_georeference": "bbox"
+      }
+    }
+  },
+  "menut-l1b-cogs": {
+    "renders": {
+      "preview": {
+        "title": "Preview (approximate location)",
+        "assets": ["thumbnail"],
+        "quicklook_georeference": "bbox"
+      }
+    }
+  },
+  "menut-l1c-cogs": {
+    "renders": {
+      "preview": {
+        "title": "Preview (approximate location)",
+        "assets": ["thumbnail"],
+        "quicklook_georeference": "bbox"
+      }
+    }
+  },
+  "platero-l1c-cogs": {
+    "renders": {
+      "preview": {
+        "title": "Preview (approximate location)",
+        "assets": ["thumbnail"],
+        "quicklook_georeference": "bbox"
+      }
+    }
+  },
+  "hammer-l1c-cogs": {
+    "renders": {
+      "preview": {
+        "title": "Preview (approximate location)",
+        "assets": ["thumbnail"],
+        "quicklook_georeference": "bbox"
+      }
+    }
+  },
+  "mantis-l1d-cogs": {
+    "renders": {
+      "preview": {
+        "title": "Preview (approximate location)",
+        "assets": ["thumbnail"],
+        "quicklook_georeference": "bbox"
+      }
+    }
+  },
+  "accenture-1-l1c-cogs": {
+    "renders": {
+      "preview": {
+        "title": "Preview (approximate location)",
+        "assets": ["thumbnail"],
+        "quicklook_georeference": "bbox"
+      }
+    }
+  }
+}

@@ -3,40 +3,6 @@
 # Plugin metadata
 PLUGIN_NAME = "EODH"
 
-# UI constants
-DEFAULT_PAGE_SIZE = 50
-THUMBNAIL_SIZE = (150, 150)
-
-# MIME types that can be loaded as QGIS layers
-LOADABLE_MIME_TYPES = [
-    "image/tiff; application=geotiff; profile=cloud-optimized",
-    "image/tiff; application=geotiff",
-    "application/x-netcdf",
-    "application/netcdf",
-    "image/tiff",
-    "image/png",
-    "image/jpeg",
-]
-
-# File extensions that can be loaded as QGIS layers
-LOADABLE_EXTENSIONS = [
-    ".tif",
-    ".tiff",
-    ".nc",
-    ".png",
-    ".jpg",
-    ".jpeg",
-]
-
-# NetCDF-specific MIME types
-NETCDF_MIME_TYPES = [
-    "application/x-netcdf",
-    "application/netcdf",
-]
-
-# Asset keys that are typically data assets
-DATA_ASSET_KEYS = ["quicklook", "data", "visual", "image"]
-
 # CF convention standard names that indicate coordinate variables
 CF_COORDINATE_STANDARD_NAMES = [
     "latitude",

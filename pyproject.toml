@@ -1,28 +1,19 @@
 [project]
 name = "eodh-qgis"
 version = "0.0.2"
-description = "QGIS plugin for EODH"
+description = "Search, filter, preview, and load datasets from the UK EO Data Hub"
 authors = [{ name = "Dusan Figala", email = "dusan@oxidian.com" }]
 license = { text = "BSD-3-Clause" }
 readme = "README.md"
 requires-python = ">=3.9,<3.14"
-dependencies = [
-    "defusedxml>=0.7.1",
-    "pyeodh>=0.0.7",
-    "qgis-plugin-ci>=2.8.10",
-]
+dependencies = []
 
 [dependency-groups]
 dev = [
+    "pytest>=8",
+    "pytest-cov>=5",
     "pre-commit",
     "pyright",
-    "pytest",
-    "pytest-cov",
-    "pytest-mock",
-    "pytest-qgis",
-    "pytest-watcher",
-    "pytest-xdist",
-    "pyqt5",
     "ruff",
     "validate-pyproject",
 ]
@@ -35,11 +26,12 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
-addopts = ["--import-mode=importlib"]
+testpaths = ["tests/unit"]
+pythonpath = ["."]
+addopts = ["--strict-config", "--strict-markers", "-ra"]
 
 [tool.pyright]
 include = ["eodh_qgis"]
-exclude = ["eodh_qgis/test"]
 pythonVersion = "3.9"
 typeCheckingMode = "basic"
 reportMissingImports = "warning"
@@ -75,8 +67,6 @@ ignore = [
     "B023",    # function uses loop variable - intentional closures in Qt signal handlers
     "ANN",     # missing type annotations - too many to add at once
     "PLC0415", # import outside top-level - intentional lazy imports in QGIS plugin
-    "PT009",   # unittest-style assertions - tests use unittest via pytest-qgis
-    "PT027",   # unittest-style raises - tests use unittest via pytest-qgis
     "RUF012",  # mutable class default - used in Qt classes
     "RUF059",  # unused unpacked variable
     "UP031",   # printf-string-formatting

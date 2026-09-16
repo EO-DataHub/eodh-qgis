@@ -1,13 +1,13 @@
-FROM qgis/qgis:release-3_36
+ARG QGIS_IMAGE=qgis/qgis:4.2-trixie
+FROM ${QGIS_IMAGE}
 
-# Install required packages
-# Constrain numpy for compatibility with scipy in QGIS base image
-RUN echo "numpy<1.25.0" > /tmp/constraints.txt && \
-    pip3 install pyeodh pytest pytest-cov pytest-qgis defusedxml -c /tmp/constraints.txt
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3-gdal python3-numpy python3-pytest python3-pytest-cov && \
+    rm -rf /var/lib/apt/lists/*
 
-# Set the entrypoint script
-COPY .docker/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["bash"] 
+WORKDIR /workspace
+ENV QT_QPA_PLATFORM=offscreen \
+    QGIS_PREFIX_PATH=/usr \
+    PYTHONPATH=/usr/share/qgis/python:/usr/share/qgis/python/plugins
+ENTRYPOINT ["python3"]
+CMD ["-m", "pytest", "tests", "--cov=eodh_qgis", "--cov-report=term-missing", "--cov-report=xml", "--junitxml=test-results.xml"]

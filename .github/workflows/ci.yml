@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   code-quality:
     runs-on: ubuntu-latest
@@ -21,34 +24,58 @@ jobs:
       - name: Code quality
         run: make check
 
-  test:
-    runs-on: ubuntu-latest
+      - name: Hub transport and commercial contract tests
+        run: uv run pytest tests/unit
 
+  qgis-compatibility:
+    name: QGIS ${{ matrix.qgis }} / Qt ${{ matrix.qt }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - qgis: "3.44"
+            qt: "5"
+            image: qgis/qgis:3.44-trixie
+          - qgis: "4.2"
+            qt: "6"
+            image: qgis/qgis:4.2-trixie
+    container:
+      image: ${{ matrix.image }}
+    env:
+      QT_QPA_PLATFORM: offscreen
+      QGIS_PREFIX_PATH: /usr
+      PYTHONPATH: /usr/share/qgis/python:/usr/share/qgis/python/plugins
+      EXPECTED_QGIS: ${{ matrix.qgis }}
+      EXPECTED_QT: ${{ matrix.qt }}
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
+      - name: Install native test dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3-gdal python3-numpy python3-pytest python3-pytest-cov
+      - name: Verify QGIS and Qt versions
+        run: |
+          python3 - <<'PY'
+          import os
+          from qgis.core import Qgis
+          from qgis.PyQt.QtCore import QT_VERSION_STR
+          print("QGIS", Qgis.QGIS_VERSION, "Qt", QT_VERSION_STR)
+          assert Qgis.QGIS_VERSION.startswith(os.environ["EXPECTED_QGIS"] + ".")
+          assert QT_VERSION_STR.startswith(os.environ["EXPECTED_QT"] + ".")
+          PY
+      - name: Test current plugin and collect coverage
+        run: python3 -m pytest tests --cov=eodh_qgis --cov-report=term-missing --cov-report=xml --junitxml=test-results.xml
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          python-version: "3.12"
-          
-      - name: Setup environment
-        run: |
-          pip install pyqt5
-
-      - name: Start container
-        run: |
-          .docker/start.sh
-          sleep 10
-
-      - name: Run Tests
-        run: |
-          .docker/exec.sh
-
-      - name: Retrieve coverage report
-        run: |
-          docker compose cp qgis:/tests_directory/coverage.xml ./
-
-      - name: Codecov Upload
+          name: test-results-qgis-${{ matrix.qgis }}
+          path: test-results.xml
+      - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
+          files: ./coverage.xml
+          flags: qgis-${{ matrix.qgis }}

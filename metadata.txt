@@ -3,15 +3,15 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=EODH Workflows
-qgisMinimumVersion=3.0
+name=EODH
+qgisMinimumVersion=3.44
 qgisMaximumVersion=4.99
-description=Access and run workflows on the EODH
-version=0.2.6
+description=Search, filter, preview, and load datasets from the UK EO Data Hub
+version=0.3.0
 author=Oxidian
 email=daniel@oxidian.com
 
-about=Access and run workflows on the EODH. The EODH is a climate and Earth Observation Hub and processing platform.
+about=Search, filter, preview, and load datasets from the UK EO Data Hub
 
 tracker=https://github.com/EO-DataHub/eodh-qgis/issues
 repository=https://github.com/EO-DataHub/eodh-qgis
@@ -24,7 +24,7 @@ hasProcessingProvider=no
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=climate, Earth observation, CWL
+tags=climate, Earth observation
 
 homepage=https://github.com/EO-DataHub/eodh-qgis
 category=Web
@@ -34,11 +34,6 @@ experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
-
-# Since QGIS 3.8, a comma separated list of plugins to be installed
-# (or upgraded) can be specified.
-# Check the documentation for more information.
-plugin_dependencies=qpip
 
 Category of the plugin: Raster, Vector, Database or Web
 # category=

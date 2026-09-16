@@ -1,4 +1,4 @@
-[report]
-omit = __init__.py
-    main.py
-    resources.py
+[run]
+source = eodh_qgis
+branch = True
+relative_files = True

@@ -1,18 +1,25 @@
-# eodh-qgis Plugin
+# EODH Plugin for QGIS
 
 [![codecov](https://codecov.io/github/EO-DataHub/eodh-qgis/graph/badge.svg?token=N2VQBHVZN8)](https://codecov.io/github/EO-DataHub/eodh-qgis)
 
-A QGIS plugin to integrate with the Earth Observation Data Hub (EODH)
-This plugin demonstrates the EO Application Package and workflow capabilities of the EODH.
+Search, filter, preview, and load datasets from the UK EO Data Hub.
+
+EODH for QGIS supports catalogue search, imagery loading, commercial quotes and
+orders, and workspace commercial records. Its dockable Search, Results and Workspace
+interface follows the EODH ArcGIS Pro add-in.
+
+See the [usage guide](USAGE_GUIDE.md) for installation, signing in,
+search filters, thumbnail timeline, Quick view, asset loading and commercial ordering.
 
 ## Installation
+
+The plugin uses libraries supplied with QGIS and requires no additional Python packages or helper plugins.
 
 ### From QGIS repository
 
 1. Go to menu Plugins -> All
-2. Search for `EODH Workflows`
+2. Search for `EODH`
 3. Click Install Plugin
-4. We're using [QPIP plugin](https://github.com/opengisch/qpip) to install python dependencies using pip. Click OK to install them.
 
 ### Manual
 
@@ -22,29 +29,24 @@ This plugin demonstrates the EO Application Package and workflow capabilities of
 4. Select `Install from ZIP...`
 5. Select the downloaded archive
 6. Click `Install Plugin`
-7. We're using [QPIP plugin](https://github.com/opengisch/qpip) to install python dependencies using pip. Click OK to install them.
 
 ### Version compatibility
 
 This plugin requires Python 3.9+ in the QGIS environment.
 
-The recommended QGIS version is always the latest LTR.
+The recommended QGIS version is always the latest LTR or QGIS 4.
 
-On Windows, this plugin is compatible with QGIS version 3.34+. It is possible to install the plugin on older versions by first fixing the missing SSL libraries following this https://stackoverflow.com/a/71226425 (requires administrator priviledges). Without it, QPIP (another plugin we use to manage python dependencies) will fail to install anything from PyPI.
+On Windows, this plugin is compatible with QGIS version 3.44+.
 
 On MacOS the plugin usually bundles it's own Python distribution which should be 3.9 or newer.
 
-If you encounter installation issues, please first try upgrading QGIS to the latest LTR.
+If you encounter installation issues, please first try upgrading QGIS to the latest LTR or QGIS 4.
 
 Please note that we can't test all possible combinations of operating systems and their versions, QGIS versions and various packaging and versions of python.
 
 ## Usage
 
-When opening the plugin for the first time, you need to configure authentication credentials to access EODH APIs.
-
-1. Click on settings button
-2. Enter your EODH username and API key (can be generated in your account settings on EODH website).
-3. Click back to Workflows or Jobs and your list will load normally.
+See the [usage guide](USAGE_GUIDE.md) for installation, signing in, searching for data, loading imagery, and commercial orders.
 
 ## Development
 
@@ -75,6 +77,20 @@ To setup language server support in VSCode if you've installed QGIS from Flatpak
 
 ### Testing
 
-1. `make check` will run code formatting and linting checks.
+Run `make install` to install the development dependencies, then `make check` for linting, formatting, and type checks.
 
-2. `make test` will run tests against a running QGIS instance in a docker container.
+All tests use pytest, with plain assertions, parameterized cases, and shared fixtures:
+
+- `uv run pytest` runs the fast unit tests in `tests/unit` without QGIS.
+- `make test` runs those unit tests, then the complete suite in a QGIS 4 Docker container.
+- `make test qgis-image=qgis/qgis:3.44-trixie` runs the same suite on QGIS 3 LTR. CI tests both versions and uploads coverage to Codecov and JUnit test results as artifacts.
+
+To run the complete suite without Docker, use the Python interpreter supplied with QGIS, with `pytest` and `pytest-cov` installed:
+
+```sh
+python -m pytest tests --cov=eodh_qgis --cov-report=term-missing --cov-report=xml --junitxml=test-results.xml
+```
+
+Use `-k streaming` to select matching tests, or a node ID such as `tests/qgis/test_login.py::test_sign_out_clears_credentials` to run one test (list available IDs with `--collect-only -q`). Reports are written to `coverage.xml` and `test-results.xml`.
+
+The integration tests in `tests/qgis` exercise the current plugin's real Qt widgets, plugin lifecycle, login, catalogue and workspace screens, map interaction, streaming and automatic fallback, and NetCDF loading. Fixtures create an isolated QGIS profile, clean up widgets and map layers after each test, and shut down QGIS normally. Service responses are mocked; COG range reads use a local HTTP server. Tests do not require EODH credentials or place commercial orders.
