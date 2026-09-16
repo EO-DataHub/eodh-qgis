@@ -53,6 +53,7 @@ def build(
     print(f"Copied LICENSE to {build_dir}")
     shutil.copy2("requirements.txt", build_dir)
     shutil.copy2(ROOT_DIR / "USAGE_GUIDE.md", build_dir)
+    shutil.copytree(ROOT_DIR / "Images", build_dir / "Images")
     shutil.copy2(ROOT_DIR / "resources" / "icon.png", build_dir)
     print(f"Copied requirements.txt to {build_dir}")
     if is_test:

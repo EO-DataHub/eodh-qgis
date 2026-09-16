@@ -32,8 +32,8 @@ search filters, thumbnail timeline, Quick view, asset loading and commercial ord
 
 The supported baseline is QGIS 3.44 LTR and QGIS 4, using their bundled Python and
 `qgis.PyQt` bindings. No separately installed PyQt wheel or resource compiler is
-needed to build the current dock UI. See [verification notes](VERIFICATION.md) for
-the versions and behaviors actually checked.
+needed to build the current dock UI. CI runs native compatibility checks on
+QGIS 3.44 / Qt 5 and QGIS 4.2 / Qt 6.
 
 ## Usage
 
