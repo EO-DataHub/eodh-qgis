@@ -1,6 +1,7 @@
 """Pure-Python regressions for the ArcGIS-derived backend contract."""
 
 import unittest
+from unittest.mock import MagicMock, patch
 from urllib.request import Request
 
 from eodh_qgis.api.hub import (
@@ -16,6 +17,22 @@ from eodh_qgis.api.hub import (
 
 
 class ContractTests(unittest.TestCase):
+    def test_range_probe_never_consumes_full_response(self):
+        client = HubClient("https://hub.test", "workspace", "secret")
+        for status, content_range, expected in ((206, "bytes 0-0/2000000000", True), (200, "", False)):
+            response = MagicMock()
+            response.status = status
+            response.headers = {"Content-Range": content_range}
+            response.__enter__.return_value = response
+            with patch("eodh_qgis.api.hub.build_opener") as opener:
+                opener.return_value.open.return_value = response
+                self.assertEqual(client.request("https://hub.test/data.tif", probe_range=True), expected)
+                request = opener.return_value.open.call_args.args[0]
+                self.assertEqual(request.get_header("Range"), "bytes=0-0")
+                self.assertEqual(request.get_header("Authorization"), "Bearer secret")
+                response.read.assert_not_called()
+                response.__exit__.assert_called_once()
+
     def test_cloud_default_and_date_validation(self):
         body = search_body("s2", "2026-01-01", "2026-02-01")
         self.assertNotIn("filter", body)

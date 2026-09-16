@@ -184,7 +184,7 @@ class HubClient:
     def __init__(self, base, workspace, token):
         self.base, self.workspace, self.token = base, workspace, token
 
-    def request(self, url, method="GET", body=None, raw=False, destination=None, progress=None):
+    def request(self, url, method="GET", body=None, raw=False, destination=None, progress=None, probe_range=False):
         url = urljoin(self.base, url)
         parsed = urlsplit(url)
         if parsed.scheme != "https" or parsed.username or parsed.password:
@@ -192,6 +192,8 @@ class HubClient:
         headers = {"Accept": "application/json"}
         if parsed.netloc == urlsplit(self.base).netloc:
             headers["Authorization"] = "Bearer " + self.token
+        if probe_range:
+            headers["Range"] = "bytes=0-0"
         if body is not None:
             headers["Content-Type"] = "application/json"
         req = Request(
@@ -199,6 +201,12 @@ class HubClient:
         )
         try:
             with build_opener(SafeRedirect()).open(req, timeout=45) as response:
+                if probe_range:
+                    # Close immediately if a server ignores Range: never consume
+                    # a multi-gigabyte response just to check stream support.
+                    return response.status == 206 and response.headers.get("Content-Range", "").startswith(
+                        "bytes 0-0/"
+                    )
                 if destination is not None:
                     total = int(response.headers.get("Content-Length", 0))
                     downloaded = 0

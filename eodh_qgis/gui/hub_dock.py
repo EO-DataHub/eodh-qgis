@@ -37,6 +37,7 @@ from .hub_widgets import button, label
 
 class HubTask(QgsTask):
     download_progress = QtCore.pyqtSignal(str, object, object)
+    asset_stage = QtCore.pyqtSignal(str)
     thumbnail_ready = QtCore.pyqtSignal(int, object)
 
     def __init__(self, title, work, finish):
@@ -214,6 +215,9 @@ class HubDock(QtWidgets.QDockWidget):
 
         def done(result):
             self.client = client
+            from eodh_qgis.raster_loader import reconnect_streams
+
+            reconnect_streams(client, QgsProject.instance().mapLayers().values())
             self.login.set_loading(False)
             if not saved:
                 config = QgsAuthMethodConfig()
@@ -263,6 +267,9 @@ class HubDock(QtWidgets.QDockWidget):
         self.submit("Connecting…", client.validate, done, failed)
 
     def disconnect(self):
+        from eodh_qgis.raster_loader import clear_stream_credentials
+
+        clear_stream_credentials()
         self.epoch += 1
         for task in self.tasks:
             task.cancel()
@@ -335,6 +342,13 @@ class HubDock(QtWidgets.QDockWidget):
                     self.progress.setRange(0, 100)
                     self.progress.setValue(min(100, int(100 * downloaded / total)))
 
+            def stage(message):
+                if epoch == self.epoch:
+                    self.status_detail.setText(message)
+                    self.status_percent.clear()
+                    self.progress.setRange(0, 0)
+
+            task.asset_stage.connect(stage)
             task.download_progress.connect(report)
         self.tasks.append(task)
         QgsApplication.taskManager().addTask(task)
@@ -913,34 +927,7 @@ class HubDock(QtWidgets.QDockWidget):
         client, item, selected = self.client, card.item, card.assets.selected()
         card.loading = True
         card.update_enabled()
-        self.status.setText(f"1 of {len(selected)}: {selected[0][0]} ({asset_type(selected[0][1])})")
-        self.status_detail.setText(f"Preparing {item.get('id', '')[:100]}...")
-
-        def work(task):
-            import tempfile
-
-            paths, errors = [], []
-            for key, asset in selected:
-                if task.isCanceled():
-                    raise HubError("Asset download cancelled.")
-                url = urljoin(href(item, "self") or client.base, asset["href"])
-                with tempfile.NamedTemporaryFile(
-                    prefix="eodh-", suffix=".nc" if asset_type(asset) == "NetCDF" else ".tif", delete=False
-                ) as output:
-                    path = output.name
-                try:
-
-                    def report(downloaded, total):
-                        if task.isCanceled():
-                            raise HubError("Asset download cancelled.")
-                        task.download_progress.emit(key, downloaded, total)
-
-                    client.request(url, destination=path, progress=report)
-                    paths.append((path, key))
-                except Exception as error:
-                    Path(path).unlink(missing_ok=True)
-                    errors.append(f"Failed to load asset '{key}' ({asset_type(asset)}).\n\nError: {error}")
-            return paths, errors
+        gui_thread = QtCore.QCoreApplication.instance().thread()
 
         def finish_card():
             try:
@@ -948,36 +935,89 @@ class HubDock(QtWidgets.QDockWidget):
                 card.update_enabled()
             except RuntimeError:
                 pass
-
-        def done(result):
-            paths, errors = result
-            from eodh_qgis.layer_utils import get_netcdf_layers
-
-            for path, key in paths:
-                name = f"{item.get('id')}_{key}"
-                try:
-                    layers = get_netcdf_layers(path, name) if path.endswith(".nc") else [QgsRasterLayer(path, name)]
-                    if not layers or any(not layer.isValid() for layer in layers):
-                        raise HubError("No valid raster layers could be created.")
-                    for layer in layers:
-                        QgsProject.instance().addMapLayer(layer)
-                    self.status.setText("Asset loaded")
-                    self.status_detail.setText(f"Added {key} to the map.")
-                except Exception as error:
-                    errors.append(str(error))
-            finish_card()
             self.status_percent.clear()
-            if errors:
-                self.status.setText("Asset load failed")
-                self.status_detail.setText(errors[-1])
-                QtWidgets.QMessageBox.warning(self, "EODH — Asset Load Error", "\n\n".join(errors))
 
         def failed(error):
             finish_card()
             self.status.setText("Asset load failed")
             self.status_detail.setText(str(error))
 
-        self.submit(self.status.text(), work, done, failed, with_task=True)
+        def start(batch, download=False):
+            def work(task):
+                from eodh_qgis.raster_loader import StreamingUnavailable, load_asset
+
+                loaded, fallback, errors = [], [], []
+                for index, (key, asset) in enumerate(batch, 1):
+                    if task.isCanceled():
+                        raise HubError("Asset loading cancelled.")
+                    url = urljoin(href(item, "self") or client.base, asset["href"])
+                    name = f"{item.get('id')}_{key}"
+                    local = download or asset_type(asset) == "NetCDF"
+                    stage = "Downloading full file" if local else "Opening remote raster"
+                    task.asset_stage.emit(f"{index} of {len(batch)}: {stage} — {key}...")
+
+                    def report(received, total):
+                        if task.isCanceled():
+                            raise HubError("Asset loading cancelled.")
+                        task.download_progress.emit(key, received, total)
+
+                    try:
+                        layers, streamed = load_asset(client, url, asset, name, download=download, progress=report)
+                        loaded.append((layers, key, streamed))
+                    except StreamingUnavailable as error:
+                        fallback.append((key, asset, str(error)))
+                    except Exception as error:
+                        errors.append(f"Failed to load asset '{key}' ({asset_type(asset)}).\n\nError: {error}")
+                # Layers are exclusively owned by this worker until this point.
+                # The main-thread callback is the only code that adds them to QGIS.
+                for layers, _, _ in loaded:
+                    for layer in layers:
+                        layer.moveToThread(gui_thread)
+                return loaded, fallback, errors
+
+            def done(result):
+                loaded, fallback, errors = result
+                for layers, key, streamed in loaded:
+                    for layer in layers:
+                        QgsProject.instance().addMapLayer(layer)
+                    self.status.setText("Asset loaded")
+                    self.status_detail.setText(
+                        f"Streaming {key} — map tiles load as you pan and zoom."
+                        if streamed
+                        else f"Added {key} to the map."
+                    )
+                if fallback:
+                    descriptions = []
+                    for key, asset, reason in fallback:
+                        size = asset.get("file:size") or asset.get("size")
+                        size_text = (
+                            f" ({size / 1048576:,.1f} MB)" if isinstance(size, (int, float)) else " (size unknown)"
+                        )
+                        descriptions.append(f"{key}{size_text}: {reason}")
+                    answer = QtWidgets.QMessageBox.question(
+                        self,
+                        "EODH — Download full raster?",
+                        "These assets could not be streamed:\n\n"
+                        + "\n".join(descriptions)
+                        + "\n\nDownload the complete files instead? This may take time and disk space.",
+                        QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+                        QtWidgets.QMessageBox.StandardButton.No,
+                    )
+                    if answer == QtWidgets.QMessageBox.StandardButton.Yes:
+                        if errors:
+                            QtWidgets.QMessageBox.warning(self, "EODH — Asset Load Error", "\n\n".join(errors))
+                        start([(key, asset) for key, asset, _ in fallback], download=True)
+                        return
+                    self.status.setText("Streaming unavailable" if not loaded else "Asset loaded")
+                    self.status_detail.setText("Full-file download skipped.")
+                finish_card()
+                if errors:
+                    failed(errors[-1])
+                    QtWidgets.QMessageBox.warning(self, "EODH — Asset Load Error", "\n\n".join(errors))
+
+            self.submit("Loading assets...", work, done, failed, with_task=True)
+
+        start(selected)
 
     def build_workspace(self):
         layout = self.tab_page("Workspace")
