@@ -40,11 +40,9 @@ def build(
     print(f"Copied metadata.txt to {build_dir}")
     shutil.copy2(ROOT_DIR / "LICENSE", build_dir)
     print(f"Copied LICENSE to {build_dir}")
-    shutil.copy2(ROOT_DIR / "requirements.txt", build_dir)
     shutil.copy2(ROOT_DIR / "USAGE_GUIDE.md", build_dir)
     shutil.copytree(ROOT_DIR / "Images", build_dir / "Images")
     shutil.copy2(SRC_DIR / "brand" / "eodh-mark.png", build_dir / "icon.png")
-    print(f"Copied requirements.txt to {build_dir}")
 
 
 def verify_install_path(install_path: pathlib.Path):

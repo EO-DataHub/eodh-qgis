@@ -6,7 +6,7 @@ authors = [{ name = "Dusan Figala", email = "dusan@oxidian.com" }]
 license = { text = "BSD-3-Clause" }
 readme = "README.md"
 requires-python = ">=3.9,<3.14"
-dependencies = ["truststore>=0.10.4; python_version >= '3.10'"]
+dependencies = []
 
 [dependency-groups]
 dev = [

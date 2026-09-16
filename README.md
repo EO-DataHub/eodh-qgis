@@ -8,17 +8,18 @@ EODH for QGIS supports catalogue search, imagery loading, commercial quotes and
 orders, and workspace commercial records. Its dockable Search, Results and Workspace
 interface follows the EODH ArcGIS Pro add-in.
 
-See the [usage guide](USAGE_GUIDE.md) for installation, qpip dependencies, signing in,
+See the [usage guide](USAGE_GUIDE.md) for installation, signing in,
 search filters, thumbnail timeline, Quick view, asset loading and commercial ordering.
 
 ## Installation
+
+The plugin uses libraries supplied with QGIS and requires no additional Python packages or helper plugins.
 
 ### From QGIS repository
 
 1. Go to menu Plugins -> All
 2. Search for `EODH`
 3. Click Install Plugin
-4. Review the [qpip dependency explanation](USAGE_GUIDE.md#what-is-qpip) before agreeing to install the listed packages.
 
 ### Manual
 
@@ -28,7 +29,6 @@ search filters, thumbnail timeline, Quick view, asset loading and commercial ord
 4. Select `Install from ZIP...`
 5. Select the downloaded archive
 6. Click `Install Plugin`
-7. Review qpip's package prompt; the [usage guide](USAGE_GUIDE.md#what-is-qpip) explains the packages and their purposes.
 
 ### Version compatibility
 
@@ -36,7 +36,7 @@ This plugin requires Python 3.9+ in the QGIS environment.
 
 The recommended QGIS version is always the latest LTR or QGIS 4.
 
-On Windows, this plugin is compatible with QGIS version 3.34+. It is possible to install the plugin on older versions by first fixing the missing SSL libraries following this https://stackoverflow.com/a/71226425 (requires administrator priviledges). Without it, QPIP (another plugin we use to manage python dependencies) will fail to install anything from PyPI.
+On Windows, this plugin is compatible with QGIS version 3.44+.
 
 On MacOS the plugin usually bundles it's own Python distribution which should be 3.9 or newer.
 

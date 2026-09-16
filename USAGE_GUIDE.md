@@ -12,12 +12,13 @@ Workspace API keys expire after at most 30 days. The plugin does not renew them 
 
 ## Installation
 
+The plugin uses the Python, Qt and GDAL libraries supplied with QGIS. No additional Python packages or helper plugins need to be installed.
+
 ### QGIS plugin manager (recommended)
 
 1. In QGIS, open **Plugins → Manage and Install Plugins…**.
 2. Select the **All** tab and search for **EODH**.
 3. Select **EODH** and choose **Install Plugin**.
-4. Review and install the dependencies requested by qpip, as explained below. Restart QGIS if prompted.
 
 ### Manual installation from GitHub
 
@@ -26,23 +27,10 @@ As an alternative, install a plugin ZIP from GitHub Releases:
 1. Download the plugin ZIP from [GitHub Releases](https://github.com/EO-DataHub/eodh-qgis/releases).
 2. In QGIS, open **Plugins → Manage and Install Plugins… → Install from ZIP**.
 3. Select the ZIP and choose **Install Plugin**.
-4. Review and install the dependencies requested by qpip, as explained below. Restart QGIS if prompted.
 
 Open the plugin using its toolbar button or **Web → EODH → Earth Observation Data Hub**.
 
 ![EODH entry in the QGIS Web menu](Images/menu.png)
-
-### What is qpip?
-
-**qpip** is a separate QGIS plugin that installs Python packages required by other plugins. It reads this plugin's `requirements.txt`, asks before installing missing packages, and installs them in the active QGIS profile's `python/dependencies` directory. Each profile has its own dependencies. See the [qpip end-user documentation](https://github.com/opengisch/qpip#usage-end-user).
-
-This plugin requests:
-
-| Package | Purpose |
-|---|---|
-| `truststore` (Python 3.10+) | Uses the operating system's trusted certificate store for HTTPS connections. |
-
-Review qpip's full package list before agreeing: it can include dependencies of these packages. This agreement installs software; it does not purchase imagery or create an EODH subscription. If you decline, features requiring the missing packages may be unavailable. QGIS supplies Qt, GDAL and its Python bindings; do not install a separate PyQt wheel into QGIS.
 
 ## Signing in
 
