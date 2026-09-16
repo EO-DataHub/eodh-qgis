@@ -7,7 +7,7 @@ import sys
 import tempfile
 from copy import deepcopy
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from qgis.core import Qgis, QgsApplication, QgsFeature, QgsGeometry, QgsProject, QgsVectorFileWriter, QgsVectorLayer
@@ -15,6 +15,7 @@ from qgis.gui import QgsMapCanvas
 from qgis.PyQt import QtCore, QtGui, QtWidgets
 
 from eodh_qgis.gui.hub_dock import HubDock
+from eodh_qgis.raster_loader import StreamingUnavailable
 
 app = QgsApplication([], False)
 app.initQgis()
@@ -178,6 +179,35 @@ dock.filter_records()
 assert dock.record_cards[0].expand.isChecked()
 assert not dock.record_cards[0].assets.selected()
 assert not dock.record_cards[1].can_load
+
+# A stream failure automatically schedules a full download, without a prompt.
+
+dock.client = Mock(base="https://example.test")
+card = dock.result_cards[0]
+card.assets.boxes[0][0].setChecked(True)
+layer = QgsVectorLayer("Point?crs=EPSG:4326", "fallback fixture", "memory")
+task = Mock()
+task.isCanceled.return_value = False
+with (
+    patch(
+        "eodh_qgis.raster_loader.load_asset", side_effect=[StreamingUnavailable("No range support"), ([layer], False)]
+    ) as loader,
+    patch.object(QtWidgets.QMessageBox, "question", side_effect=AssertionError("Download must not ask permission")),
+):
+    dock.load_card(card)
+    work, done, _ = pending.pop()
+    done(work(task))
+    assert card.loading
+    assert len(pending) == 1
+    work, done, _ = pending.pop()
+    done(work(task))
+    assert [call.kwargs["download"] for call in loader.call_args_list] == [False, True]
+    assert any("Downloading full file" in call.args[0] for call in task.asset_stage.emit.call_args_list)
+    assert not card.loading
+    assert QgsProject.instance().mapLayer(layer.id()) is layer
+    assert dock.status.text() == "Asset loaded"
+QgsProject.instance().removeMapLayer(layer.id())
+dock.client = None
 
 # Imported projected vector bounds are transformed without adding project layers.
 with tempfile.TemporaryDirectory() as directory:

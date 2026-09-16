@@ -987,29 +987,10 @@ class HubDock(QtWidgets.QDockWidget):
                         else f"Added {key} to the map."
                     )
                 if fallback:
-                    descriptions = []
-                    for key, asset, reason in fallback:
-                        size = asset.get("file:size") or asset.get("size")
-                        size_text = (
-                            f" ({size / 1048576:,.1f} MB)" if isinstance(size, (int, float)) else " (size unknown)"
-                        )
-                        descriptions.append(f"{key}{size_text}: {reason}")
-                    answer = QtWidgets.QMessageBox.question(
-                        self,
-                        "EODH — Download full raster?",
-                        "These assets could not be streamed:\n\n"
-                        + "\n".join(descriptions)
-                        + "\n\nDownload the complete files instead? This may take time and disk space.",
-                        QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
-                        QtWidgets.QMessageBox.StandardButton.No,
-                    )
-                    if answer == QtWidgets.QMessageBox.StandardButton.Yes:
-                        if errors:
-                            QtWidgets.QMessageBox.warning(self, "EODH — Asset Load Error", "\n\n".join(errors))
-                        start([(key, asset) for key, asset, _ in fallback], download=True)
-                        return
-                    self.status.setText("Streaming unavailable" if not loaded else "Asset loaded")
-                    self.status_detail.setText("Full-file download skipped.")
+                    if errors:
+                        QtWidgets.QMessageBox.warning(self, "EODH — Asset Load Error", "\n\n".join(errors))
+                    start([(key, asset) for key, asset, _ in fallback], download=True)
+                    return
                 finish_card()
                 if errors:
                     failed(errors[-1])

@@ -143,10 +143,18 @@ with tempfile.TemporaryDirectory() as directory:
     with patch.object(client, "request", return_value=False) as request:
         try:
             load_asset(client, "https://example.test/no-range.tif", asset, "no ranges")
-            raise AssertionError("Must ask the user before falling back to a download")
+            raise AssertionError("Must signal that the loading task should use its download fallback")
         except StreamingUnavailable:
             pass
         assert request.call_count == 1
+    for status in (416, 503, 401, 403):
+        with patch.object(client, "request", side_effect=HubError("Probe failed", status)):
+            try:
+                load_asset(client, "https://example.test/probe.tif", asset, "probe failure")
+                raise AssertionError("Probe failure must be reported")
+            except HubError as error:
+                fallback = isinstance(error, StreamingUnavailable)
+            assert fallback == (status not in (401, 403))
     server.shutdown()
     server.server_close()
     thread.join()

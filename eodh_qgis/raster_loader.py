@@ -15,7 +15,7 @@ _authenticated_sources = set()
 
 
 class StreamingUnavailable(HubError):
-    """The UI may offer an explicit full-file download instead."""
+    """The loading task should fall back to downloading the complete file."""
 
 
 def streaming_source(client, url):
@@ -73,7 +73,13 @@ def load_asset(client, url, asset, name, *, download=False, progress=None):
     if kind not in ("COG", "GeoTIFF", "NetCDF"):
         raise HubError("This asset format is not supported.")
     if kind != "NetCDF" and not download:
-        if not client.request(url, probe_range=True):
+        try:
+            supports_ranges = client.request(url, probe_range=True)
+        except HubError as error:
+            if error.status in (401, 403):
+                raise
+            raise StreamingUnavailable("The server could not serve a byte-range request.") from error
+        if not supports_ranges:
             raise StreamingUnavailable("The server does not support HTTP byte-range requests.")
         source = streaming_source(client, url)
         try:

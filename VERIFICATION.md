@@ -113,6 +113,15 @@ tests; they are no longer reachable through the plugin's menu or toolbar.
   both normal default profiles. Reloaded both running plugins without closing
   the user's projects. QGIS 4 reconnected automatically; LTR requires its key again.
 
+## Automatic fallback follow-up (2026-09-16, version 0.2.8)
+
+- Supersedes the 0.2.7 confirmation behavior above: failed streaming now starts
+  a full-file download automatically, with download progress and no question dialog.
+- Both native QGIS screen suites verify the stream-failure/download/load sequence,
+  progress stage and restored card state. Range-probe failures also allow fallback;
+  authentication failures still report access denied.
+- Installed the updated package into both normal default profiles.
+
 ## Boundaries
 
 No commercial quote or purchase was submitted to the live service. Commercial
