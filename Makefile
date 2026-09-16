@@ -26,6 +26,7 @@ typecheck:
 
 .PHONY: test
 test:
+	${uv-run} python -m unittest discover -s tests -v
 	.docker/stop.sh
 	.docker/start.sh
 	sleep 5
