@@ -11,7 +11,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CHECKS = ("plugin", "runtime", "login", "search", "screen", "streaming", "netcdf")
+CHECKS = ("plugin", "runtime", "login", "search", "async", "screen", "streaming", "netcdf")
 
 
 def main():
