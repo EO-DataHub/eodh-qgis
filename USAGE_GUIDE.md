@@ -95,7 +95,9 @@ Select **N loadable / N total assets** to expand a result. Check supported COG, 
 
 ![Expanded result asset selection](Images/assets.png)
 
-COG and GeoTIFF assets stream using HTTP byte-range requests: QGIS reads overview pixels when zoomed out and higher-resolution blocks as you zoom in or pan. If streaming is unavailable, the plugin automatically downloads the complete file and loads it, showing download progress. Untiled files or files without overviews can require more data. NetCDF assets download before loading.
+Results, workspace records, collection menus and the thumbnail timeline use smooth pixel scrolling. Expanding an asset list keeps wheel movement at the same speed, and changing asset selections preserves your position. Scrolling over a closed selector moves the surrounding page without changing its selection.
+
+COG and GeoTIFF assets stream using HTTP byte-range requests: QGIS reads overview pixels when zoomed out and higher-resolution blocks as you zoom in or pan. If streaming is unavailable, the plugin automatically downloads the complete file and loads it, showing download progress. Before accepting a remote raster, the loader checks real overview and full-resolution pixels. Large files without usable internal overviews automatically download in full. Background loading preserves the raster CRS for display in a different project CRS. NetCDF assets download before loading.
 
 Streamed layers need an internet connection. After reopening a project with protected EODH layers, connect to the same workspace to restore access. Authentication covers the EODH API and the selected workspace's storage host, including delivered Airbus assets. Downloaded files are temporary; copy data needed by a long-lived project to durable storage and update the layer source accordingly.
 

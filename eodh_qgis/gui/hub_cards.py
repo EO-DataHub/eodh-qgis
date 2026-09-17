@@ -5,6 +5,7 @@ from qgis.PyQt import QtCore, QtGui, QtWidgets
 from eodh_qgis.api.hub import COMPLETED, asset_type, href, property_value, record_status
 from eodh_qgis.api.presentation import default_assets, display_date, file_type, metadata, parsed_date, quick_view
 
+from .hub_scroll import SmoothScroll, SmoothScrollArea
 from .hub_widgets import CommercialPanel, button, label
 
 
@@ -68,24 +69,44 @@ class CardList(QtWidgets.QListWidget):
         self.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.scrolling = SmoothScroll(self)
         self.setStyleSheet("QListWidget {background:transparent;border:0;} QListWidget::item {padding:0;border:0;}")
 
     def add_card(self, card):
         row = QtWidgets.QListWidgetItem()
         self.addItem(row)
         self.setItemWidget(row, card)
+        self.scrolling.watch(card)
         card.changed.connect(lambda: self.fit_cards())
         self.fit_cards()
 
+    def clear(self):
+        self.scrolling.stop()
+        super().clear()
+
     def fit_cards(self):
+        bar = self.verticalScrollBar()
+        anchor = self.indexAt(QtCore.QPoint(0, 0))
+        offset = self.visualRect(anchor).top() if anchor.isValid() else 0
+        value = bar.value()
         width = max(150, self.viewport().width())
+        changed = False
         for index in range(self.count()):
             row = self.item(index)
             card = self.itemWidget(row)
             if card:
                 card.setFixedWidth(width)
                 height = card.layout().heightForWidth(width)
-                row.setSizeHint(QtCore.QSize(width, max(height, card.minimumSizeHint().height())))
+                size = QtCore.QSize(width, max(height, card.minimumSizeHint().height()))
+                if row.sizeHint() != size:
+                    row.setSizeHint(size)
+                    changed = True
+        if changed:
+            self.scrolling.stop()
+            self.doItemsLayout()
+            # Keep the first visible card at the same pixel offset when another
+            # card expands or changes height above it.
+            bar.setValue(bar.value() + self.visualRect(anchor).top() - offset if anchor.isValid() else value)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -397,7 +418,7 @@ class Timeline(QtWidgets.QWidget):
             control.setFixedWidth(24)
             control.setSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Expanding)
         layout.addWidget(self.previous)
-        self.strip = QtWidgets.QScrollArea()
+        self.strip = SmoothScrollArea()
         self.strip.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
         self.strip.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.strip.setStyleSheet("QScrollArea {background:transparent;}")

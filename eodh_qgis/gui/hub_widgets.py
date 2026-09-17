@@ -4,6 +4,8 @@ from qgis.PyQt import QtCore, QtGui, QtWidgets
 
 from eodh_qgis.api.hub import OPTICAL_BUNDLES, OPTICAL_LICENCES, SAR_LICENCES, PurchaseContext, href, provider
 
+from .hub_scroll import ScrollComboBox
+
 
 def label(text):
     widget = QtWidgets.QLabel(text)
@@ -57,7 +59,7 @@ class CommercialPanel(QtWidgets.QFrame):
             row.setContentsMargins(0, 0, 0, 0)
             row.setSpacing(4)
             row.addWidget(label(title))
-            widget = QtWidgets.QLineEdit() if key == "country" else QtWidgets.QComboBox()
+            widget = QtWidgets.QLineEdit() if key == "country" else ScrollComboBox()
             self.fields[key] = widget
             widget.setMinimumWidth(40 if key == "country" else 120 if key in ("licence", "bundle") else 100)
             if key == "country":

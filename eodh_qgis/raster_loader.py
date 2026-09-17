@@ -67,6 +67,61 @@ def raster_layer(source, name, asset):
     return layer
 
 
+def validate_stream(source):
+    """Check layout and actual pixels before QGIS can accept a metadata-only layer."""
+    dataset = None
+    errors = []
+
+    def capture(level, number, message):
+        if level >= gdal.CE_Failure:
+            errors.append(message)
+
+    # GDAL may return None or emit an error instead of raising, depending on the
+    # host application's exception settings. Do not change those global settings.
+    gdal.PushErrorHandler(capture)
+    try:
+        dataset = gdal.Open(source, gdal.GA_ReadOnly)
+        if dataset is None or dataset.RasterCount == 0:
+            raise StreamingUnavailable("The remote raster could not be opened.")
+        for index in range(1, dataset.RasterCount + 1):
+            band = dataset.GetRasterBand(index)
+            # A full-scene render without overviews can read most of a large
+            # ordinary TIFF, despite a successful HTTP range probe and isValid().
+            if max(band.XSize, band.YSize) > 2048 and band.GetOverviewCount() == 0:
+                raise StreamingUnavailable(
+                    "This raster has no internal overviews; downloading it for reliable display."
+                )
+            # Probe both overview rendering and native-resolution detail. Sample
+            # multiple locations, since TIFF headers alone say nothing about
+            # whether later range requests or compressed tile decoding work.
+            levels = [band]
+            if band.GetOverviewCount():
+                overview = band.GetOverview(band.GetOverviewCount() - 1)
+                if max(overview.XSize, overview.YSize) > 2048:
+                    raise StreamingUnavailable("The raster overviews are too large for efficient remote display.")
+                levels.append(overview)
+            for level in levels:
+                width, height = min(32, level.XSize), min(32, level.YSize)
+                for fraction in (0, 0.5, 1):
+                    data = level.ReadRaster(
+                        round((level.XSize - width) * fraction),
+                        round((level.YSize - height) * fraction),
+                        width,
+                        height,
+                    )
+                    if data is None or errors:
+                        raise StreamingUnavailable(
+                            "Remote raster pixels could not be read; downloading the full file."
+                        )
+    except StreamingUnavailable:
+        raise
+    except Exception as error:
+        raise StreamingUnavailable("Remote raster pixels could not be read; downloading the full file.") from error
+    finally:
+        dataset = None
+        gdal.PopErrorHandler()
+
+
 def load_asset(client, url, asset, name, *, download=False, progress=None):
     """Run in a loading task. The caller transfers returned layers to the UI."""
     kind = asset_type(asset)
@@ -83,7 +138,10 @@ def load_asset(client, url, asset, name, *, download=False, progress=None):
             raise StreamingUnavailable("The server does not support HTTP byte-range requests.")
         source = streaming_source(client, url)
         try:
+            validate_stream(source)
             layer = raster_layer(source, name, asset)
+        except StreamingUnavailable:
+            raise
         except Exception as error:
             raise StreamingUnavailable("QGIS could not open this raster remotely.") from error
         layer.setCustomProperty("eodh/remote_url", url)

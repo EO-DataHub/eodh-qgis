@@ -8,6 +8,7 @@ from qgis.core import (
     Qgis,
     QgsApplication,
     QgsAuthMethodConfig,
+    QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
     QgsMessageLog,
     QgsProject,
@@ -34,6 +35,7 @@ from eodh_qgis.api.presentation import bbox2d, overlap, parsed_date, quick_view,
 from .hub_cards import CardList, ResultCard, Timeline, WorkspaceCard, busy_bar, hyperlink, text_label
 from .hub_login import LoginPage
 from .hub_map import WGS84, Overlays, RectangleTool, geometry
+from .hub_scroll import ScrollComboBox, SmoothScrollArea
 from .hub_widgets import button, label
 
 
@@ -174,7 +176,7 @@ class HubDock(QtWidgets.QDockWidget):
         page = QtWidgets.QWidget()
         layout = QtWidgets.QVBoxLayout(page)
         layout.setContentsMargins(8, 8, 8, 8)
-        scroll = QtWidgets.QScrollArea()
+        scroll = SmoothScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
         scroll.setWidget(page)
@@ -185,7 +187,7 @@ class HubDock(QtWidgets.QDockWidget):
         self.login = LoginPage(self.connect_workspace)
         self.workspace, self.key = self.login.workspace, self.login.key
         self.connect_button = self.login.connect_button
-        self.login_scroll = QtWidgets.QScrollArea()
+        self.login_scroll = SmoothScrollArea()
         self.login_scroll.setWidgetResizable(True)
         self.login_scroll.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
         self.login_scroll.setWidget(self.login)
@@ -359,7 +361,7 @@ class HubDock(QtWidgets.QDockWidget):
         _, layout = self.page("Search")
         layout.setSpacing(4)
         layout.addWidget(text_label("Catalog", 12, True))
-        self.catalogue = QtWidgets.QComboBox()
+        self.catalogue = ScrollComboBox()
         self.catalogue.addItems(("Public", "Commercial"))
         self.catalogue.currentTextChanged.connect(self.discover)
         layout.addWidget(self.catalogue)
@@ -370,7 +372,7 @@ class HubDock(QtWidgets.QDockWidget):
         self.commercial_help.hide()
         layout.addWidget(self.commercial_help)
         layout.addWidget(text_label("Collection", 12, True))
-        self.collection = QtWidgets.QComboBox()
+        self.collection = ScrollComboBox()
         self.collection.setEditable(True)
         self.collection.setMaxVisibleItems(20)
         self.collection.setInsertPolicy(QtWidgets.QComboBox.InsertPolicy.NoInsert)
@@ -972,22 +974,31 @@ class HubDock(QtWidgets.QDockWidget):
 
                     try:
                         layers, streamed = load_asset(client, url, asset, name, download=download, progress=report)
-                        loaded.append((layers, key, streamed))
+                        # Serialize while the worker's PROJ context still exists.
+                        # Moving the QObject does not transfer that thread-local
+                        # context; its CRS can otherwise turn empty on pool expiry.
+                        loaded.append((layers, key, streamed, [layer.crs().toWkt() for layer in layers]))
                     except StreamingUnavailable as error:
                         fallback.append((key, asset, str(error)))
                     except Exception as error:
                         errors.append(f"Failed to load asset '{key}' ({asset_type(asset)}).\n\nError: {error}")
                 # Layers are exclusively owned by this worker until this point.
                 # The main-thread callback is the only code that adds them to QGIS.
-                for layers, _, _ in loaded:
+                for layers, _, _, _ in loaded:
                     for layer in layers:
                         layer.moveToThread(gui_thread)
                 return loaded, fallback, errors
 
             def done(result):
                 loaded, fallback, errors = result
-                for layers, key, streamed in loaded:
-                    for layer in layers:
+                for layers, key, streamed, definitions in loaded:
+                    for layer, wkt in zip(layers, definitions):
+                        if wkt:
+                            crs = QgsCoordinateReferenceSystem.fromWkt(wkt)
+                            # setCrs skips equal EPSG identifiers, even if the old
+                            # thread-local definition is gone. Force a fresh copy.
+                            layer.setCrs(QgsCoordinateReferenceSystem())
+                            layer.setCrs(crs)
                         QgsProject.instance().addMapLayer(layer)
                     self.status.setText("Asset loaded")
                     self.status_detail.setText(
@@ -1025,7 +1036,7 @@ class HubDock(QtWidgets.QDockWidget):
         row = QtWidgets.QHBoxLayout()
         row.setContentsMargins(8, 4, 8, 4)
         row.setSpacing(4)
-        self.provider_filter, self.status_filter = QtWidgets.QComboBox(), QtWidgets.QComboBox()
+        self.provider_filter, self.status_filter = ScrollComboBox(), ScrollComboBox()
         for title, widget in (("Provider:", self.provider_filter), ("Status:", self.status_filter)):
             row.addWidget(text_label(title))
             widget.addItem("All")
