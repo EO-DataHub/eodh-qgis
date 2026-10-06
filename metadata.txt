@@ -7,7 +7,7 @@ name=EODH
 qgisMinimumVersion=3.0.0
 qgisMaximumVersion=4.99
 description=Search, filter, preview, and load datasets from the UK EO Data Hub
-version=0.3.1
+version=0.2.9
 author=Oxidian
 email=daniel@oxidian.com
 
@@ -21,7 +21,7 @@ repository=https://github.com/EO-DataHub/eodh-qgis
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-changelog=0.3.1: Validate remote raster reads and fall back to full downloads when streaming is unsuitable. Preserve raster reprojection after background loading. Smooth scrolling in lists and expanded asset selectors.
+changelog=0.2.9: Replace the workflow dialog with a unified EODH catalogue dock aligned with the ArcGIS plugin, including timeline, workspace cards and commercial purchase flow. Stream remote rasters with range reads and fall back to full downloads when streaming is unavailable or unsuitable. Authenticate delivered assets on the selected workspace storage host. Support QGIS 3 and QGIS 4. Remove QPIP and truststore runtime dependencies.
 
 # Tags are comma separated with spaces allowed
 tags=climate, Earth observation
