@@ -18,7 +18,7 @@ The plugin uses libraries supplied with QGIS and requires no additional Python p
 ### From QGIS repository
 
 1. Go to menu Plugins -> All
-2. Search for `EODH`
+2. Search for `EODH Workflows`
 3. Click Install Plugin
 
 ### Manual
