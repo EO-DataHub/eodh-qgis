@@ -13,7 +13,7 @@ from urllib.request import Request, urlopen
 import numpy as np
 import pytest
 from osgeo import gdal, osr
-from qgis.core import QgsRectangle
+from qgis.core import QgsRectangle, QgsVectorLayer
 
 from eodh_qgis.api.hub import HubClient, HubError
 from eodh_qgis.main import EodhQgis
@@ -22,6 +22,7 @@ from eodh_qgis.raster_loader import (
     clear_stream_credentials,
     load_asset,
     raster_layer,
+    reconnect_streams,
     streaming_source,
 )
 
@@ -239,3 +240,16 @@ def test_workspace_stream_credentials_are_scoped_and_cleared():
     assert not gdal.GetPathSpecificOption(other_source, "GDAL_HTTP_HEADERS", "")
     clear_stream_credentials()
     assert not gdal.GetPathSpecificOption(workspace_source, "GDAL_HTTP_HEADERS", "")
+
+
+def test_reconnect_skips_streams_that_this_gdal_cannot_authenticate(monkeypatch):
+    # A project saved with GDAL >= 3.6 can be reopened on GDAL < 3.6.
+    monkeypatch.delattr(gdal, "SetPathSpecificOption")
+    client = HubClient("https://eodatahub.org.uk", "test", "secret")
+    layer = QgsVectorLayer("Point?crs=EPSG:4326", "saved stream", "memory")
+    layer.setCustomProperty("eodh/remote_url", "https://eodatahub.org.uk/api/data/a.tif")
+    layer.setCustomProperty("eodh/workspace", client.workspace)
+    layer.setCustomProperty("eodh/base", client.base)
+    source = layer.source()
+    reconnect_streams(client, [layer])
+    assert layer.source() == source

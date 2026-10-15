@@ -1,0 +1,49 @@
+name: Nightly
+on:
+  push:
+    branches: [main]
+
+# Queue rather than cancel, so a publish is never interrupted halfway.
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+jobs:
+  nightly:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set nightly plugin version
+        run: sed -i "s/^version=.*/&-nightly.${GITHUB_SHA::7}/" metadata.txt
+
+      - name: Build nightly
+        run: |
+          python deploy.py --dist dist/eodh_qgis
+          cd dist
+          zip -r eodh_qgis_nightly.zip eodh_qgis
+
+      - name: Publish nightly
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version=$(sed -n "s/^version=//p" metadata.txt)
+          notes="Automated build of \`main\` at ${GITHUB_SHA::7} (plugin version ${version}), for testing only.
+
+          Install it in QGIS via Plugins → Manage and Install Plugins → Install from ZIP."
+          git tag -f nightly "$GITHUB_SHA"
+          git push -f origin refs/tags/nightly
+          if gh release view nightly >/dev/null 2>&1; then
+            gh release upload nightly dist/eodh_qgis_nightly.zip --clobber
+            gh release edit nightly --title "Nightly ($version)" --notes "$notes" --prerelease
+          else
+            gh release create nightly dist/eodh_qgis_nightly.zip --title "Nightly ($version)" --notes "$notes" --prerelease --verify-tag
+          fi
