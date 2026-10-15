@@ -1,4 +1,4 @@
-"""Real background download fallback retains its CRS after worker expiry."""
+"""Real background asset loading through the dock, including download fallbacks."""
 
 import shutil
 import time
@@ -100,4 +100,61 @@ def test_background_fallback_retains_reprojected_pixels(dock, qgis_app, tmp_path
     local_path = Path(layer.source())
     QgsProject.instance().removeAllMapLayers()
     layers = layer = job = settings = None
+    local_path.unlink()
+
+
+def test_gdal_without_path_specific_options_downloads_instead_of_failing(dock, tmp_path, monkeypatch):
+    # GDAL < 3.6 (e.g. Ubuntu 22.04 packages) cannot scope HTTP headers to one URL.
+    monkeypatch.delattr(gdal, "SetPathSpecificOption")
+    path = str(tmp_path / "visual.tif")
+    data = gdal.GetDriverByName("GTiff").Create(path, 64, 64, 3, gdal.GDT_Byte)
+    srs = osr.SpatialReference()
+    srs.ImportFromEPSG(32630)
+    data.SetProjection(srs.ExportToWkt())
+    data.SetGeoTransform([705606, 10, 0, 5711064, 0, -10])
+    data = None
+
+    class Client:
+        base = "https://example.test"
+        workspace = "fixture"
+        token = "fixture-secret"
+        calls = []
+
+        def request(self, url, probe_range=False, destination=None, progress=None):
+            self.calls.append("probe" if probe_range else "download")
+            if probe_range:
+                return True
+            shutil.copyfile(path, destination)
+
+    dock.client = Client()
+    dock.records = [
+        {
+            "id": "old-gdal",
+            "_provider": "Airbus",
+            "properties": {"order:status": "succeeded"},
+            "assets": {
+                "visual": {
+                    "href": "https://example.test/visual.tif",
+                    "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+                }
+            },
+        }
+    ]
+    dock.filter_records()
+    with patch.object(QtWidgets.QMessageBox, "warning") as warning:
+        dock.load_card(dock.record_cards[0])
+        deadline = time.monotonic() + 20
+        while dock.tasks and time.monotonic() < deadline:
+            QtTest.QTest.qWait(20)
+        assert not dock.tasks, "Background loading did not finish"
+        QgsApplication.taskManager().threadPool().waitForDone()
+    warning.assert_not_called()
+    assert dock.client.calls == ["probe", "download"]
+    layers = list(QgsProject.instance().mapLayers().values())
+    assert len(layers) == 1
+    assert not layers[0].source().startswith("/vsicurl")
+    assert dock.status.text() == "Asset loaded"
+    local_path = Path(layers[0].source())
+    QgsProject.instance().removeAllMapLayers()
+    layers = None
     local_path.unlink()

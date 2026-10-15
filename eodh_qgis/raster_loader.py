@@ -22,6 +22,10 @@ def streaming_source(client, url):
     parsed = urlsplit(url)
     if parsed.scheme != "https" or parsed.username or parsed.password:
         raise HubError("EODH links must use HTTPS without embedded credentials.")
+    # GDAL < 3.6 lacks per-path options and GDAL_HTTP_HEADERS. Process-wide
+    # options would send the API key with every QGIS request, so download instead.
+    if not hasattr(gdal, "SetPathSpecificOption"):
+        raise StreamingUnavailable("This QGIS uses GDAL older than 3.6, which cannot stream EODH rasters.")
     source = "/vsicurl?empty_dir=yes&use_head=no&url=" + quote(url, safe="")
     options = {
         "GDAL_HTTP_CONNECTTIMEOUT": "10",
@@ -136,8 +140,8 @@ def load_asset(client, url, asset, name, *, download=False, progress=None):
             raise StreamingUnavailable("The server could not serve a byte-range request.") from error
         if not supports_ranges:
             raise StreamingUnavailable("The server does not support HTTP byte-range requests.")
-        source = streaming_source(client, url)
         try:
+            source = streaming_source(client, url)
             validate_stream(source)
             layer = raster_layer(source, name, asset)
         except StreamingUnavailable:
@@ -178,7 +182,10 @@ def reconnect_streams(client, layers):
             and layer.customProperty("eodh/workspace", "") == client.workspace
             and layer.customProperty("eodh/base", "") == client.base
         ):
-            source = streaming_source(client, url)
+            try:
+                source = streaming_source(client, url)
+            except StreamingUnavailable:
+                continue
             if not layer.isValid():
                 layer.setDataSource(source, layer.name(), "gdal")
             layer.triggerRepaint()
