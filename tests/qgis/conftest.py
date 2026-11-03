@@ -2,6 +2,7 @@
 
 import gc
 import os
+import sys
 import threading
 from copy import deepcopy
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -16,7 +17,7 @@ from qgis.core import QgsApplication, QgsProject
 from qgis.gui import QgsMapCanvas
 from qgis.PyQt import QtCore, QtWidgets
 
-from eodh_qgis.gui.hub_dock import HubDock
+from eodh_qgis.gui.hub_dock import HubDock, HubTask
 from eodh_qgis.raster_loader import clear_stream_credentials
 
 
@@ -34,6 +35,20 @@ def qgis_app(tmp_path_factory):
     app.exitQgis()
     if use_exceptions:
         gdal.UseExceptions()
+
+
+@pytest.fixture(autouse=True)
+def trace_task_threads(monkeypatch):
+    """Coverage traces only threads Python starts; QgsTask work runs on Qt's thread pool."""
+    tracer = threading.gettrace()
+    if tracer is not None:
+        run = HubTask.run
+
+        def traced(self):
+            sys.settrace(tracer)
+            return run(self)
+
+        monkeypatch.setattr(HubTask, "run", traced)
 
 
 @pytest.fixture(autouse=True)
