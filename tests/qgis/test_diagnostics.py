@@ -1,14 +1,16 @@
 """Errors explain themselves in a screenshot, and Debug info collects the rest."""
 
 import re
+import socket
 import sys
 import time
+import urllib.request
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
-from qgis.core import Qgis, QgsApplication, QgsRasterLayer
+from qgis.core import Qgis, QgsApplication, QgsProject, QgsRasterLayer, QgsVectorLayer
 from qgis.PyQt import QtTest, QtWidgets
 
 from eodh_qgis import diagnostics
@@ -114,3 +116,55 @@ def test_quick_view_failure_dialog_names_the_reason_and_versions(dock, scene, mo
     assert text.endswith(diagnostics.environment_line())
     assert dock.status.text() == "Asset load failed"
     assert diagnostics.recent_errors()[0]["context"] == "Opening Quick view"
+
+
+def test_debug_info_reports_failed_checks_replaced_openers_and_streamed_layers(dock, monkeypatch):
+    with socket.socket() as closed:
+        closed.bind(("127.0.0.1", 0))
+        base = f"http://127.0.0.1:{closed.getsockname()[1]}"
+    for name in ("http_proxy", "HTTP_PROXY"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setitem(diagnostics.PROBES, "Python", lambda: diagnostics.probe(PythonNetwork(), base))
+    monkeypatch.setitem(diagnostics.PROBES, "QGIS network", lambda: diagnostics.probe(QgisNetwork(), base))
+    monkeypatch.setitem(diagnostics.PROBES, "GDAL (raster streaming)", lambda: diagnostics.probe_gdal(base))
+    # What QGIS's MetaSearch plugin does at startup when a QGIS proxy is set.
+    proxy = urllib.request.ProxyHandler({"http": "http://user:proxy-secret@proxy.test:8080"})
+    monkeypatch.setattr(urllib.request, "_opener", urllib.request.build_opener(proxy))
+    layer = QgsVectorLayer("Point?crs=EPSG:4326", "scene_visual", "memory")
+    layer.setCustomProperty("eodh/remote_url", "https://data.test/scene/visual.tif?X-Amz-Signature=signed-secret")
+    QgsProject.instance().addMapLayer(layer)
+    dock.show_debug_info()
+    wait_for_tasks(dock)
+    report = dock.debug_dialog.text.toPlainText()
+    assert re.search(r"Python\s+: failed: Connection refused in [\d.]+ s \(direct\)", report)
+    assert re.search(r"QGIS network\s+: failed: Connection refused \(\w+\) in [\d.]+ s \(direct\)", report)
+    assert re.search(r"GDAL \(raster streaming\)\s+: failed: ", report)
+    assert "replaced by another plugin (proxies: [{'http': 'http://[credentials]@proxy.test:8080'}])" in report
+    assert "scene_visual (streamed from data.test/scene/visual.tif, valid)" in report
+    assert "secret" not in report
+
+
+def test_asset_load_failure_dialog_names_the_error_and_versions(dock, scene, pending, monkeypatch):
+    monkeypatch.setattr(
+        "eodh_qgis.raster_loader.load_asset", Mock(side_effect=RuntimeError("GDAL could not decode tile 3"))
+    )
+    dock.client = Mock(base="https://example.test")
+    dock.display_page({"features": [scene]})
+    card = dock.result_cards[0]
+    card.assets.boxes[0][0].setChecked(True)
+    task = Mock()
+    task.isCanceled.return_value = False
+    with patch.object(QtWidgets.QMessageBox, "warning") as warning:
+        dock.load_card(card)
+        work, done, _ = pending.pop()
+        done(work(task))
+    title, text = warning.call_args.args[1:]
+    assert title == "EODH — Asset Load Error"
+    assert re.fullmatch(
+        r"Failed to load asset 'cog' \(GeoTIFF\)\.\n\nError: Unexpected error: RuntimeError: GDAL could not "
+        r"decode tile 3 at hub_dock\.py:\d+ in work\n\n" + re.escape(diagnostics.environment_line()),
+        text,
+    )
+    assert dock.status.text() == "Asset load failed"
+    assert diagnostics.recent_errors()[0]["context"] == "Loading asset 'cog'"
+    dock.client = None
