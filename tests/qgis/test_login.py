@@ -1,5 +1,5 @@
 from types import SimpleNamespace
-from unittest.mock import Mock, patch
+from unittest.mock import ANY, Mock, patch
 
 import pytest
 from qgis.PyQt import QtWidgets
@@ -39,7 +39,7 @@ def login_service():
 
     manager.storeAuthenticationConfig.side_effect = store_config
     manager.loadAuthenticationConfig.side_effect = load_config
-    client = Mock()
+    client = Mock(fallback_reasons=[])
     client.validate.return_value = {}
     with (
         patch("eodh_qgis.gui.hub_dock.QtCore.QSettings", return_value=settings),
@@ -93,7 +93,7 @@ def test_login_layout_validation_and_encrypted_save(login_service, dock_factory,
     dock.workspace.setText("workspace")
     dock.key.setText("fake-test-key")
     dock.connect_workspace()
-    client_type.assert_called_once_with(ENVIRONMENTS["Production"], "workspace", "fake-test-key")
+    client_type.assert_called_once_with(ENVIRONMENTS["Production"], "workspace", "fake-test-key", fallback=ANY)
     manager.storeAuthenticationConfig.assert_called_once()
     assert values["eodh/hub_auth"] == "test-id"
     assert "fake-test-key" not in str(values)

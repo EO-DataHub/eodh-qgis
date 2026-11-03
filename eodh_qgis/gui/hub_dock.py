@@ -10,6 +10,7 @@ from qgis.core import (
     QgsAuthMethodConfig,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
+    QgsErrorMessage,
     QgsMessageLog,
     QgsProject,
     QgsProviderRegistry,
@@ -19,6 +20,7 @@ from qgis.core import (
 )
 from qgis.PyQt import QtCore, QtGui, QtWidgets
 
+from eodh_qgis import diagnostics
 from eodh_qgis.api.hub import (
     ENVIRONMENTS,
     HubClient,
@@ -31,8 +33,10 @@ from eodh_qgis.api.hub import (
     validate_bbox,
 )
 from eodh_qgis.api.presentation import bbox2d, overlap, parsed_date, quick_view, thumbnail_asset
+from eodh_qgis.api.qgis_network import QgisNetwork
 
 from .hub_cards import CardList, ResultCard, Timeline, WorkspaceCard, busy_bar, hyperlink, text_label
+from .hub_debug import DebugDialog
 from .hub_login import LoginPage
 from .hub_map import WGS84, Overlays, RectangleTool, geometry
 from .hub_scroll import ScrollComboBox, SmoothScrollArea
@@ -105,6 +109,10 @@ class HubDock(QtWidgets.QDockWidget):
         account.addWidget(self.workspace_label)
         account.addWidget(text_label("•  production", 10, color="#666"))
         header.addLayout(account, 1)
+        debug = button("Debug info", self.show_debug_info)
+        debug.setToolTip("Copy diagnostics for a support request")
+        debug.setObjectName("headerAction")
+        header.addWidget(debug)
         switch = button("Switch", self.disconnect)
         switch.setToolTip("Switch workspace")
         switch.setObjectName("headerAction")
@@ -184,7 +192,7 @@ class HubDock(QtWidgets.QDockWidget):
         return page, layout
 
     def build_login(self):
-        self.login = LoginPage(self.connect_workspace)
+        self.login = LoginPage(self.connect_workspace, self.show_debug_info)
         self.workspace, self.key = self.login.workspace, self.login.key
         self.connect_button = self.login.connect_button
         self.login_scroll = SmoothScrollArea()
@@ -213,12 +221,18 @@ class HubDock(QtWidgets.QDockWidget):
         if not key:
             self.login.set_error("Please enter your workspace API key (not the Token ID).")
             return
-        client = HubClient(ENVIRONMENTS["Production"], workspace, key)
+        client = HubClient(ENVIRONMENTS["Production"], workspace, key, fallback=QgisNetwork())
+        diagnostics.add_secret(key)
         self.login.set_error("")
         self.login.set_loading(True)
 
         def done(result):
             self.client = client
+            if client.fallback_reasons:
+                diagnostics.log(
+                    f"Connected through {client.network} because " + "; ".join(client.fallback_reasons),
+                    Qgis.MessageLevel.Warning,
+                )
             from eodh_qgis.raster_loader import reconnect_streams
 
             reconnect_streams(client, QgsProject.instance().mapLayers().values())
@@ -270,6 +284,10 @@ class HubDock(QtWidgets.QDockWidget):
 
         self.submit("Connecting…", client.validate, done, failed)
 
+    def show_debug_info(self):
+        self.debug_dialog = DebugDialog(self)
+        self.debug_dialog.show()
+
     def disconnect(self):
         from eodh_qgis.raster_loader import clear_stream_credentials
 
@@ -318,6 +336,10 @@ class HubDock(QtWidgets.QDockWidget):
             if not quiet:
                 self.progress.hide()
             if error is not None:
+                if not task.isCanceled():
+                    diagnostics.record(title, error)
+                if not isinstance(error, HubError):
+                    error = HubError(diagnostics.describe(error))
                 if failed:
                     failed(error)
                 if not quiet:
@@ -560,7 +582,7 @@ class HubDock(QtWidgets.QDockWidget):
         try:
             self.set_bbox(self.overlays.extent_wgs84(rect))
         except Exception as error:
-            self.search_summary.setText(f"Failed to draw AOI: {error}")
+            self.search_summary.setText(f"Failed to draw AOI: {diagnostics.describe(error)}")
         if self.previous_tool:
             self.iface.mapCanvas().setMapTool(self.previous_tool)
         else:
@@ -570,7 +592,7 @@ class HubDock(QtWidgets.QDockWidget):
         try:
             self.set_bbox(self.overlays.extent_wgs84(self.iface.mapCanvas().extent()), "Map extent")
         except Exception as error:
-            self.search_summary.setText(f"Failed to get map extent: {error}")
+            self.search_summary.setText(f"Failed to get map extent: {diagnostics.describe(error)}")
 
     def import_aoi(self):
         path, _ = QtWidgets.QFileDialog.getOpenFileName(
@@ -583,7 +605,8 @@ class HubDock(QtWidgets.QDockWidget):
             try:
                 self.import_aoi_path(path)
             except Exception as error:
-                self.search_summary.setText(f"Failed to import AOI: {error}")
+                diagnostics.record("Importing AOI", error)
+                self.search_summary.setText(f"Failed to import AOI: {diagnostics.describe(error)}")
 
     def import_aoi_path(self, path):
         if Path(path).suffix.lower() in (".json", ".geojson"):
@@ -852,11 +875,12 @@ class HubDock(QtWidgets.QDockWidget):
                     try:
                         data = client.request(urljoin(href(item, "self") or client.base, asset["href"]), raw=True)
                         task.thumbnail_ready.emit(index, data)
-                    except Exception:
+                    except Exception as error:
                         # Thumbnails are optional. Keep loading the remaining results,
                         # but record failures without exposing signed URLs or credentials.
                         QgsMessageLog.logMessage(
-                            f"Could not load thumbnail for result {index + 1}. The result remains available.",
+                            f"Could not load thumbnail for result {index + 1}: {diagnostics.describe(error)}. "
+                            "The result remains available.",
                             "EODH",
                             Qgis.MessageLevel.Warning,
                             notifyUser=False,
@@ -906,7 +930,8 @@ class HubDock(QtWidgets.QDockWidget):
             ]
             layer = QgsRasterLayer(uri, name, "wms")
             if not layer.isValid():
-                raise HubError("Quick view could not be opened.")
+                reason = " ".join(layer.error().message(QgsErrorMessage.Format.Text).split())
+                raise HubError(f"Quick view could not be opened: {reason or 'QGIS gave no reason'}")
             canvas = self.iface.mapCanvas()
             previous_extent, previous_crs = canvas.extent(), canvas.mapSettings().destinationCrs()
             QgsProject.instance().addMapLayer(layer)
@@ -920,10 +945,14 @@ class HubDock(QtWidgets.QDockWidget):
             self.status.setText("Asset loaded")
             self.status_detail.setText(f"Added {title} to the map.")
         except Exception as error:
+            diagnostics.record("Opening Quick view", error)
             self.status.setText("Asset load failed")
-            self.status_detail.setText(str(error))
+            self.status_detail.setText(diagnostics.describe(error))
             QtWidgets.QMessageBox.warning(
-                self, "EODH - Quick View Error", f"Failed to open Quick view for this item.\n\n{error}"
+                self,
+                "EODH - Quick View Error",
+                f"Failed to open Quick view for this item.\n\n{diagnostics.describe(error)}\n\n"
+                + diagnostics.environment_line(),
             )
         finally:
             card.loading = False
@@ -979,9 +1008,9 @@ class HubDock(QtWidgets.QDockWidget):
                         # context; its CRS can otherwise turn empty on pool expiry.
                         loaded.append((layers, key, streamed, [layer.crs().toWkt() for layer in layers]))
                     except StreamingUnavailable as error:
-                        fallback.append((key, asset, str(error)))
+                        fallback.append((key, asset, error))
                     except Exception as error:
-                        errors.append(f"Failed to load asset '{key}' ({asset_type(asset)}).\n\nError: {error}")
+                        errors.append((key, asset, error))
                 # Layers are exclusively owned by this worker until this point.
                 # The main-thread callback is the only code that adds them to QGIS.
                 for layers, _, _, _ in loaded:
@@ -990,7 +1019,17 @@ class HubDock(QtWidgets.QDockWidget):
                 return loaded, fallback, errors
 
             def done(result):
-                loaded, fallback, errors = result
+                loaded, fallback, failures = result
+                errors = []
+                for key, asset, error in failures:
+                    diagnostics.record(f"Loading asset '{key}'", error)
+                    errors.append(
+                        f"Failed to load asset '{key}' ({asset_type(asset)}).\n\nError: {diagnostics.describe(error)}"
+                    )
+                message = "\n\n".join([*errors, diagnostics.environment_line()])
+                for key, _, error in fallback:
+                    cause = f" ({diagnostics.describe(error.__cause__)})" if error.__cause__ else ""
+                    diagnostics.log(f"Streaming '{key}' unavailable, downloading the full file: {error}{cause}")
                 for layers, key, streamed, definitions in loaded:
                     for layer, wkt in zip(layers, definitions):
                         if wkt:
@@ -1008,13 +1047,13 @@ class HubDock(QtWidgets.QDockWidget):
                     )
                 if fallback:
                     if errors:
-                        QtWidgets.QMessageBox.warning(self, "EODH — Asset Load Error", "\n\n".join(errors))
+                        QtWidgets.QMessageBox.warning(self, "EODH — Asset Load Error", message)
                     start([(key, asset) for key, asset, _ in fallback], download=True)
                     return
                 finish_card()
                 if errors:
                     failed(errors[-1])
-                    QtWidgets.QMessageBox.warning(self, "EODH — Asset Load Error", "\n\n".join(errors))
+                    QtWidgets.QMessageBox.warning(self, "EODH — Asset Load Error", message)
 
             self.submit("Loading assets...", work, done, failed, with_task=True)
 

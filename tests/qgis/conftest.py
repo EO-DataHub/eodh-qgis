@@ -2,7 +2,11 @@
 
 import gc
 import os
+import sys
+import threading
 from copy import deepcopy
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
@@ -13,7 +17,7 @@ from qgis.core import QgsApplication, QgsProject
 from qgis.gui import QgsMapCanvas
 from qgis.PyQt import QtCore, QtWidgets
 
-from eodh_qgis.gui.hub_dock import HubDock
+from eodh_qgis.gui.hub_dock import HubDock, HubTask
 from eodh_qgis.raster_loader import clear_stream_credentials
 
 
@@ -31,6 +35,20 @@ def qgis_app(tmp_path_factory):
     app.exitQgis()
     if use_exceptions:
         gdal.UseExceptions()
+
+
+@pytest.fixture(autouse=True)
+def trace_task_threads(monkeypatch):
+    """Coverage traces only threads Python starts; QgsTask work runs on Qt's thread pool."""
+    tracer = threading.gettrace()
+    if tracer is not None:
+        run = HubTask.run
+
+        def traced(self):
+            sys.settrace(tracer)
+            return run(self)
+
+        monkeypatch.setattr(HubTask, "run", traced)
 
 
 @pytest.fixture(autouse=True)
@@ -140,3 +158,40 @@ def collection_entry():
             },
         },
     }
+
+
+@pytest.fixture
+def http_server():
+    """Local HTTP server: tests add handlers to `routes` and inspect `requests`."""
+    requests, routes = [], {}
+
+    class Handler(BaseHTTPRequestHandler):
+        def log_message(self, *args):
+            pass
+
+        def do_GET(self):
+            requests.append((self.path, self.headers.get("Authorization"), self.headers.get("Range")))
+            route = routes.get(self.path.split("?")[0])
+            if route is None:
+                self.send_error(404)
+            else:
+                route(self)
+
+        def reply(self, status, body=b"", content_type="application/json", **headers):
+            self.send_response(status)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Content-Length", str(headers.pop("length", len(body))))
+            for name, value in headers.items():
+                self.send_header(name.replace("_", "-"), value)
+            self.end_headers()
+            self.wfile.write(body)
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        yield SimpleNamespace(base=f"http://127.0.0.1:{server.server_port}", requests=requests, routes=routes)
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)

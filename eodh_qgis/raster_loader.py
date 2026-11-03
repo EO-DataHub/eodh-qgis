@@ -5,7 +5,7 @@ from pathlib import Path
 from urllib.parse import quote, urlsplit
 
 from osgeo import gdal
-from qgis.core import QgsRasterLayer
+from qgis.core import QgsErrorMessage, QgsRasterLayer
 
 from eodh_qgis.api.hub import HubError, asset_type, requires_auth
 
@@ -50,12 +50,32 @@ def clear_stream_credentials():
     _authenticated_sources.clear()
 
 
+def gdal_reason(source, name):
+    """GDAL's own reason a source cannot be opened, which QGIS hides (for example an
+    HTML page saved instead of a raster). The source can be a remote URL, so it is
+    replaced by the layer name."""
+    reason = ""
+    gdal.PushErrorHandler("CPLQuietErrorHandler")
+    try:
+        gdal.ErrorReset()
+        if gdal.Open(source) is None:
+            reason = gdal.GetLastErrorMsg()
+    except RuntimeError as error:  # The host application enabled GDAL exceptions.
+        reason = str(error)
+    finally:
+        gdal.PopErrorHandler()
+    return " ".join(reason.replace(source, name).split())
+
+
 def raster_layer(source, name, asset):
     options = QgsRasterLayer.LayerOptions()
     options.loadDefaultStyle = False
     layer = QgsRasterLayer(source, name, "gdal", options)
     if not layer.isValid():
-        raise HubError("No valid raster layer could be created.")
+        reason = gdal_reason(source, name) or " ".join(
+            layer.error().message(QgsErrorMessage.Format.Text).replace(source, name).split()
+        )
+        raise HubError(f"QGIS could not open the raster: {reason}")
     # STAC's spectral order is commonly blue/green/red (Sentinel-2 ARD).
     # Preserve native values; only select the matching display channels.
     bands = asset.get("eo:bands") or asset.get("bands") or []
@@ -130,7 +150,10 @@ def load_asset(client, url, asset, name, *, download=False, progress=None):
     """Run in a loading task. The caller transfers returned layers to the UI."""
     kind = asset_type(asset)
     if kind not in ("COG", "GeoTIFF", "NetCDF"):
-        raise HubError("This asset format is not supported.")
+        raise HubError(
+            f"This asset format is not supported ({asset.get('type') or 'no media type'}). "
+            "Supported formats: COG, GeoTIFF and NetCDF."
+        )
     if kind != "NetCDF" and not download:
         try:
             supports_ranges = client.request(url, probe_range=True)
@@ -166,7 +189,11 @@ def load_asset(client, url, asset, name, *, download=False, progress=None):
         else:
             layers = [raster_layer(path, name, asset)]
         if not layers or any(not layer.isValid() for layer in layers):
-            raise HubError("No valid raster layers could be created.")
+            size = Path(path).stat().st_size / 1048576
+            reason = gdal_reason(path, name) or "see Recent log messages in Debug info"
+            raise HubError(
+                f"No valid raster layers could be created from the downloaded {kind} file ({size:.1f} MB): {reason}"
+            )
         return layers, False
     except Exception:
         Path(path).unlink(missing_ok=True)

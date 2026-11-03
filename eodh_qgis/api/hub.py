@@ -9,11 +9,14 @@ from __future__ import annotations
 import json
 import math
 import re
+import socket
+import ssl
 from collections import deque
 from dataclasses import dataclass
+from http.client import HTTPException
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urljoin, urlsplit
-from urllib.request import HTTPRedirectHandler, Request, build_opener
+from urllib.request import HTTPRedirectHandler, Request, build_opener, getproxies, proxy_bypass
 
 ENVIRONMENTS = {
     name: f"https://{prefix}eodatahub.org.uk"
@@ -39,6 +42,41 @@ class HubError(Exception):
     def __init__(self, message, status=None):
         super().__init__(message)
         self.status = status
+
+
+# Failures of the connection itself, as opposed to an HTTP error response.
+# HTTPError is a URLError, so callers must handle it first.
+NETWORK_ERRORS = (URLError, TimeoutError, ConnectionError, HTTPException, ssl.SSLError)
+
+
+def network_reason(error):
+    """Why a connection failed, specific enough to diagnose from a screenshot."""
+    reason = error.reason if isinstance(error, URLError) else error
+    if isinstance(reason, ssl.SSLCertVerificationError):
+        return (
+            f"TLS certificate rejected ({reason.verify_message}); "
+            "a proxy or security software may be intercepting HTTPS"
+        )
+    if isinstance(reason, socket.gaierror):
+        return f"DNS lookup failed ({reason.strerror or reason})"
+    if isinstance(reason, TimeoutError):
+        return "timed out"
+    if isinstance(reason, OSError) and reason.strerror:
+        return reason.strerror
+    return str(reason) or type(reason).__name__
+
+
+def strip_queries(text):
+    """Signed URLs carry credentials in their query string. Remove it from absolute URLs,
+    JSON-escaped ones included, and from any other `?key=value` run such as a relative path."""
+    text = re.sub(r"(https?:(?:\\?/){2}[^\s?#'\"<>]*)\?[^\s'\"<>]*", r"\1?[query-redacted]", text)
+    return re.sub(r"\?[^\s'\"<>?]*(?:=|\\u003d)[^\s'\"<>]*", "?[query-redacted]", text)
+
+
+def proxy_address(url):
+    """host:port of a proxy URL, without any credentials it contains."""
+    proxy = urlsplit(url if "://" in url else "http://" + url)
+    return f"{proxy.hostname}:{proxy.port or 80}"
 
 
 def link(document, rel):
@@ -199,9 +237,65 @@ class SafeRedirect(HTTPRedirectHandler):
         return result
 
 
+class PythonNetwork:
+    """Python's urllib, honouring proxy environment variables and system proxy settings."""
+
+    name = "Python"
+
+    def open(self, req, timeout):
+        return build_opener(SafeRedirect()).open(req, timeout=timeout)
+
+    def route(self, url):
+        target = urlsplit(url)
+        try:
+            proxy = getproxies().get(target.scheme)
+            if not proxy or proxy_bypass(target.hostname or ""):
+                return "direct"
+            return "proxy " + proxy_address(proxy)
+        except Exception as error:
+            return f"proxy settings unreadable: {error}"
+
+
 class HubClient:
-    def __init__(self, base, workspace, token):
+    def __init__(self, base, workspace, token, fallback=None):
         self.base, self.workspace, self.token = base, workspace, token
+        # Python's urllib is tried first; the fallback (the QGIS network stack in the
+        # plugin) covers proxies and certificates only QGIS is configured for. The
+        # first network that connects is preferred for all later requests.
+        self.networks = [PythonNetwork()] + ([fallback] if fallback else [])
+        # Why earlier networks failed when a later one connected, for diagnostics.
+        self.fallback_reasons = []
+
+    @property
+    def network(self):
+        return self.networks[0].name
+
+    def _open(self, new_request):
+        failures = []
+        for network in list(self.networks):
+            # A fresh request per network: urllib adds proxy credentials to the one it sends.
+            req = new_request()
+            try:
+                response = network.open(req, timeout=45)
+            except HTTPError:
+                self._prefer(network)
+                raise
+            except NETWORK_ERRORS as error:
+                failures.append(f"{network.name} ({network.route(req.full_url)}): {network_reason(error)}")
+                # Only retry requests that are safe to repeat, never a quote or an order.
+                if req.get_method() not in ("GET", "HEAD"):
+                    break
+                continue
+            self._prefer(network)
+            if failures:
+                self.fallback_reasons = failures
+            return response
+        host = urlsplit(req.full_url).hostname
+        raise HubError(f"Cannot reach EODH ({host}). {'; '.join(failures)}. Check your connection and retry.")
+
+    def _prefer(self, network):
+        self.networks.remove(network)
+        self.networks.insert(0, network)
 
     def request(self, url, method="GET", body=None, raw=False, destination=None, progress=None, probe_range=False):
         url = urljoin(self.base, url)
@@ -215,11 +309,11 @@ class HubClient:
             headers["Range"] = "bytes=0-0"
         if body is not None:
             headers["Content-Type"] = "application/json"
-        req = Request(
-            url, data=json.dumps(body).encode() if body is not None else None, headers=headers, method=method
-        )
+        payload = json.dumps(body).encode() if body is not None else None
+        # Never show query strings: signed asset URLs carry credentials there.
+        where = f"{method} {parsed.hostname}{parsed.path}"
         try:
-            with build_opener(SafeRedirect()).open(req, timeout=45) as response:
+            with self._open(lambda: Request(url, data=payload, headers=headers, method=method)) as response:
                 if probe_range:
                     # Close immediately if a server ignores Range: never consume
                     # a multi-gigabyte response just to check stream support.
@@ -239,22 +333,39 @@ class HubClient:
                 data = response.read()
                 if raw:
                     return data
-                result = json.loads(data) if data else {}
+                try:
+                    result = json.loads(data) if data else {}
+                except ValueError:
+                    kind = response.headers.get("Content-Type") or "no content type"
+                    raise HubError(
+                        f"EODH sent an unreadable response to {where} ({kind}, {len(data)} bytes: "
+                        f"{self._excerpt(data)}). A proxy or captive portal may have replaced it."
+                    ) from None
                 if isinstance(result, dict):
                     result.setdefault("_url", response.url)
                 return result
         except HTTPError as error:
             if error.code in (401, 403):
                 raise HubError(
-                    "Access denied. Check the workspace name and use a current Workspace API key (not the Token ID).",
+                    f"Access denied (HTTP {error.code} for {where}). Check the workspace name and use a "
+                    "current Workspace API key (not the Token ID).",
                     error.code,
                 ) from None
-            detail = error.read(4096).decode("utf-8", errors="replace").replace(self.token, "[redacted]")
+            detail = self._excerpt(error.read(4096))
             if "credential" in detail.lower() or "linked" in detail.lower():
                 detail = "Link your provider account in EODH Workspace settings. " + detail
-            raise HubError(f"EODH request failed ({error.code}). {detail}", error.code) from None
-        except (URLError, TimeoutError) as error:
-            raise HubError("Cannot reach EODH. Check your connection and retry.") from error
+            raise HubError(f"EODH request failed (HTTP {error.code} for {where}). {detail}", error.code) from None
+        except NETWORK_ERRORS as error:
+            raise HubError(
+                f"Lost the connection to EODH during {where} via {self.network}: {network_reason(error)}. "
+                "Check your connection and retry."
+            ) from error
+
+    def _excerpt(self, data):
+        """Readable start of a response body: tags dropped, whitespace collapsed, token redacted."""
+        text = re.sub(r"<[^>]*>", " ", data.decode("utf-8", errors="replace"))
+        text = strip_queries(" ".join(text.split()).replace(self.token, "[redacted]"))
+        return text[:300] + ("…" if len(text) > 300 else "")
 
     def validate(self):
         return self.request(f"/api/catalogue/stac/catalogs/user/catalogs/{quote(self.workspace, safe='')}")

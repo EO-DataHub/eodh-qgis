@@ -2,12 +2,14 @@
 
 import io
 import json
+import socket
+import ssl
 from unittest.mock import MagicMock, Mock, patch
 from urllib.error import HTTPError, URLError
 
 import pytest
 
-from eodh_qgis.api.hub import HubClient, HubError
+from eodh_qgis.api.hub import HubClient, HubError, strip_queries
 
 
 @pytest.fixture
@@ -80,6 +82,139 @@ def test_connection_errors_are_actionable(client, error):
         opener.return_value.open.side_effect = error
         with pytest.raises(HubError, match="Check your connection and retry"):
             client.request("/data")
+
+
+def certificate_error():
+    error = ssl.SSLCertVerificationError(1, "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed")
+    error.verify_message = "unable to get local issuer certificate"
+    return error
+
+
+@pytest.mark.parametrize(
+    ("reason", "expected"),
+    [
+        (ConnectionRefusedError(61, "Connection refused"), "Connection refused"),
+        (OSError("Tunnel connection failed: 407 Proxy Authentication Required"), "407 Proxy Authentication Required"),
+        (socket.gaierror(8, "nodename nor servname provided"), "DNS lookup failed (nodename nor servname provided)"),
+        (certificate_error(), "TLS certificate rejected (unable to get local issuer certificate)"),
+    ],
+)
+def test_connection_failures_name_the_cause_and_proxy(client, monkeypatch, reason, expected):
+    monkeypatch.setenv("HTTPS_PROXY", "http://user:secret@proxy.example:3128")
+    monkeypatch.delenv("NO_PROXY", raising=False)
+    monkeypatch.delenv("no_proxy", raising=False)
+    with patch("eodh_qgis.api.hub.build_opener") as opener:
+        opener.return_value.open.side_effect = URLError(reason)
+        with pytest.raises(HubError) as raised:
+            client.request("/data")
+    message = str(raised.value)
+    assert message.startswith("Cannot reach EODH (hub.test). Python (proxy proxy.example:3128): ")
+    assert expected in message
+    assert "secret" not in message
+
+
+class FakeNetwork:
+    name = "QGIS network"
+
+    def __init__(self, response=None, error=None):
+        self.response, self.error, self.calls, self.requests = response, error, [], []
+
+    def route(self, url):
+        return "system proxy"
+
+    def open(self, req, timeout):
+        self.calls.append(req.get_method())
+        self.requests.append(req)
+        if self.error:
+            raise self.error
+        return self.response
+
+
+def test_fallback_network_connects_and_is_preferred_afterwards():
+    fallback = FakeNetwork(make_response(b'{"id":"via-qgis"}'))
+    client = HubClient("https://hub.test", "workspace", "private-test-token", fallback=fallback)
+    with patch("eodh_qgis.api.hub.build_opener") as opener:
+        opener.return_value.open.side_effect = URLError(ConnectionRefusedError(61, "Connection refused"))
+        assert client.request("/data")["id"] == "via-qgis"
+        assert client.network == "QGIS network"
+        assert client.fallback_reasons == ["Python (direct): Connection refused"]
+        fallback.response = make_response(b'{"id":"again"}')
+        assert client.request("/data")["id"] == "again"
+        assert opener.return_value.open.call_count == 1
+
+
+def test_every_failed_network_is_named_and_orders_are_never_resent():
+    fallback = FakeNetwork(error=URLError("Proxy authentication required"))
+    client = HubClient("https://hub.test", "workspace", "private-test-token", fallback=fallback)
+    with patch("eodh_qgis.api.hub.build_opener") as opener:
+        opener.return_value.open.side_effect = URLError(TimeoutError())
+        with pytest.raises(HubError) as raised:
+            client.request("/data")
+        assert str(raised.value) == (
+            "Cannot reach EODH (hub.test). Python (direct): timed out; "
+            "QGIS network (system proxy): Proxy authentication required. Check your connection and retry."
+        )
+        with pytest.raises(HubError, match=r"Python \(direct\): timed out\. Check"):
+            client.request("/order", "POST", {"confirm": True})
+    assert fallback.calls == ["GET"]
+
+
+def test_proxy_credentials_never_reach_the_fallback_network(monkeypatch):
+    # urllib adds Proxy-Authorization to the request it sends through a proxy.
+    for name in ("https_proxy", "NO_PROXY", "no_proxy"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("HTTPS_PROXY", "http://user:proxy-secret@127.0.0.1:9")
+    fallback = FakeNetwork(make_response(b"{}"))
+    client = HubClient("https://hub.test", "workspace", "private-test-token", fallback=fallback)
+    client.request("/data")
+    assert client.fallback_reasons == ["Python (proxy 127.0.0.1:9): Connection refused"]
+    sent = fallback.requests[0]
+    assert sent.get_header("Proxy-authorization") is None
+    assert sent.get_header("Authorization") == "Bearer private-test-token"
+
+
+def test_unreadable_response_shows_what_arrived(client):
+    page = b"<html><body><h1>Sign in to the corporate proxy</h1></body></html>"
+    with patch("eodh_qgis.api.hub.build_opener") as opener:
+        response = make_response(page)
+        response.headers["Content-Type"] = "text/html"
+        opener.return_value.open.return_value = response
+        with pytest.raises(HubError) as raised:
+            client.request("/api/catalogue/stac/")
+    assert str(raised.value) == (
+        f"EODH sent an unreadable response to GET hub.test/api/catalogue/stac/ (text/html, {len(page)} bytes: "
+        "Sign in to the corporate proxy). A proxy or captive portal may have replaced it."
+    )
+
+
+def test_http_errors_name_the_request_without_its_query(client):
+    with patch("eodh_qgis.api.hub.build_opener") as opener:
+        opener.return_value.open.side_effect = HTTPError(
+            "https://hub.test/data",
+            502,
+            "Bad Gateway",
+            {},
+            io.BytesIO(
+                b"<h1>Upstream unavailable</h1> for https://bucket.test/a.tif?X-Amz-Signature=echoed, "
+                b"https://bucket.test/d.tif?X-Amz-Signature\\u003dencoded, "
+                b'{"href": "https:\\/\\/bucket.test\\/b.tif?X-Amz-Signature=escaped", "path": "/c.tif?sig=relative"}'
+            ),
+        )
+        with pytest.raises(HubError) as raised:
+            client.request("/data?X-Amz-Signature=signed-secret")
+    assert str(raised.value) == (
+        "EODH request failed (HTTP 502 for GET hub.test/data). "
+        "Upstream unavailable for https://bucket.test/a.tif?[query-redacted] "
+        "https://bucket.test/d.tif?[query-redacted] "
+        '{"href": "https:\\/\\/bucket.test\\/b.tif?[query-redacted]", "path": "/c.tif?[query-redacted]"}'
+    )
+
+
+def test_query_redaction_is_unchanged_when_applied_again():
+    # Debug info redacts messages that were already redacted when recorded.
+    once = strip_queries("https://bucket.test/a.tif?sig=secret and /b.tif?x=1")
+    assert once == "https://bucket.test/a.tif?[query-redacted] and /b.tif?[query-redacted]"
+    assert strip_queries(once) == once
 
 
 def test_validation_encodes_workspace_name(client):
