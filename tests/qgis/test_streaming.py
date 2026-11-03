@@ -253,3 +253,29 @@ def test_reconnect_skips_streams_that_this_gdal_cannot_authenticate(monkeypatch)
     source = layer.source()
     reconnect_streams(client, [layer])
     assert layer.source() == source
+
+
+def test_unsupported_and_unreadable_assets_say_why(tmp_path):
+    with pytest.raises(HubError) as raised:
+        load_asset(Mock(), "https://example.test/scene.zip", {"type": "application/zip"}, "zip")
+    assert str(raised.value) == (
+        "This asset format is not supported (application/zip). Supported formats: COG, GeoTIFF and NetCDF."
+    )
+    # A sign-in page saved in place of the raster, as a proxy might return.
+    page = tmp_path / "download.tif"
+    page.write_text("<html>Sign in to continue</html>")
+    with pytest.raises(HubError) as raised:
+        raster_layer(str(page), "scene_visual", {})
+    assert str(raised.value) == (
+        "QGIS could not open the raster: `scene_visual' not recognized as being in a supported file format."
+    )
+    client = Mock()
+    client.request.side_effect = lambda url, destination, progress: Path(destination).write_text(
+        "<html>Sign in</html>"
+    )
+    with pytest.raises(HubError) as raised:
+        load_asset(client, "https://example.test/sst.nc", {"type": "application/netcdf"}, "sst", download=True)
+    assert re.fullmatch(
+        r"No valid raster layers could be created from the downloaded NetCDF file \(0\.0 MB\): .*sst.*",
+        str(raised.value),
+    )
