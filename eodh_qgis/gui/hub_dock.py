@@ -31,6 +31,7 @@ from eodh_qgis.api.hub import (
     validate_bbox,
 )
 from eodh_qgis.api.presentation import bbox2d, overlap, parsed_date, quick_view, thumbnail_asset
+from eodh_qgis.api.qgis_network import QgisNetwork
 
 from .hub_cards import CardList, ResultCard, Timeline, WorkspaceCard, busy_bar, hyperlink, text_label
 from .hub_login import LoginPage
@@ -213,7 +214,7 @@ class HubDock(QtWidgets.QDockWidget):
         if not key:
             self.login.set_error("Please enter your workspace API key (not the Token ID).")
             return
-        client = HubClient(ENVIRONMENTS["Production"], workspace, key)
+        client = HubClient(ENVIRONMENTS["Production"], workspace, key, fallback=QgisNetwork())
         self.login.set_error("")
         self.login.set_loading(True)
 
