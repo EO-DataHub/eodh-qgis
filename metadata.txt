@@ -7,7 +7,7 @@ name=EODH Workflows
 qgisMinimumVersion=3.0.0
 qgisMaximumVersion=4.99
 description=Search, filter, preview, and load datasets from the UK EO Data Hub
-version=0.2.9
+version=0.2.10
 author=Oxidian
 email=daniel@oxidian.com
 
@@ -21,7 +21,7 @@ repository=https://github.com/EO-DataHub/eodh-qgis
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-changelog=0.2.9: Replace the workflow dialog with a unified EODH catalogue dock aligned with the ArcGIS plugin, including timeline, workspace cards and commercial purchase flow. Stream remote rasters with range reads and fall back to full downloads when streaming is unavailable or unsuitable. Authenticate delivered assets on the selected workspace storage host. Support QGIS 3 and QGIS 4. Remove QPIP and truststore runtime dependencies.
+changelog=0.2.10: Fall back to full downloads when QGIS uses GDAL older than 3.6, instead of failing to load COG and GeoTIFF assets. Retry requests through the QGIS network stack when Python cannot connect, honouring QGIS and system proxy and certificate settings. Show the cause of connection, HTTP and loading errors. Add Debug info with versions, network diagnostics and recent errors.
 
 # Tags are comma separated with spaces allowed
 tags=climate, Earth observation
