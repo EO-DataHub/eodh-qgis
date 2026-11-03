@@ -245,10 +245,10 @@ def test_thumbnail_failure_is_logged_without_secrets_and_remaining_images_load(
     assert not dock.result_cards[1].thumbnail.pixmap().isNull()
     assert not dock.timeline.images[1].icon().isNull()
     assert not dock.tasks
-    log.assert_called_once_with(
-        "Could not load thumbnail for result 1. The result remains available.",
-        "EODH",
-        Qgis.MessageLevel.Warning,
-        notifyUser=False,
-    )
+    log.assert_called_once()
+    message = log.call_args.args[0]
+    assert message.startswith("Could not load thumbnail for result 1: ")
+    assert "https://example.test/thumbnail?[query-redacted]" in message
+    assert message.endswith(". The result remains available.")
+    assert log.call_args.args[1:] == ("EODH", Qgis.MessageLevel.Warning)
     assert "private-secret" not in str(log.call_args)

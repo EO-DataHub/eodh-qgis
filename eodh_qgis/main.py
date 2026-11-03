@@ -8,6 +8,7 @@ try:
 except ImportError:
     from qgis.PyQt.QtWidgets import QAction
 
+from . import diagnostics
 from .gui.hub_dock import HubDock
 
 MENU_NAME = "&EODH"
@@ -135,6 +136,7 @@ class EodhQgis:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
+        diagnostics.install()
         icon_path = os.path.join(self.plugin_dir, "brand", "eodh-mark.png")
         self.add_action(
             icon_path,
@@ -156,6 +158,7 @@ class EodhQgis:
         for action in self.actions:
             self.iface.removePluginWebMenu(self.menu, action)
             self.iface.removeToolBarIcon(action)
+        diagnostics.uninstall()
 
     def run(self):
         """Run method that performs all the real work"""

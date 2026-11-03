@@ -5,11 +5,13 @@ from urllib.parse import quote
 
 from qgis.PyQt import QtCore, QtGui, QtWidgets
 
+from eodh_qgis import diagnostics
+
 from .hub_widgets import label
 
 
 class LoginPage(QtWidgets.QWidget):
-    def __init__(self, connect):
+    def __init__(self, connect, debug=None):
         super().__init__()
         self.setObjectName("eodhLogin")
         self.setStyleSheet(
@@ -110,6 +112,13 @@ class LoginPage(QtWidgets.QWidget):
         layout.addSpacing(2)
         self.credentials = self.link_label("Open credentials for this EODH workspace")
         layout.addWidget(self.credentials)
+        layout.addSpacing(2)
+        self.debug = self.link_label("Copy diagnostics for a support request")
+        self.debug.setOpenExternalLinks(False)
+        self.debug.setText(self.link_html("debug-info", "\uebe8", "Debug info"))
+        if debug:
+            self.debug.linkActivated.connect(lambda _link: debug())
+        layout.addWidget(self.debug)
         layout.addSpacing(16)
         self.error = label("")
         self.error.setObjectName("loginError")
@@ -133,6 +142,13 @@ class LoginPage(QtWidgets.QWidget):
         self.progress.setTextVisible(False)
         self.progress.hide()
         layout.addWidget(self.progress)
+        layout.addSpacing(16)
+        # Versions belong in every screenshot of a login problem.
+        self.versions = label(diagnostics.environment_line())
+        self.versions.setObjectName("loginHint")
+        self.versions.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.versions.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
+        layout.addWidget(self.versions)
         self.loading = False
         self.workspace.textChanged.connect(self.workspace_changed)
         self.workspace.returnPressed.connect(connect)
