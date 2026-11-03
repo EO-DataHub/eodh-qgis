@@ -5,8 +5,6 @@ from urllib.parse import quote
 
 from qgis.PyQt import QtCore, QtGui, QtWidgets
 
-from eodh_qgis import diagnostics
-
 from .hub_widgets import label
 
 
@@ -142,13 +140,6 @@ class LoginPage(QtWidgets.QWidget):
         self.progress.setTextVisible(False)
         self.progress.hide()
         layout.addWidget(self.progress)
-        layout.addSpacing(16)
-        # Versions belong in every screenshot of a login problem.
-        self.versions = label(diagnostics.environment_line())
-        self.versions.setObjectName("loginHint")
-        self.versions.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.versions.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextSelectableByMouse)
-        layout.addWidget(self.versions)
         self.loading = False
         self.workspace.textChanged.connect(self.workspace_changed)
         self.workspace.returnPressed.connect(connect)

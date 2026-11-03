@@ -67,13 +67,14 @@ def test_unexpected_error_shows_type_and_location_and_debug_info_keeps_its_trace
     assert QtWidgets.QApplication.clipboard().text() == report
 
 
-def test_login_page_shows_versions_and_opens_debug_info(dock_factory, local_probes):
+def test_login_page_debug_info_link_shows_versions(dock_factory, local_probes):
     dock = dock_factory()
-    assert dock.login.versions.text().startswith(f"EODH plugin {VERSION} · QGIS {Qgis.version()}")
     dock.login.debug.linkActivated.emit("debug-info")
     assert dock.debug_dialog.isVisible()
     wait_for_tasks(dock)
-    assert re.search(r"Signed in\s+: no", dock.debug_dialog.text.toPlainText())
+    report = dock.debug_dialog.text.toPlainText()
+    assert f"EODH plugin {VERSION} · QGIS {Qgis.version()}" in report
+    assert re.search(r"Signed in\s+: no", report)
 
 
 def test_uncaught_plugin_errors_are_kept_until_debug_info_is_opened(iface, monkeypatch):
