@@ -1,4 +1,4 @@
-ARG QGIS_IMAGE=qgis/qgis:4.2-trixie
+ARG QGIS_IMAGE=qgis/qgis:4.2-trixie@sha256:2752326202b7df66387c2073c39d6d6a1e8f59418b199a11b88276089dc355a8
 FROM ${QGIS_IMAGE}
 
 RUN apt-get update && \
